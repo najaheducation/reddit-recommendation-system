@@ -1,16 +1,16 @@
 import { Flex, Image, useColorMode, useColorModeValue } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+// import { useAuthState } from "react-firebase-hooks/auth";
 
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  Timestamp,
-} from "firebase/firestore";
+// import {
+//   doc,
+//   getDoc,
+//   serverTimestamp,
+//   setDoc,
+//   Timestamp,
+// } from "firebase/firestore";
 import { defaultMenuItem } from "../atoms/directoryMenuAtom";
-import { auth, firestore } from "../firebase/clientApp";
+// import { auth, firestore } from "../firebase/clientApp";
 import useDirectory from "../hooks/useDirectory";
 import Directory from "./Directory/Directory";
 import RightContent from "./RightContent/RightContent";
@@ -23,11 +23,11 @@ interface RedditUserDocument {
   userEmail?: string;
   userImage: string;
   redditImage: string;
-  timestamp: Timestamp;
+  timestamp: any; // Timestamp;
 }
 
 const Navbar: React.FC = () => {
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = [null as any, false, null as any]; // useAuthState(auth);
   const [redditUserImage, setRedditUserImage] = useState("");
   const [userCreates, setUserCreate] = useState<boolean>(false);
   const { onSelectMenuItem } = useDirectory();
@@ -35,34 +35,11 @@ const Navbar: React.FC = () => {
   const bg = useColorModeValue("white", "blackAlpha.800");
 
   const getUserData = async () => {
-    if (user) {
-      try {
-        const docRef = doc(firestore, "redditUser", user?.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          console.log("User Already Created");
-          setUserCreate(false);
-        } else {
-          setUserCreate(true);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else return;
+    // Firebase-backed navbar user data commented out for static demo mode.
   };
 
   const userCreate = async (session: any) => {
-    const document: RedditUserDocument = {
-      userId: user?.uid,
-      userName: user?.displayName || "",
-      userEmail: user?.email?.toString(),
-      userImage: user?.photoURL || "",
-      redditImage: redditUserImage,
-      timestamp: serverTimestamp() as Timestamp,
-    };
-    const userDocRef = doc(firestore, "redditUser", session?.uid);
-    await setDoc(userDocRef, document);
+    // Firebase-backed navbar user creation commented out for static demo mode.
   };
 
   useEffect(() => {
@@ -75,7 +52,7 @@ const Navbar: React.FC = () => {
     if (userCreates) {
       userCreate(user);
     } else return;
-  }, [user, firestore, userCreates]);
+  }, [user, userCreates]);
 
   return (
     <Flex

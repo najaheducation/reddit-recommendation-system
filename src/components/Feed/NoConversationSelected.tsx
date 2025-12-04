@@ -1,9 +1,8 @@
 import { Flex, Stack, Text } from "@chakra-ui/react";
-import { User } from "firebase/auth";
 import { IoLogoReddit } from "react-icons/io5";
 
 type Props = {
-  user?: User;
+  user?: { uid?: string | null } | null;
 };
 
 function NoConversationSelected({ user }: Props) {

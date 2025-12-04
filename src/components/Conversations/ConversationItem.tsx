@@ -7,14 +7,6 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
-import {
-  collection,
-  getDocs,
-  onSnapshot,
-  orderBy,
-  query,
-} from "firebase/firestore";
 import { motion } from "framer-motion";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -24,17 +16,14 @@ import { FaReddit } from "react-icons/fa";
 import { ImUsers } from "react-icons/im";
 
 import { Community } from "../../atoms/CommunitiesAtom";
-import { firestore } from "../../firebase/clientApp";
-import { MessageBody } from "../Feed/Messages";
 
 type Props = {
   user: Community;
 };
 
 function ConversationItem({ user }: Props) {
-  const [userCommunities, SetUserCommunities] = useState<Community>();
+  const [userCommunities, SetUserCommunities] = useState<Community>(user);
   const [decryptMessage, setDecryptedMessage] = useState("");
-  const [lastSeenMessages, setLastSeenMessages] = useState<MessageBody[]>([]);
   const router = useRouter();
   const {
     query: { userInCommunities },
@@ -43,66 +32,13 @@ function ConversationItem({ user }: Props) {
   const bg = useColorModeValue("gray.300", "whiteAlpha.200");
   const textBg = useColorModeValue("gray.500", "whiteAlpha.700");
 
-  const getChatUser = async (userId: any) => {
-    if (userId) {
-      try {
-        const chatUserQuery = query(collection(firestore, `communities`));
-        const chatUserDoc = await getDocs(chatUserQuery);
-        const chat = chatUserDoc.docs.map((doc: any) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        const filterCommunities = chat.find((doc) => doc.id === userId);
-        SetUserCommunities(filterCommunities);
-      } catch (error: any) {
-        console.log(error.message);
-      }
-    } else return;
-  };
-
-  useEffect(
-    () =>
-      onSnapshot(
-        query(
-          collection(
-            firestore,
-            `communities/${userCommunities?.id}/conversation`
-          ),
-          orderBy("sendedAt", "desc")
-        ),
-        (snapshot) => {
-          const chat = snapshot.docs.map((doc: any) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setLastSeenMessages(chat);
-        }
-      ),
-    [firestore, userCommunities?.id]
-  );
+  useEffect(() => {
+    SetUserCommunities(user);
+  }, [user]);
 
   useEffect(() => {
-    getChatUser(user.id);
-  }, [user, firestore]);
-
-  useEffect(() => {
-    const decryptArr = [];
-    try {
-      for (let index = 0; index < lastSeenMessages.length; index++) {
-        const pushArr = lastSeenMessages[index].messageBody;
-
-        const bytes = CryptoJS.AES.decrypt(
-          pushArr.toString(),
-          process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-        );
-        const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        decryptArr.push(data);
-      }
-      setDecryptedMessage(decryptArr[0]);
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  }, [userCommunities?.id, lastSeenMessages]);
+    setDecryptedMessage("");
+  }, [userCommunities?.id]);
 
   return (
     <motion.div

@@ -1,11 +1,11 @@
 import { Button, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+// import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
+// import { auth } from "../../../firebase/clientApp";
+// import { FIREBASE_ERRORS } from "../../../firebase/errors";
 
 type LoginProps = {};
 
@@ -20,12 +20,12 @@ const Login: React.FC<LoginProps> = () => {
   const focusedInputBg = useColorModeValue("white", "#2D3748");
   const placeholderColor = useColorModeValue("gray.500", "#CBD5E0");
 
-  const [signInWithEmailAndPassword, user, loading, error] =
-    useSignInWithEmailAndPassword(auth);
+  // const [signInWithEmailAndPassword, user, loading, error] =
+  //   useSignInWithEmailAndPassword(auth);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    signInWithEmailAndPassword(loginForm.email, loginForm.password);
+    // signInWithEmailAndPassword(loginForm.email, loginForm.password);
   };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,16 +82,16 @@ const Login: React.FC<LoginProps> = () => {
         }}
         bg={inputBg}
       />
-      <Text textAlign="center" color="red" fontSize="10pt">
+      {/* <Text textAlign="center" color="red" fontSize="10pt">
         {FIREBASE_ERRORS[error?.message as keyof typeof FIREBASE_ERRORS]}
-      </Text>
+      </Text> */}
       <Button
         width="100%"
         height="36px"
         mt={2}
         mb={2}
         type="submit"
-        isLoading={loading}
+        // isLoading={loading}
       >
         Log In
       </Button>

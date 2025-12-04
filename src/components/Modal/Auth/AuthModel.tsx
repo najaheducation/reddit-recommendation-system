@@ -12,10 +12,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+// import { useAuthState } from "react-firebase-hooks/auth";
 import { useRecoilState } from "recoil";
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
+// import { auth } from "../../../firebase/clientApp";
 import AuthInput from "./AuthInput";
 import OAuthButtons from "./OAuthButtons";
 import ResetPassword from "./ResetPassword";
@@ -23,7 +23,7 @@ import ResetPassword from "./ResetPassword";
 const AuthModel: React.FC = () => {
   //const { isOpen, onOpen, onClose } = useDisclosure();
   const [modelState, setModelState] = useRecoilState(authModelState);
-  const [user, loading, error] = useAuthState(auth);
+  // const [user, loading, error] = useAuthState(auth);
 
   const handleClose = () => {
     setModelState((prev) => ({
@@ -33,9 +33,9 @@ const AuthModel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user) handleClose();
+    // if (user) handleClose();
     //console.log(user, "🔥🔥");
-  }, [user]);
+  }, []);
 
   return (
     <>

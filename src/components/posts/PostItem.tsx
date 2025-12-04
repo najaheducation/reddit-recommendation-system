@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
 import moment from "moment";
@@ -66,6 +67,7 @@ const PostItem: React.FC<PostItemProps> = ({
   });
   const singlePostPage = !onSelectPost;
   const router = useRouter();
+  const toast = useToast();
 
   // Thames
   const bg = useColorModeValue("white", "#1A202C");
@@ -99,36 +101,95 @@ const PostItem: React.FC<PostItemProps> = ({
     setLoadingDelete(false);
   };
 
-  useEffect(() => {
-    const arr = [];
-    const arrName: string[] = [];
+  /**
+   * Handles share button click using Web Share API or fallback to clipboard.
+   * Shares the post URL with title and description.
+   */
+  const handleShare = async (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    event.stopPropagation();
 
-    if (post.body) {
-      arr.push(post.title, post.body, post.creatorDisplayName, post.imageURL);
-      arrName.push("title", "body", "creatorDisplayName", "imageURL");
-    } else {
-      arr.push(post.title, post.creatorDisplayName, post.imageURL);
-      arrName.push("title", "creatorDisplayName", "imageURL");
-    }
+    const postUrl = `${window.location.origin}/r/${post.communityId}/comments/${post.id}`;
+    const shareData = {
+      title: decryptedData.title || "Reddit Post",
+      text: decryptedData.body || "Check out this post on Reddit Clone",
+      url: postUrl,
+    };
 
     try {
-      for (let index = 0; index < arr.length; index++) {
-        if (arr[index]) {
-          const bytes = CryptoJS.AES.decrypt(
-            arr[index]!,
-            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-          );
-          const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-          setDecryptedData((prev) => ({
-            ...prev,
-            [arrName[index]]: data,
-          }));
-        } else return;
+      // Use Web Share API if available (mobile devices, modern browsers)
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        // Fallback: Copy URL to clipboard
+        await navigator.clipboard.writeText(postUrl);
+        toast({
+          title: "Link copied to clipboard",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // User cancelled or error occurred
+      if (error.name !== "AbortError") {
+        // Try clipboard as final fallback
+        try {
+          await navigator.clipboard.writeText(postUrl);
+          toast({
+            title: "Link copied to clipboard",
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+          });
+        } catch (clipboardError) {
+          toast({
+            title: "Failed to share",
+            description: "Please copy the link manually",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      }
     }
+  };
+
+  useEffect(() => {
+    const initialData = {
+      title: post.title,
+      body: post.body,
+      creatorDisplayName: post.creatorDisplayName,
+      imageURL: post.imageURL || "",
+    };
+
+    const decryptValue = (value?: string | null) => {
+      if (!value) return "";
+      try {
+        const bytes = CryptoJS.AES.decrypt(
+          value,
+          process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
+        );
+        const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        return data || value;
+      } catch (_err) {
+        return value;
+      }
+    };
+
+    setDecryptedData({
+      title: decryptValue(post.title),
+      body: decryptValue(post.body),
+      creatorDisplayName: decryptValue(post.creatorDisplayName),
+      imageURL: decryptValue(post.imageURL),
+    });
   }, [post]);
 
   return (
@@ -207,7 +268,11 @@ const PostItem: React.FC<PostItemProps> = ({
             )}
             <Text>
               Posted by u/{decryptedData.creatorDisplayName}{" "}
-              {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
+              {moment(
+                post.createdAt?.seconds
+                  ? new Date(post.createdAt.seconds * 1000)
+                  : new Date(post.createdAt)
+              ).fromNow()}
             </Text>
           </Stack>
           <Text fontSize="12pt" fontWeight={600}>
@@ -220,11 +285,18 @@ const PostItem: React.FC<PostItemProps> = ({
                 <Skeleton height="200px" width="100%" borderRadius={4} />
               )}
               <Image
-                src={decryptedData.imageURL}
+                src={
+                  decryptedData.imageURL?.startsWith("http")
+                    ? "/images/recCommsArt.png"
+                    : decryptedData.imageURL || "/images/recCommsArt.png"
+                }
                 maxHeight="460px"
                 alt="Post Image"
                 display={loadingImage ? "none" : "unset"}
                 onLoad={() => setLoadingImage(false)}
+                onError={() => {
+                  setLoadingImage(false);
+                }}
               />
             </Flex>
           )}
@@ -248,6 +320,7 @@ const PostItem: React.FC<PostItemProps> = ({
             borderRadius={4}
             _hover={{ bg: IconHoverBg }}
             cursor="pointer"
+            onClick={handleShare}
           >
             <Icon as={IoArrowRedoOutline} mr={2} color={IconBg} />
             <Text fontSize="9pt" color={IconBg}>

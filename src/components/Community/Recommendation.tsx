@@ -10,13 +10,13 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+// import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaReddit } from "react-icons/fa";
 
 import { Community } from "../../atoms/CommunitiesAtom";
-import { firestore } from "../../firebase/clientApp";
+// import { firestore } from "../../firebase/clientApp";
 import useCommunityData from "../../hooks/useCommunityData";
 
 const Recommendation: React.FC = () => {
@@ -29,32 +29,8 @@ const Recommendation: React.FC = () => {
 
   const getCommunityRecommendation = async () => {
     setLoading(true);
-    try {
-      const communityQuery = query(
-        collection(firestore, "communities"),
-        orderBy("numberOfMembers", "desc")
-        //limit(5)
-      );
-      const communityDocs = await getDocs(communityQuery);
-
-      if (isViewAll) {
-        const communities = communityDocs.docs
-          .slice(0, communityDocs.docs.length)
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Community[];
-        setCommunities(communities);
-      } else {
-        const communities = communityDocs.docs.slice(0, 5).map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Community[];
-        setCommunities(communities);
-      }
-    } catch (error) {
-      console.log("getCommunityRecommendation", error);
-    }
+    // Firebase-backed recommendation logic commented out for static demo mode.
+    // In demo, `communities` can be set from static data elsewhere.
     setLoading(false);
   };
 

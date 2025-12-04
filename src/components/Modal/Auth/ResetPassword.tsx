@@ -1,9 +1,7 @@
 import { Button, Flex, Icon, Input, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
 import { BsDot, BsReddit } from "react-icons/bs";
 
 /*
@@ -16,14 +14,15 @@ const ResetPassword: React.FC = () => {
   const setAuthModalState = useSetRecoilState(authModelState);
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
-  const [sendPasswordResetEmail, sending, error] =
-    useSendPasswordResetEmail(auth);
+  const sending = false;
+  const error = null;
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    await sendPasswordResetEmail(email);
-    setSuccess(true);
+    if (email) {
+      setSuccess(true);
+    }
   };
 
   return (

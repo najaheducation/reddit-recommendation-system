@@ -8,25 +8,25 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
-import { User } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  increment,
-  orderBy,
-  query,
-  serverTimestamp,
-  Timestamp,
-  where,
-  writeBatch,
-} from "firebase/firestore";
+// import { User } from "firebase/auth";
+// import {
+//   collection,
+//   doc,
+//   getDoc,
+//   getDocs,
+//   increment,
+//   orderBy,
+//   query,
+//   serverTimestamp,
+//   Timestamp,
+//   where,
+//   writeBatch,
+// } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
 
 import { Post, postState } from "../../../atoms/PostAtom";
-import { firestore } from "../../../firebase/clientApp";
+// import { firestore } from "../../../firebase/clientApp";
 import CommentInput from "./CommentInput";
 import CommentItem, { Comment } from "./CommentItem";
 
@@ -40,7 +40,7 @@ interface RedditUserDocument {
 }
 
 type CommentsProps = {
-  user: User;
+  user: any; // User;
   selectedPost: Post | null;
   communityId: string;
 };
@@ -123,6 +123,7 @@ const Comments: React.FC<CommentsProps> = ({
         selectedPost: {
           ...prev.selectedPost,
           numberOfComments: prev.selectedPost?.numberOfComments! + 1,
+          userCommented: true, // Mark that user has commented
         } as Post,
       }));
     } catch (error) {

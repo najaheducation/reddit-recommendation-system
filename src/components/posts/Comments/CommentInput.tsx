@@ -5,14 +5,13 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { User } from "firebase/auth";
 import React from "react";
 import AuthButtons from "../../../Navbar/RightContent/AuthButtons";
 
 type CommentInputProps = {
   commentText: string;
   setCommentText: (value: string) => void;
-  user: User;
+  user: { uid?: string | null; email?: string | null } | null;
   createLoading: boolean;
   onCreateComments: (commentText: string) => void;
 };

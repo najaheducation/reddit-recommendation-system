@@ -16,19 +16,19 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import {
-  doc,
-  runTransaction,
-  serverTimestamp,
-  Timestamp,
-} from "firebase/firestore";
+// import {
+//   doc,
+//   runTransaction,
+//   serverTimestamp,
+//   Timestamp,
+// } from "firebase/firestore";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+// import { useAuthState } from "react-firebase-hooks/auth";
 import { BsFillEyeFill, BsFillPersonFill } from "react-icons/bs";
 import { HiLockClosed } from "react-icons/hi";
 
-import { auth, firestore } from "../../../firebase/clientApp";
+// import { auth, firestore } from "../../../firebase/clientApp";
 import useDirectory from "../../../hooks/useDirectory";
 
 type CreateCommunityModelProps = {
@@ -40,7 +40,7 @@ const CreateCommunityModel: React.FC<CreateCommunityModelProps> = ({
   open,
   handleClose,
 }) => {
-  const [user] = useAuthState(auth);
+  // const [user] = useAuthState(auth);
   const [CommunitiesName, setCommunities] = useState("");
   const [charsRemaining, setCharsRemaining] = useState(21);
   const [communityType, setCommunityType] = useState("");
@@ -75,71 +75,71 @@ const CreateCommunityModel: React.FC<CreateCommunityModelProps> = ({
       );
     }
 
-    setLoading(true);
-
-    try {
-      const communityDocRef = doc(firestore, "communities", CommunitiesName);
-
-      await runTransaction(firestore, async (transaction) => {
-        const communityDoc = await transaction.get(communityDocRef);
-        if (communityDoc.exists()) {
-          throw new Error(
-            `Sorry, r/${CommunitiesName} is MdTakeoutDining. Try Another`
-          );
-          return;
-        }
-
-        await transaction.set(communityDocRef, {
-          creatorId: user?.uid,
-          createdAt: serverTimestamp(),
-          numberOfMembers: 1,
-          privacyTYpe: communityType,
-        });
-
-        //update
-        updateCommunitySnippet(user?.uid!, transaction);
-
-        // create
-        transaction.set(
-          doc(
-            firestore,
-            `users/${user?.uid}/communitySnippets`,
-            CommunitiesName
-          ),
-          {
-            communityId: CommunitiesName,
-            isModerator: true,
-            updateTimeStamp: serverTimestamp() as Timestamp,
-          }
-        );
-      });
-
-      handleClose();
-      toggleMenuOpen();
-      setCommunityType("");
-      setCommunities("");
-      router.push(`r/${CommunitiesName}`);
-    } catch (error: any) {
-      console.log("HandleCreateCommunity Error", error);
-      setError(error.message);
-    }
-
-    setLoading(false);
+    // setLoading(true);
+    //
+    // try {
+    //   const communityDocRef = doc(firestore, "communities", CommunitiesName);
+    //
+    //   await runTransaction(firestore, async (transaction) => {
+    //     const communityDoc = await transaction.get(communityDocRef);
+    //     if (communityDoc.exists()) {
+    //       throw new Error(
+    //         `Sorry, r/${CommunitiesName} is MdTakeoutDining. Try Another`
+    //       );
+    //       return;
+    //     }
+    //
+    //     await transaction.set(communityDocRef, {
+    //       creatorId: user?.uid,
+    //       createdAt: serverTimestamp(),
+    //       numberOfMembers: 1,
+    //       privacyTYpe: communityType,
+    //     });
+    //
+    //     //update
+    //     updateCommunitySnippet(user?.uid!, transaction);
+    //
+    //     // create
+    //     transaction.set(
+    //       doc(
+    //         firestore,
+    //         `users/${user?.uid}/communitySnippets`,
+    //         CommunitiesName
+    //       ),
+    //       {
+    //         communityId: CommunitiesName,
+    //         isModerator: true,
+    //         updateTimeStamp: serverTimestamp() as Timestamp,
+    //       }
+    //     );
+    //   });
+    //
+    //   handleClose();
+    //   toggleMenuOpen();
+    //   setCommunityType("");
+    //   setCommunities("");
+    //   router.push(`r/${CommunitiesName}`);
+    // } catch (error: any) {
+    //   console.log("HandleCreateCommunity Error", error);
+    //   setError(error.message);
+    // }
+    //
+    // setLoading(false);
     //setError("")
   };
 
   const updateCommunitySnippet = async (userId: string, transaction: any) => {
-    if (!userId) return;
-
-    const communityUpdateDocRef = doc(
-      firestore,
-      `communities/${CommunitiesName}/userInCommunity/${userId}`
-    );
-
-    await transaction.set(communityUpdateDocRef, {
-      userId: userId,
-      userEmail: user?.email,
-    });
+    // if (!userId) return;
+    //
+    // const communityUpdateDocRef = doc(
+    //   firestore,
+    //   `communities/${CommunitiesName}/userInCommunity/${userId}`
+    // );
+    //
+    // await transaction.set(communityUpdateDocRef, {
+    //   userId: userId,
+    //   userEmail: user?.email,
+    // });
   };
 
   return (

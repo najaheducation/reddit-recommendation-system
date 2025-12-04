@@ -9,12 +9,10 @@ import {
 import React, { useState } from "react";
 import { FaReddit } from "react-icons/fa";
 
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/clientApp";
 import CreateCommunityModel from "../Modal/CreateCommunity/CreateCommunityModel";
 
 const PersonalHome: React.FC = () => {
-  const [user] = useAuthState(auth);
+  const user = null;
   const [open, setOpen] = useState(false);
   const bg = useColorModeValue("white", "#1A202C");
   const borderColor = useColorModeValue("gray.300", "#2D3748");

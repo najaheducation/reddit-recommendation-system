@@ -1,15 +1,5 @@
 import { Flex, Stack } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-} from "firebase/firestore";
 import { useEffect, useState } from "react";
-
-import { firestore } from "../../firebase/clientApp";
 import SkeletonLoader from "../common/SkeletonLoader";
 import MessageItems from "./MessageItems";
 
@@ -21,43 +11,22 @@ export interface MessageBody {
   senderName: string;
   senderEmail: any;
   messageBody: string;
-  sendedAt: Timestamp;
+  sendedAt: string;
 }
 
 type Props = {
   conversationId: string;
-  user: User;
+  user: { uid?: string | null } | null;
 };
 
 function Messages({ conversationId, user }: Props) {
   const [messageDetails, setMessageDetails] = useState<MessageBody[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(
-    () =>
-      onSnapshot(
-        query(
-          collection(firestore, `communities/${conversationId}/conversation`),
-          orderBy("sendedAt", "desc")
-        ),
-        (snapshot) => {
-          const chat = snapshot.docs.map((doc: any) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setMessageDetails(chat);
-        }
-      ),
-    [firestore, conversationId]
-  );
-
   useEffect(() => {
-    setTimeout(() => {
-      if (user) {
-        setLoading(true);
-      }
-    }, 2000);
-  });
+    setMessageDetails([]);
+    setLoading(false);
+  }, [conversationId, user]);
 
   return (
     <Flex direction="column" justify="flex-end" overflow="hidden">

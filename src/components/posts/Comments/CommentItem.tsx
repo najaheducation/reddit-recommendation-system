@@ -8,7 +8,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
-import { Timestamp } from "firebase/firestore";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,7 +24,7 @@ export type Comment = {
   postId: string;
   postTitle: string;
   text: string;
-  createdAt: Timestamp;
+  createdAt: { seconds: number };
 };
 
 type CommentItemProps = {

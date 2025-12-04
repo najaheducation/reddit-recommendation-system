@@ -8,8 +8,9 @@ function NoPost({}: Props) {
     <Flex justify="center" pt="50px">
       <Stack spacing={5}>
         <Image
-          src="https://drive.google.com/uc?export=download&id=1oS2QPa8ex6ufQvTG3mZ51Gm-LSWSb2SQ"
+          src="/images/not-found-512.webp"
           height="200px"
+          alt="No Post"
         />
         <Text
           fontSize="20pt"

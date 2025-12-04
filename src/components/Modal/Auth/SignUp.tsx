@@ -1,13 +1,13 @@
 import { Button, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+// import { User } from "firebase/auth";
+// import { addDoc, collection } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth, firestore } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
+// import { auth, firestore } from "../../../firebase/clientApp";
+// import { FIREBASE_ERRORS } from "../../../firebase/errors";
 
 const SignUp: React.FC = () => {
   const setAuthModelState = useSetRecoilState(authModelState);
@@ -24,8 +24,8 @@ const SignUp: React.FC = () => {
 
   //console.log(signUpForm);
 
-  const [createUserWithEmailAndPassword, userCred, loading, userError] =
-    useCreateUserWithEmailAndPassword(auth);
+  // const [createUserWithEmailAndPassword, userCred, loading, userError] =
+  //   useCreateUserWithEmailAndPassword(auth);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,7 +36,7 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
+    // createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
   };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +47,18 @@ const SignUp: React.FC = () => {
     }));
   };
 
-  const createUserDocument = async (user: User) => {
-    await addDoc(
-      collection(firestore, "users"),
-      JSON.parse(JSON.stringify(user))
-    );
+  const createUserDocument = async (user: any /* User */) => {
+    // await addDoc(
+    //   collection(firestore, "users"),
+    //   JSON.parse(JSON.stringify(user))
+    // );
   };
 
   useEffect(() => {
-    if (userCred) {
-      createUserDocument(userCred.user);
-    }
-  }, [userCred]);
+    // if (userCred) {
+    //   createUserDocument(userCred.user);
+    // }
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -129,22 +129,18 @@ const SignUp: React.FC = () => {
         }}
         bg={inputBg}
       />
-      {error ||
-        (userError && (
-          <Text textAlign="center" color="red" fontSize="10px">
-            {error ||
-              FIREBASE_ERRORS[
-                userError.message as keyof typeof FIREBASE_ERRORS
-              ]}
-          </Text>
-        ))}
+      {error && (
+        <Text textAlign="center" color="red" fontSize="10px">
+          {error}
+        </Text>
+      )}
       <Button
         width="100%"
         height="36px"
         mt={2}
         mb={2}
         type="submit"
-        isLoading={loading}
+        // isLoading={loading}
       >
         Sign Up
       </Button>

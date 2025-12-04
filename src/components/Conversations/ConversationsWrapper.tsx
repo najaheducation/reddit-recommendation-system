@@ -6,19 +6,10 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-} from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 
 import { Community } from "../../atoms/CommunitiesAtom";
-import { auth, firestore } from "../../firebase/clientApp";
 import SkeletonLoader from "../common/SkeletonLoader";
 import ConversationsList from "./ConversationsList";
 
@@ -36,7 +27,7 @@ export interface ChatUser {
   uid: string;
   photoURL: string;
   displayName: string;
-  updatedAt: Timestamp;
+  updatedAt: string;
 }
 
 type Props = {};
@@ -46,45 +37,23 @@ function ConversationsWrapper({}: Props) {
   const {
     query: { userInCommunities },
   } = router;
-  const [user] = useAuthState(auth);
+  const user = null;
   const [chatUsers, setChatUser] = useState<Community[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const bg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
 
   const getChatUser = async (userId: any) => {
-    if (userId) {
-      try {
-        const chatUserQuery = onSnapshot(
-          query(
-            collection(firestore, `users/${userId}/communitySnippets`),
-            orderBy("updateTimeStamp", "desc")
-          ),
-          (snapshot) => {
-            const chat = snapshot.docs.map((doc: any) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setChatUser(chat);
-          }
-        );
-
-        chatUserQuery;
-      } catch (error: any) {
-        console.log(error.message);
-      }
-    } else return;
+    setChatUser([]);
   };
 
   useEffect(() => {
     getChatUser(user?.uid);
-  }, [user, firestore]);
+  }, [user]);
 
   useEffect(() => {
     setTimeout(() => {
-      if (user) {
-        setLoading(false);
-      }
+      setLoading(false);
     }, 2000);
   });
 
@@ -108,8 +77,9 @@ function ConversationsWrapper({}: Props) {
             <Flex justify="center" pt="50px">
               <Stack spacing={5}>
                 <Image
-                  src="https://drive.google.com/uc?export=download&id=1oS2QPa8ex6ufQvTG3mZ51Gm-LSWSb2SQ"
+                  src="/images/not-found-512.webp"
                   height="200px"
+                  alt="No Communities"
                 />
                 <Text
                   fontSize="15pt"

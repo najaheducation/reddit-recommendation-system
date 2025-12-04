@@ -11,7 +11,6 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { signOut, User } from "firebase/auth";
 import React from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaRedditSquare } from "react-icons/fa";
@@ -22,10 +21,9 @@ import { useRouter } from "next/router";
 import { IoSparkles } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
 import { authModelState } from "../../atoms/authModalAtom";
-import { auth } from "../../firebase/clientApp";
 
 type UserMenuProps = {
-  user?: User | null;
+  user?: { uid?: string | null; displayName?: string | null; email?: string | null } | null;
 };
 
 const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
@@ -44,9 +42,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
     }
   };
 
-  const logout = async () => {
-    await signOut(auth);
-  };
+  const logout = async () => {};
 
   return (
     <Menu>

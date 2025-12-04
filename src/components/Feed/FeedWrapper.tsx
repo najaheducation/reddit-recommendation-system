@@ -1,5 +1,4 @@
 import { Flex } from "@chakra-ui/react";
-import { User } from "firebase/auth";
 import { useRouter } from "next/router";
 
 import MessageInput from "./MessageInput";
@@ -8,7 +7,7 @@ import MessagesHeader from "./MessagesHeader";
 import NoConversationSelected from "./NoConversationSelected";
 
 type Props = {
-  user: User;
+  user: { uid?: string | null } | null;
   userInCommunities: string;
   member: any;
 };

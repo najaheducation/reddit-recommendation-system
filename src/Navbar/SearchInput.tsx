@@ -8,10 +8,9 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import { User } from "firebase/auth";
 
 type SearchInputProps = {
-  user?: User | null;
+  user?: { uid?: string | null } | null;
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({ user }) => {
