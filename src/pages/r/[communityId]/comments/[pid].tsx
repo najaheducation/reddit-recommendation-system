@@ -6,7 +6,9 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 // import { useAuthState } from "react-firebase-hooks/auth";
 
+import { useRecoilValue } from "recoil";
 import { Post } from "../../../../atoms/PostAtom";
+import { userState } from "../../../../atoms/userAtom";
 import About from "../../../../components/Community/About";
 import PageContent from "../../../../components/Layout/PageContent";
 import Comments from "../../../../components/posts/Comments/Comments";
@@ -17,20 +19,26 @@ import usePosts from "../../../../hooks/usePosts";
 
 const PostPage: React.FC = () => {
   // const [user] = useAuthState(auth);
+  const user = useRecoilValue(userState);
   const router = useRouter();
   const { communityStateValue } = useCommunityData();
   const { postStateValue, setPostStateValue, onVote, onDeletePost } =
     usePosts();
 
   const fetchPost = async (postId: string) => {
-    // try {
-    //   const postDocRef = doc(firestore, "posts", postId);
-    //   const postDoc = await getDoc(postDocRef);
-    //   setPostStateValue((prev) => ({
-    //     ...prev,
-    //     selectedPost: { id: postDoc.id, ...postDoc.data() } as Post,
-    //   }));
-    // } catch (error) {}
+    try {
+      // Use mock posts for frontend-only mode
+      const { mockPosts } = await import("../../../../data/mockPosts");
+      const post = mockPosts.find((p) => p.id === postId);
+      if (post) {
+        setPostStateValue((prev) => ({
+          ...prev,
+          selectedPost: post,
+        }));
+      }
+    } catch (error) {
+      console.log("FetchPost Error", error);
+    }
   };
 
   useEffect(() => {
@@ -67,11 +75,11 @@ const PostPage: React.FC = () => {
               userIsCreator={false /* user?.uid === selectedPost?.creatorId */}
             />
           )}
-          {/* <Comments
-            user={user as User}
+          <Comments
+            user={user}
             selectedPost={postStateValue.selectedPost}
             communityId={postStateValue.selectedPost?.communityId as string}
-          /> */}
+          />
         </>
         <>
           {communityStateValue.currentCommunity && (

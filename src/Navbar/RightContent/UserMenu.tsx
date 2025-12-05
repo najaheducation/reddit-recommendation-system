@@ -20,15 +20,19 @@ import { VscAccount } from "react-icons/vsc";
 import { useRouter } from "next/router";
 import { IoSparkles } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
+import { signOut } from "firebase/auth";
 import { authModelState } from "../../atoms/authModalAtom";
+import { auth } from "../../firebase/clientApp";
+import { BasicUser, userState } from "../../atoms/userAtom";
 
 type UserMenuProps = {
-  user?: { uid?: string | null; displayName?: string | null; email?: string | null } | null;
+  user?: BasicUser | null;
 };
 
 const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
   const router = useRouter();
   const setAuthModalState = useSetRecoilState(authModelState);
+  const setUser = useSetRecoilState(userState);
   const { colorMode, toggleColorMode } = useColorMode();
 
   const handelNavigatePage = () => {
@@ -42,7 +46,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
     }
   };
 
-  const logout = async () => {};
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
+  };
 
   return (
     <Menu>

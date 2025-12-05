@@ -3,36 +3,44 @@ import { useRouter } from "next/router";
 import React from "react";
 
 type PageContentProps = {
-  children: any;
+  children: React.ReactNode | React.ReactNode[];
 };
 
 const PageContent: React.FC<PageContentProps> = ({ children }) => {
   const router = useRouter();
-  const uid = router.query;
+  const hasProfileSidebar = Boolean(router.query?.uid);
+  const [primaryContent, secondaryContent] = React.Children.toArray(children);
 
   return (
-    <Flex justify="center" p="16px 0px">
+    <Flex
+      justify="center"
+      p={{ base: "18px", md: "32px" }}
+      minH="calc(100vh - 72px)"
+      position="relative"
+      zIndex={1}
+    >
       <Flex
-        width="95%"
-        justify="center"
-        maxWidth={uid.uid ? "1160px" : "860px"}
+        width="100%"
+        maxWidth={hasProfileSidebar ? "1280px" : "1160px"}
+        gap={{ base: 4, md: 8 }}
+        align="flex-start"
       >
-        {/* Left */}
         <Flex
           direction="column"
-          width={{ base: "100%", md: "65%" }}
-          mr={{ base: 0, md: 6 }}
+          width={{ base: "100%", md: "68%" }}
+          gap={{ base: 4, md: 5 }}
         >
-          {children && children[0 as keyof typeof children]}
+          {primaryContent}
         </Flex>
 
-        {/* Right */}
         <Flex
           direction="column"
           display={{ base: "none", md: "flex" }}
           flexGrow={1}
+          gap={{ base: 4, md: 5 }}
+          maxW="360px"
         >
-          {children && children[1 as keyof typeof children]}
+          {secondaryContent}
         </Flex>
       </Flex>
     </Flex>

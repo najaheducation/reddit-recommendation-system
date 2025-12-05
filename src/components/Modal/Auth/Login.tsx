@@ -1,135 +1,130 @@
-import { Button, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
-import React, { useState } from "react";
-// import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { Flex, Link, Stack, Text, useToast } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-// import { auth } from "../../../firebase/clientApp";
-// import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import { auth } from "../../../firebase/clientApp";
+import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import InputField from "../../common/InputField";
+import PrimaryButton from "../../common/PrimaryButton";
 
-type LoginProps = {};
-
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC = () => {
+  const [signInWithEmailAndPassword, userCred, loading, hookError] =
+    useSignInWithEmailAndPassword(auth);
   const setAuthModelState = useSetRecoilState(authModelState);
-  const [loginForm, setLoginForm] = useState({
-    email: "",
-    password: "",
-  });
-  const searchBorder = useColorModeValue("blue.500", "#4A5568");
-  const inputBg = useColorModeValue("gray.50", "#4A5568");
-  const focusedInputBg = useColorModeValue("white", "#2D3748");
-  const placeholderColor = useColorModeValue("gray.500", "#CBD5E0");
+  const toast = useToast();
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
-  // const [signInWithEmailAndPassword, user, loading, error] =
-  //   useSignInWithEmailAndPassword(auth);
-
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // signInWithEmailAndPassword(loginForm.email, loginForm.password);
+    setError("");
+    try {
+      const res = await signInWithEmailAndPassword(
+        loginForm.email,
+        loginForm.password
+      );
+      if (res) {
+        setAuthModelState((prev) => ({ ...prev, open: false }));
+        toast({
+          title: "Logged in successfully",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+    } catch (err: any) {
+      const message =
+        FIREBASE_ERRORS[err?.message as keyof typeof FIREBASE_ERRORS] ||
+        err?.message ||
+        "Invalid email or password";
+      setError(message);
+      toast({
+        title: "Login failed",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // update state
-    setLoginForm((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
-  };
+  useEffect(() => {
+    if (hookError) {
+      const message =
+        FIREBASE_ERRORS[hookError?.message as keyof typeof FIREBASE_ERRORS] ||
+        hookError.message;
+      setError(message);
+    }
+  }, [hookError]);
+
+  useEffect(() => {
+    if (userCred) {
+      setAuthModelState((prev) => ({ ...prev, open: false }));
+    }
+  }, [setAuthModelState, userCred]);
 
   return (
     <form onSubmit={onSubmit}>
-      <Input
-        required
-        name="email"
-        placeholder="Email..."
-        type="email"
-        mb={2}
-        onChange={onChange}
-        fontSize="10pt"
-        _placeholder={{ color: placeholderColor }}
-        _hover={{
-          bg: focusedInputBg,
-          border: "1px solid",
-          borderColor: searchBorder,
-        }}
-        _focus={{
-          outline: "none",
-          bg: focusedInputBg,
-          border: "1px solid",
-          borderColor: searchBorder,
-        }}
-        bg={inputBg}
-      />
-      <Input
-        required
-        name="password"
-        placeholder="Password..."
-        type="password"
-        mb={2}
-        onChange={onChange}
-        fontSize="10pt"
-        _placeholder={{ color: placeholderColor }}
-        _hover={{
-          bg: focusedInputBg,
-          border: "1px solid",
-          borderColor: searchBorder,
-        }}
-        _focus={{
-          outline: "none",
-          bg: focusedInputBg,
-          border: "1px solid",
-          borderColor: searchBorder,
-        }}
-        bg={inputBg}
-      />
-      {/* <Text textAlign="center" color="red" fontSize="10pt">
-        {FIREBASE_ERRORS[error?.message as keyof typeof FIREBASE_ERRORS]}
-      </Text> */}
-      <Button
-        width="100%"
-        height="36px"
-        mt={2}
-        mb={2}
-        type="submit"
-        // isLoading={loading}
-      >
-        Log In
-      </Button>
-      <Flex justifyContent="center" mb={2}>
-        <Text fontSize="9pt" mr={1}>
-          Forgot your password?
-        </Text>
-        <Text
-          fontSize="9pt"
-          color="blue.500"
-          cursor="pointer"
-          onClick={() =>
-            setAuthModelState((prev) => ({
-              ...prev,
-              view: "resetPassword",
-            }))
-          }
+      <Stack spacing={5}>
+        <InputField
+          id="email"
+          label="Email"
+          type="email"
+          value={loginForm.email}
+          onChange={(val) => setLoginForm((prev) => ({ ...prev, email: val }))}
+          placeholder="you@example.com"
+          icon={HiOutlineMail}
+        />
+        <InputField
+          id="password"
+          label="Password"
+          type="password"
+          value={loginForm.password}
+          onChange={(val) => setLoginForm((prev) => ({ ...prev, password: val }))}
+          placeholder="••••••••"
+          icon={HiOutlineLockClosed}
+          error={error}
+        />
+        <Flex justify="space-between" align="center" fontSize="sm">
+          <Link
+            color="brand.500"
+            onClick={() =>
+              setAuthModelState((prev) => ({
+                ...prev,
+                view: "resetPassword",
+              }))
+            }
+          >
+            Forgot password?
+          </Link>
+          <Link
+            color="gray.500"
+            onClick={() =>
+              setAuthModelState((prev) => ({
+                ...prev,
+                view: "signup",
+              }))
+            }
+          >
+            Create account
+          </Link>
+        </Flex>
+        <PrimaryButton
+          width="100%"
+          height="52px"
+          type="submit"
+          isLoading={loading}
+          fontWeight={800}
+          mt={2}
         >
-          Reset
-        </Text>
-      </Flex>
-      <Flex fontSize="9pt" justifyContent="center">
-        <Text mr={1}>New Here?</Text>
-        <Text
-          color="blue.500"
-          fontWeight={700}
-          cursor="pointer"
-          onClick={() =>
-            setAuthModelState((prev) => ({
-              ...prev,
-              view: "signup",
-            }))
-          }
-        >
-          Sign Up
-        </Text>
-      </Flex>
+          Log In
+        </PrimaryButton>
+      </Stack>
     </form>
   );
 };
+
 export default Login;

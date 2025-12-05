@@ -23,9 +23,10 @@ import CryptoJS from "crypto-js";
 //   writeBatch,
 // } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { Post, postState } from "../../../atoms/PostAtom";
+import { userState } from "../../../atoms/userAtom";
 // import { firestore } from "../../../firebase/clientApp";
 import CommentInput from "./CommentInput";
 import CommentItem, { Comment } from "./CommentItem";
@@ -36,20 +37,22 @@ interface RedditUserDocument {
   userEmail?: string;
   userImage: string;
   redditImage: string;
-  timestamp: Timestamp;
+  timestamp: any; // Timestamp;
 }
 
 type CommentsProps = {
-  user: any; // User;
+  user?: any; // User;
   selectedPost: Post | null;
   communityId: string;
 };
 
 const Comments: React.FC<CommentsProps> = ({
-  user,
+  user: propUser,
   selectedPost,
   communityId,
 }) => {
+  const userFromState = useRecoilValue(userState);
+  const user = propUser || userFromState;
   const [commentText, setCommentText] = useState("");
   const [encryptedData, setEncryptedData] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -60,61 +63,49 @@ const Comments: React.FC<CommentsProps> = ({
   const setPostState = useSetRecoilState(postState);
   const bg = useColorModeValue("white", "#1A202C");
   const lineBorderColor = useColorModeValue("gray.100", "#171923");
+  const emptyTextColor = useColorModeValue("gray.400", "gray.500");
 
   //console.log(comments);
 
   const fetchRedditUser = async (userId: any) => {
     if (!userId) return;
 
-    try {
-      const docRef = doc(firestore, "redditUser", userId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        setRedditUser(docSnap.data() as RedditUserDocument);
-      } else return;
-    } catch (error: any) {
-      console.log(error.message);
-    }
+    // Mock user data for frontend-only mode
+    setRedditUser({
+      userId: userId,
+      userName: "Mock User",
+      userEmail: "user@example.com",
+      userImage: "/images/redditlogo.png",
+      redditImage: "/images/redditlogo.png",
+      timestamp: { seconds: Math.floor(Date.now() / 1000) },
+    } as RedditUserDocument);
   };
 
   const onCreateComments = async () => {
     try {
       setCreateLoading(true);
 
-      const splitName = user.email!.split("@")[0];
+      if (!user || !selectedPost) return;
+
+      const splitName = user.email?.split("@")[0] || "anonymous";
 
       const dataName = CryptoJS.AES.encrypt(
         JSON.stringify(splitName),
         process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
       ).toString();
 
-      const batch = writeBatch(firestore);
-
-      const commentDocRef = doc(collection(firestore, "comments"));
-
+      // Create new comment for frontend-only mode
       const newComment: Comment = {
-        id: commentDocRef.id,
-        creatorId: user.uid,
+        id: `comment-${Date.now()}`,
+        creatorId: user.uid || "anonymous",
         creatorDisplayText: dataName,
-        creatorPhotoURL: redditUser?.redditImage!,
+        creatorPhotoURL: redditUser?.redditImage || "/images/redditlogo.png",
         communityId,
-        postId: selectedPost?.id!,
-        postTitle: selectedPost?.title!,
+        postId: selectedPost.id!,
+        postTitle: selectedPost.title,
         text: encryptedData,
-        createdAt: serverTimestamp() as Timestamp,
+        createdAt: { seconds: Math.floor(Date.now() / 1000) },
       };
-
-      batch.set(commentDocRef, newComment);
-
-      newComment.createdAt = { seconds: Date.now() / 1000 } as Timestamp;
-
-      const postDocRef = doc(firestore, "posts", selectedPost?.id!);
-      batch.update(postDocRef, {
-        numberOfComments: increment(1),
-      });
-
-      await batch.commit();
 
       setCommentText("");
       setComments((prev) => [newComment, ...prev]);
@@ -122,7 +113,7 @@ const Comments: React.FC<CommentsProps> = ({
         ...prev,
         selectedPost: {
           ...prev.selectedPost,
-          numberOfComments: prev.selectedPost?.numberOfComments! + 1,
+          numberOfComments: (prev.selectedPost?.numberOfComments || 0) + 1,
           userCommented: true, // Mark that user has commented
         } as Post,
       }));
@@ -135,24 +126,15 @@ const Comments: React.FC<CommentsProps> = ({
   const onDeleteComment = async (comment: Comment) => {
     setLoadingDeleteId(comment.id!);
     try {
-      const batch = writeBatch(firestore);
-
-      // delete comment document
-      const commentDocRef = doc(firestore, "comments", comment.id!);
-      batch.delete(commentDocRef);
-
-      const postDocRef = doc(firestore, "posts", selectedPost?.id!);
-      batch.update(postDocRef, {
-        numberOfComments: increment(-1),
-      });
-
-      await batch.commit();
-
+      // Delete comment in frontend-only mode
       setPostState((prev) => ({
         ...prev,
         selectedPost: {
           ...prev.selectedPost,
-          numberOfComments: prev.selectedPost?.numberOfComments! - 1,
+          numberOfComments: Math.max(
+            (prev.selectedPost?.numberOfComments || 1) - 1,
+            0
+          ),
         } as Post,
       }));
 
@@ -165,21 +147,19 @@ const Comments: React.FC<CommentsProps> = ({
 
   const getPostComments = async () => {
     try {
-      const commentsQuery = query(
-        collection(firestore, "comments"),
-        where("postId", "==", selectedPost?.id),
-        orderBy("createdAt", "desc")
-      );
-      const commentsDocs = await getDocs(commentsQuery);
-
-      const comments = commentsDocs.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setComments(comments as Comment[]);
+      // Use mock comments for frontend-only mode
+      if (selectedPost?.id) {
+        const { getMockCommentsByPostId } = await import(
+          "../../../data/mockComments"
+        );
+        const mockComments = getMockCommentsByPostId(selectedPost.id);
+        setComments(mockComments);
+      } else {
+        setComments([]);
+      }
     } catch (error) {
       console.log("GetPostComments Error", error);
+      setComments([]);
     }
     setFetchLoading(false);
   };
@@ -207,13 +187,19 @@ const Comments: React.FC<CommentsProps> = ({
   }, [user]);
 
   return (
-    <Box bg={bg} borderRadius="0px 0px 4px 4px" p={2}>
+    <Box 
+      bg={bg} 
+      borderRadius="0px 0px 12px 12px" 
+      p={4}
+      borderTop="1px solid"
+      borderColor={lineBorderColor}
+    >
       <Flex
         direction="column"
         pl={10}
         pr={4}
         mb={6}
-        fontSize="10pt"
+        fontSize="14px"
         width="100%"
       >
         {!fetchLoading && (
@@ -226,7 +212,7 @@ const Comments: React.FC<CommentsProps> = ({
           />
         )}
       </Flex>
-      <Stack spacing={6} p={2}>
+      <Stack spacing={4} p={2}>
         {fetchLoading ? (
           <>
             {[0, 1, 2].map((item) => (
@@ -247,8 +233,21 @@ const Comments: React.FC<CommentsProps> = ({
                 borderColor={lineBorderColor}
                 p={20}
               >
-                <Text fontWeight={700} opacity={0.3}>
+                <Text 
+                  fontWeight={600} 
+                  fontSize="16px"
+                  color={emptyTextColor}
+                  opacity={0.7}
+                >
                   No Comments Yet
+                </Text>
+                <Text 
+                  fontSize="14px"
+                  color={emptyTextColor}
+                  mt={2}
+                  opacity={0.5}
+                >
+                  Be the first to comment!
                 </Text>
               </Flex>
             ) : (

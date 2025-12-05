@@ -4,9 +4,10 @@ import AuthModel from "../../components/Modal/Auth/AuthModel";
 import AuthButtons from "./AuthButtons";
 import Icons from "./Icons";
 import UserMenu from "./UserMenu";
+import { BasicUser } from "../../atoms/userAtom";
 
 type RightContentProps = {
-  user?: { uid?: string | null } | null;
+  user?: BasicUser | null;
 };
 
 const RightContent: React.FC<RightContentProps> = ({ user }) => {

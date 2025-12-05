@@ -1,8 +1,12 @@
-import { Button, Flex, Icon, Input, Text } from "@chakra-ui/react";
+import { Button, Flex, Icon, Stack, Text, Link } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { authModelState } from "../../../atoms/authModalAtom";
 import { BsDot, BsReddit } from "react-icons/bs";
+import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
+import { auth } from "../../../firebase/clientApp";
+import { HiOutlineMail } from "react-icons/hi";
+import InputField from "../../common/InputField";
 
 /*
 type ResetPasswordProps = {
@@ -14,78 +18,51 @@ const ResetPassword: React.FC = () => {
   const setAuthModalState = useSetRecoilState(authModelState);
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
-  const sending = false;
-  const error = null;
+  const [sendPasswordResetEmail, sending, error] =
+    useSendPasswordResetEmail(auth);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (email) {
-      setSuccess(true);
+      const res = await sendPasswordResetEmail(email);
+      if (res) setSuccess(true);
     }
   };
 
   return (
     <Flex direction="column" alignItems="center" width="100%">
       <Icon as={BsReddit} color="brand.100" fontSize={40} mb={2} />
-      <Text fontWeight={700} mb={2}>
+      <Text fontWeight={800} mb={2} fontSize="xl">
         Reset your password
       </Text>
       {success ? (
         <Text mb={4}>Check your email :)</Text>
       ) : (
-        <>
-          <Text fontSize="sm" textAlign="center" mb={2}>
-            Enter the email associated with your account and we will send you a
-            reset link
-          </Text>
-          <form onSubmit={onSubmit} style={{ width: "100%" }}>
-            <Input
-              required
-              name="email"
-              placeholder="Email..."
-              type="email"
-              mb={2}
-              onChange={(event) => setEmail(event.target.value)}
-              fontSize="10pt"
-              _placeholder={{ color: "gray.500" }}
-              _hover={{
-                bg: "white",
-                border: "1px solid",
-                borderColor: "blue.500",
-              }}
-              _focus={{
-                outline: "none",
-                bg: "white",
-                border: "1px solid",
-                borderColor: "blue.500",
-              }}
-              bg="gray.50"
-            />
-            <Text textAlign="center" fontSize="10pt" color="red">
-              {error?.message}
+        <form onSubmit={onSubmit} style={{ width: "100%" }}>
+          <Stack spacing={3}>
+            <Text fontSize="sm" textAlign="center" color="gray.500">
+              Enter the email associated with your account and we’ll send you a reset link.
             </Text>
-            <Button
-              width="100%"
-              height="36px"
-              mb={2}
-              mt={2}
-              type="submit"
-              isLoading={sending}
-            >
-              Reset Password
+            <InputField
+              id="reset-email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(val) => setEmail(val)}
+              placeholder="you@example.com"
+              icon={HiOutlineMail}
+              error={error?.message}
+            />
+            <Button width="100%" height="44px" type="submit" isLoading={sending}>
+              Send reset link
             </Button>
-          </form>
-        </>
+          </Stack>
+        </form>
       )}
-      <Flex
-        alignItems="center"
-        fontSize="9pt"
-        color="blue.500"
-        fontWeight={700}
-        cursor="pointer"
-      >
-        <Text
+      <Flex alignItems="center" fontSize="sm" mt={4} gap={2}>
+        <Link
+          color="brand.500"
           onClick={() =>
             setAuthModalState((prev) => ({
               ...prev,
@@ -93,10 +70,11 @@ const ResetPassword: React.FC = () => {
             }))
           }
         >
-          LOGIN
-        </Text>
-        <Icon as={BsDot} />
-        <Text
+          Back to login
+        </Link>
+        <Icon as={BsDot} color="gray.400" />
+        <Link
+          color="gray.500"
           onClick={() =>
             setAuthModalState((prev) => ({
               ...prev,
@@ -104,8 +82,8 @@ const ResetPassword: React.FC = () => {
             }))
           }
         >
-          SIGN UP
-        </Text>
+          Create account
+        </Link>
       </Flex>
     </Flex>
   );

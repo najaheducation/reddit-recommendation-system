@@ -6,6 +6,7 @@ import {
   Spinner,
   Stack,
   Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
 import moment from "moment";
@@ -69,35 +70,85 @@ const CommentItem: React.FC<CommentItemProps> = ({
     }
   }, [comment]);
 
+  const textColor = useColorModeValue("gray.700", "gray.300");
+  const metaColor = useColorModeValue("gray.500", "gray.400");
+  const hoverBg = useColorModeValue("gray.50", "gray.800");
+
   return (
-    <Flex>
-      <Box mr={2}>
+    <Flex
+      p={3}
+      borderRadius="8px"
+      _hover={{ bg: hoverBg }}
+      transition="background-color 0.2s"
+      mb={2}
+    >
+      <Box mr={3}>
         <Avatar
           src={comment.creatorPhotoURL}
-          size="sm"
+          size="md"
           name={decryptedData.creatorDisplayText}
+          border="2px solid"
+          borderColor={useColorModeValue("gray.200", "gray.600")}
         />
       </Box>
-      <Stack spacing={1}>
-        <Stack direction="row" align="center" fontSize="8px">
-          <Text>{decryptedData.creatorDisplayText}</Text>
-          <Text>
+      <Stack spacing={2} flex={1}>
+        <Stack direction="row" align="center" fontSize="12px" spacing={2}>
+          <Text fontWeight={600} color={textColor}>
+            u/{decryptedData.creatorDisplayText}
+          </Text>
+          <Text color={metaColor} fontSize="11px">
             {moment(new Date(comment.createdAt?.seconds * 1000)).fromNow()}
           </Text>
-          {isLoading && <Spinner size="sm" />}
+          {isLoading && <Spinner size="sm" color="accent.500" />}
         </Stack>
-        <Text fontSize="10pt">{decryptedData.text}</Text>
-        <Stack direction="row" align="center" cursor="pointer" color="gray.500">
-          <Icon as={IoArrowUpCircleOutline} />
-          <Icon as={IoArrowDownCircleOutline} />
+        <Text 
+          fontSize="14px" 
+          color={textColor}
+          lineHeight="1.6"
+          wordBreak="break-word"
+        >
+          {decryptedData.text}
+        </Text>
+        <Stack 
+          direction="row" 
+          align="center" 
+          spacing={4}
+          color={metaColor}
+          fontSize="12px"
+        >
+          <Flex
+            align="center"
+            cursor="pointer"
+            _hover={{ color: "brand.500" }}
+            transition="color 0.2s"
+          >
+            <Icon as={IoArrowUpCircleOutline} mr={1} fontSize="16px" />
+            <Text>Upvote</Text>
+          </Flex>
+          <Flex
+            align="center"
+            cursor="pointer"
+            _hover={{ color: "accent.500" }}
+            transition="color 0.2s"
+          >
+            <Icon as={IoArrowDownCircleOutline} mr={1} fontSize="16px" />
+            <Text>Downvote</Text>
+          </Flex>
           {userId === comment.creatorId && (
             <>
-              <Text fontSize="9pt" _hover={{ color: "blue.500" }}>
+              <Text
+                cursor="pointer"
+                _hover={{ color: "accent.500" }}
+                transition="color 0.2s"
+                fontWeight={500}
+              >
                 Edit
               </Text>
               <Text
-                fontSize="9pt"
-                _hover={{ color: "blue.500" }}
+                cursor="pointer"
+                _hover={{ color: "red.500" }}
+                transition="color 0.2s"
+                fontWeight={500}
                 onClick={() => onDeleteComment(comment)}
               >
                 Delete

@@ -4,14 +4,15 @@ import React from "react";
 import { BsLink45Deg } from "react-icons/bs";
 import { FaReddit } from "react-icons/fa";
 import { IoImageOutline } from "react-icons/io5";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../atoms/authModalAtom";
+import { userState } from "../../atoms/userAtom";
 import useDirectory from "../../hooks/useDirectory";
 
 const CreatePostLink: React.FC = () => {
   const router = useRouter();
-  const user = null;
+  const user = useRecoilValue(userState);
   const { toggleMenuOpen } = useDirectory();
   const setAuthModelState = useSetRecoilState(authModelState);
   const bg = useColorModeValue("white", "#1A202C");

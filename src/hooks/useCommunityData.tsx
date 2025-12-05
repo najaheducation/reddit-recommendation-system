@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { authModelState } from "../atoms/authModalAtom";
+import { userState } from "../atoms/userAtom";
 import {
   Community,
   CommunityState,
@@ -9,7 +10,7 @@ import {
 } from "../atoms/CommunitiesAtom";
 
 const useCommunityData = () => {
-  const user = null;
+  const user = useRecoilValue(userState);
   const router = useRouter();
   const setAuthModelState = useSetRecoilState(authModelState);
   const [communityStateValue, setCommunityStateValue] =

@@ -13,7 +13,7 @@ type CommentInputProps = {
   setCommentText: (value: string) => void;
   user: { uid?: string | null; email?: string | null } | null;
   createLoading: boolean;
-  onCreateComments: (commentText: string) => void;
+  onCreateComments: () => void;
 };
 
 const CommentInput: React.FC<CommentInputProps> = ({
@@ -24,47 +24,58 @@ const CommentInput: React.FC<CommentInputProps> = ({
   onCreateComments,
 }) => {
   const bg = useColorModeValue("white", "#1A202C");
-  const bgBottom = useColorModeValue("gray.100", "#1A202C");
+  const bgBottom = useColorModeValue("gray.50", "#2D3748");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const hoverBorderColor = useColorModeValue("gray.300", "gray.500");
+  const textColor = useColorModeValue("gray.700", "gray.300");
+
   return (
     <Flex direction="column" position="relative">
       {user ? (
         <>
-          <Text mb={1}>
+          <Text mb={3} fontSize="14px" color={textColor} fontWeight={500}>
             Comment as{" "}
-            <span style={{ color: "#3182CE" }}>
+            <Text as="span" color="accent.500" fontWeight={600}>
               {user?.email?.split("@")[0]}
-            </span>
+            </Text>
           </Text>
           <Textarea
             value={commentText}
             onChange={(event) => setCommentText(event.target.value)}
             placeholder="What are your thoughts?"
-            fontSize="10pt"
-            borderRadius={4}
-            minHeight="160px"
-            pb={10}
-            _placeholder={{ color: "gray.500" }}
+            fontSize="14px"
+            borderRadius="8px"
+            minHeight="120px"
+            pb={14}
+            border="2px solid"
+            borderColor={borderColor}
+            _placeholder={{ color: "gray.400" }}
             _focus={{
               outline: "none",
               bg: bg,
-              border: "1px solid black",
+              borderColor: "accent.500",
+              boxShadow: "0 0 0 1px var(--chakra-colors-accent-500)",
             }}
+            _hover={{
+              borderColor: hoverBorderColor,
+            }}
+            transition="all 0.2s"
           />
           <Flex
             position="absolute"
-            left="1px"
-            right={0.1}
-            bottom="1px"
+            left="2px"
+            right="2px"
+            bottom="2px"
             justify="flex-end"
             bg={bgBottom}
-            p="6px 8px"
-            borderRadius="0px 0px 4px 4px"
+            p="8px 12px"
+            borderRadius="0px 0px 6px 6px"
           >
             <Button
-              height="26px"
+              size="sm"
               disabled={!commentText.length}
               isLoading={createLoading}
-              onClick={() => onCreateComments(commentText)}
+              onClick={() => onCreateComments()}
             >
               Comment
             </Button>
@@ -74,12 +85,15 @@ const CommentInput: React.FC<CommentInputProps> = ({
         <Flex
           align="center"
           justify="space-between"
-          borderRadius={2}
-          border="1px solid"
-          borderColor="gray.100"
-          p={4}
+          borderRadius="8px"
+          border="2px solid"
+          borderColor={borderColor}
+          p={6}
+          bg={bg}
         >
-          <Text fontWeight={600}>Log in or sign up to leave a comment</Text>
+          <Text fontWeight={600} fontSize="14px" color={textColor}>
+            Log in or sign up to leave a comment
+          </Text>
           <AuthButtons />
         </Flex>
       )}

@@ -2,6 +2,8 @@ import { Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Community } from "../../atoms/CommunitiesAtom";
 import { Post } from "../../atoms/PostAtom";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../atoms/userAtom";
 import usePosts from "../../hooks/usePosts";
 import PostItem from "./PostItem";
 import PostLoader from "./PostLoader";
@@ -12,7 +14,7 @@ type PostsProps = {
 };
 
 const Posts: React.FC<PostsProps> = ({ communityData }) => {
-  const user = null;
+  const user = useRecoilValue(userState);
   const [loading, setLoading] = useState(false);
   const {
     postStateValue,

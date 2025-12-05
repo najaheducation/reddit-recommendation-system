@@ -1,6 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
 * {
   -ms-overflow-style: none;
 }
 ::-webkit-scrollbar {
   display: none;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10% 5% auto;
+  height: 420px;
+  background: radial-gradient(ellipse at top, rgba(30, 136, 255, 0.25), transparent 55%);
+  filter: blur(50px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto 10% -20% 10%;
+  height: 360px;
+  background: radial-gradient(ellipse at bottom, rgba(18, 180, 151, 0.16), transparent 55%);
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
 }

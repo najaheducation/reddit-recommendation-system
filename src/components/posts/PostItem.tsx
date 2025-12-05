@@ -1,6 +1,7 @@
 import {
   Alert,
   AlertIcon,
+  Box,
   Flex,
   Icon,
   Image,
@@ -13,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
 import moment from "moment";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -29,8 +29,6 @@ import {
 } from "react-icons/io5";
 
 import { Post } from "../../atoms/PostAtom";
-
-// const secretPass = process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS;
 
 type PostItemProps = {
   post: Post;
@@ -56,7 +54,7 @@ const PostItem: React.FC<PostItemProps> = ({
   onSelectPost,
   homePage,
 }) => {
-  const [loadingImage, setLoadingImage] = useState(true);
+  const [loadingImage, setLoadingImage] = useState<boolean>(Boolean(post.imageURL));
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [error, setError] = useState(false);
   const [decryptedData, setDecryptedData] = useState({
@@ -69,87 +67,57 @@ const PostItem: React.FC<PostItemProps> = ({
   const router = useRouter();
   const toast = useToast();
 
-  // Thames
-  const bg = useColorModeValue("white", "#1A202C");
-  const borderColor = useColorModeValue("gray.300", "#2D3748");
-  const singlePageBorderColor = useColorModeValue("white", "#2D3748");
-  const voteLineBorderColor = useColorModeValue("gray.100", "#171923");
-  const IconHoverBg = useColorModeValue("gray.200", "#2A4365");
-  const IconBg = useColorModeValue("none", "#A0AEC0");
-  const voteIconBg = useColorModeValue("gray.400", "#CBD5E0");
+  // Theme colors
+  const bg = useColorModeValue("white", "rgba(255,255,255,0.04)");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const hoverBorderColor = useColorModeValue("brand.100", "whiteAlpha.300");
+  const singlePageBorderColor = useColorModeValue("white", "rgba(255,255,255,0.06)");
+  const voteLineBorderColor = useColorModeValue("gray.50", "whiteAlpha.50");
+  const IconHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const IconBg = useColorModeValue("gray.500", "#A0AEC0");
+  const voteIconBg = useColorModeValue("gray.500", "#CBD5E0");
+  const communityImageBorder = useColorModeValue("gray.200", "whiteAlpha.200");
+  const communityTextColor = useColorModeValue("gray.700", "gray.200");
+  const metaTextColor = useColorModeValue("gray.600", "gray.400");
+  const titleColor = useColorModeValue("#0F172A", "white");
+  const bodyTextColor = useColorModeValue("gray.700", "gray.300");
 
-  const handleDelete = async (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleDelete = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     setLoadingDelete(true);
     try {
       const success = await onDeletePost(post);
-
-      if (!success) {
-        throw new Error("Failed to Delete Post");
-      }
-
-      console.log("Post was Successfully Deleted");
-
-      if (singlePostPage) {
-        router.push(`/r/${post.communityId}`);
-      }
-    } catch (error: any) {
-      setError(error.message);
+      if (!success) throw new Error("Failed to Delete Post");
+      if (singlePostPage) router.push(`/r/${post.communityId}`);
+    } catch (err: any) {
+      setError(err.message);
     }
     setLoadingDelete(false);
   };
 
-  /**
-   * Handles share button click using Web Share API or fallback to clipboard.
-   * Shares the post URL with title and description.
-   */
-  const handleShare = async (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleShare = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
-
     const postUrl = `${window.location.origin}/r/${post.communityId}/comments/${post.id}`;
     const shareData = {
       title: decryptedData.title || "Reddit Post",
-      text: decryptedData.body || "Check out this post on Reddit Clone",
+      text: decryptedData.body || "Check out this post",
       url: postUrl,
     };
 
     try {
-      // Use Web Share API if available (mobile devices, modern browsers)
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-        toast({
-          title: "Shared successfully",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
+        toast({ title: "Shared successfully", status: "success", duration: 2000, isClosable: true });
       } else {
-        // Fallback: Copy URL to clipboard
         await navigator.clipboard.writeText(postUrl);
-        toast({
-          title: "Link copied to clipboard",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
+        toast({ title: "Link copied to clipboard", status: "success", duration: 2000, isClosable: true });
       }
-    } catch (error: any) {
-      // User cancelled or error occurred
-      if (error.name !== "AbortError") {
-        // Try clipboard as final fallback
+    } catch (err: any) {
+      if (err.name !== "AbortError") {
         try {
           await navigator.clipboard.writeText(postUrl);
-          toast({
-            title: "Link copied to clipboard",
-            status: "success",
-            duration: 2000,
-            isClosable: true,
-          });
-        } catch (clipboardError) {
+          toast({ title: "Link copied to clipboard", status: "success", duration: 2000, isClosable: true });
+        } catch {
           toast({
             title: "Failed to share",
             description: "Please copy the link manually",
@@ -163,20 +131,10 @@ const PostItem: React.FC<PostItemProps> = ({
   };
 
   useEffect(() => {
-    const initialData = {
-      title: post.title,
-      body: post.body,
-      creatorDisplayName: post.creatorDisplayName,
-      imageURL: post.imageURL || "",
-    };
-
     const decryptValue = (value?: string | null) => {
       if (!value) return "";
       try {
-        const bytes = CryptoJS.AES.decrypt(
-          value,
-          process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-        );
+        const bytes = CryptoJS.AES.decrypt(value, process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string);
         const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         return data || value;
       } catch (_err) {
@@ -190,179 +148,199 @@ const PostItem: React.FC<PostItemProps> = ({
       creatorDisplayName: decryptValue(post.creatorDisplayName),
       imageURL: decryptValue(post.imageURL),
     });
+    setLoadingImage(Boolean(post.imageURL));
   }, [post]);
+
+  const VoteColumn = () => (
+    <Flex
+      direction="column"
+      align="center"
+      bg={singlePostPage ? "none" : voteLineBorderColor}
+      p={3}
+      width="64px"
+      borderRight={singlePostPage ? "none" : "1px solid"}
+      borderColor={singlePostPage ? "transparent" : borderColor}
+      borderRadius={singlePostPage ? "0" : "18px 0px 0px 18px"}
+      gap={2}
+    >
+      <Icon
+        as={userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline}
+        color={userVoteValue === 1 ? "brand.500" : voteIconBg}
+        fontSize={24}
+        onClick={(event) => onVote(event, post, 1, post.communityId)}
+        cursor="pointer"
+        _hover={{ color: "brand.500", transform: "scale(1.1)" }}
+        transition="all 0.2s"
+      />
+      <Text fontSize="12px" fontWeight={700} color={voteIconBg} minW="24px" textAlign="center">
+        {post.voteStatus}
+      </Text>
+      <Icon
+        as={userVoteValue === -1 ? IoArrowDownCircleSharp : IoArrowDownCircleOutline}
+        color={userVoteValue === -1 ? "accent.500" : voteIconBg}
+        fontSize={24}
+        onClick={(event) => onVote(event, post, -1, post.communityId)}
+        cursor="pointer"
+        _hover={{ color: "accent.500", transform: "scale(1.1)" }}
+        transition="all 0.2s"
+      />
+    </Flex>
+  );
+
+  const PostHeader = () => (
+    <Flex align="center" gap={3} mb={1} flexWrap="wrap">
+      <Flex
+        align="center"
+        justify="center"
+        w="36px"
+        h="36px"
+        borderRadius="full"
+        border="1px solid"
+        borderColor={communityImageBorder}
+        bg={useColorModeValue("white", "whiteAlpha.100")}
+      >
+        {post.communityImageURL ? (
+          <Image src={post.communityImageURL} borderRadius="full" boxSize="30px" alt={post.communityId} />
+        ) : (
+          <Icon as={FaReddit} fontSize={22} color="brand.500" />
+        )}
+      </Flex>
+      <Stack spacing={0}>
+        <Flex align="center" gap={1.5} flexWrap="wrap">
+          <Text fontWeight={800} color={communityTextColor}>
+            r/{post.communityId}
+          </Text>
+          <BsDot color={metaTextColor as string} />
+          <Text color={metaTextColor} fontSize="sm">
+            Posted by u/{decryptedData.creatorDisplayName || post.creatorDisplayName} •{" "}
+            {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
+          </Text>
+        </Flex>
+      </Stack>
+    </Flex>
+  );
+
+  const PostImage = () =>
+    decryptedData.imageURL ? (
+      <Box borderRadius="14px" overflow="hidden" border="1px solid" borderColor={borderColor}>
+        {loadingImage && (
+          <Skeleton height="320px" width="100%" startColor="gray.100" endColor="gray.200" borderRadius="14px" />
+        )}
+        <Image
+          src={decryptedData.imageURL}
+          alt={decryptedData.title}
+          maxHeight="460px"
+          width="100%"
+          objectFit="cover"
+          display={loadingImage ? "none" : "block"}
+          onLoad={() => setLoadingImage(false)}
+          borderRadius="14px"
+          boxShadow="md"
+        />
+      </Box>
+    ) : null;
+
+  const PostActions = () => (
+    <Flex
+      align="center"
+      gap={3}
+      mt={3}
+      pt={3}
+      borderTop="1px solid"
+      borderColor={borderColor}
+      fontWeight={600}
+      color={metaTextColor}
+      fontSize="sm"
+      flexWrap="wrap"
+    >
+      <Flex align="center" gap={2} px={3} py={2} borderRadius="12px" _hover={{ bg: IconHoverBg }} transition="all 0.2s ease">
+        <Icon as={BsChat} fontSize={18} />
+        <Text>{post.numberOfComments || 0}</Text>
+      </Flex>
+      <Flex
+        align="center"
+        gap={2}
+        px={3}
+        py={2}
+        borderRadius="12px"
+        _hover={{ bg: IconHoverBg }}
+        transition="all 0.2s ease"
+        onClick={handleShare}
+      >
+        <Icon as={IoArrowRedoOutline} fontSize={18} />
+        <Text>Share</Text>
+      </Flex>
+      <Flex align="center" gap={2} px={3} py={2} borderRadius="12px" _hover={{ bg: IconHoverBg }} transition="all 0.2s ease">
+        <Icon as={IoBookmarkOutline} fontSize={18} />
+        <Text>Save</Text>
+      </Flex>
+      {userIsCreator && (
+        <Flex
+          align="center"
+          gap={2}
+          px={3}
+          py={2}
+          borderRadius="12px"
+          _hover={{ bg: IconHoverBg }}
+          transition="all 0.2s ease"
+          onClick={handleDelete}
+        >
+          {loadingDelete ? (
+            <Spinner size="sm" />
+          ) : (
+            <>
+              <Icon as={AiOutlineDelete} fontSize={18} />
+              <Text>Delete</Text>
+            </>
+          )}
+        </Flex>
+      )}
+    </Flex>
+  );
 
   return (
     <Flex
       border="1px solid"
       bg={bg}
       borderColor={singlePostPage ? singlePageBorderColor : borderColor}
-      borderRadius={singlePostPage ? "4px 4px 0px 0px" : "4px"}
-      _hover={{ borderColor: singlePostPage ? "none" : borderColor }}
+      borderRadius="18px"
+      boxShadow={singlePostPage ? "none" : "xl"}
+      backdropFilter={singlePostPage ? "none" : "blur(10px)"}
+      _hover={{
+        borderColor: singlePostPage ? "none" : hoverBorderColor,
+        boxShadow: singlePostPage ? "none" : "2xl",
+        transform: singlePostPage ? "none" : "translateY(-3px)",
+      }}
       cursor={singlePostPage ? "unset" : "pointer"}
       onClick={() => onSelectPost && onSelectPost(post)}
+      transition="all 0.2s ease-in-out"
+      mb={4}
+      overflow="hidden"
     >
-      <Flex
-        direction="column"
-        align="center"
-        bg={singlePostPage ? "none" : voteLineBorderColor}
-        p={2}
-        width="40px"
-        borderRadius={singlePostPage ? "0" : "3px 0px 0px 3px"}
-      >
-        <Icon
-          as={
-            userVoteValue === 1 ? IoArrowUpCircleSharp : IoArrowUpCircleOutline
-          }
-          color={userVoteValue === 1 ? "brand.100" : voteIconBg}
-          fontSize={22}
-          onClick={(event) => onVote(event, post, 1, post.communityId)}
-          cursor="pointer"
-        />
-        <Text fontSize="9pt" color={voteIconBg}>
-          {post.voteStatus}
+      <VoteColumn />
+      <Flex direction="column" width="100%" p={{ base: 4, md: 5 }} gap={3}>
+        <PostHeader />
+        <Text fontSize="18px" fontWeight={800} color={titleColor} lineHeight="1.3">
+          {decryptedData.title}
         </Text>
-        <Icon
-          as={
-            userVoteValue === -1
-              ? IoArrowDownCircleSharp
-              : IoArrowDownCircleOutline
-          }
-          color={userVoteValue === -1 ? "#4379ff" : voteIconBg}
-          fontSize={22}
-          onClick={(event) => onVote(event, post, -1, post.communityId)}
-          cursor="pointer"
-        />
-      </Flex>
-      <Flex direction="column" width="100%">
+        {decryptedData.body && (
+          <Text fontSize="15px" color={bodyTextColor} lineHeight="1.6">
+            {decryptedData.body}
+          </Text>
+        )}
+        <PostImage />
+
         {error && (
           <Alert status="error">
             <AlertIcon />
-            <Text mr={2}>{error}</Text>
+            <Text mr={2}>Error deleting post</Text>
           </Alert>
         )}
-        <Stack spacing={1} p="10px">
-          <Stack direction="row" spacing={0.5} align="center" fontSize="9pt">
-            {/* check */}
-            {homePage && (
-              <>
-                {post.communityImageURL ? (
-                  <Image
-                    src={post.communityImageURL}
-                    borderRadius="full"
-                    boxSize="18px"
-                    mr={2}
-                  />
-                ) : (
-                  <Icon as={FaReddit} fontSize="18px" color="blue.500" />
-                )}
-                <Link href={`r/${post.communityId}`}>
-                  <Text
-                    fontWeight={700}
-                    _hover={{ textDecoration: "underline" }}
-                    onClick={(event) => event.stopPropagation}
-                  >{`r/${post.communityId}`}</Text>
-                </Link>
-                <Icon as={BsDot} color="gray.500" fontSize={8} />
-              </>
-            )}
-            <Text>
-              Posted by u/{decryptedData.creatorDisplayName}{" "}
-              {moment(
-                post.createdAt?.seconds
-                  ? new Date(post.createdAt.seconds * 1000)
-                  : new Date(post.createdAt)
-              ).fromNow()}
-            </Text>
-          </Stack>
-          <Text fontSize="12pt" fontWeight={600}>
-            {decryptedData.title}
-          </Text>
-          <Text fontSize="10pt">{decryptedData.body}</Text>
-          {post.imageURL && (
-            <Flex justify="center" align="center" p={2}>
-              {loadingImage && (
-                <Skeleton height="200px" width="100%" borderRadius={4} />
-              )}
-              <Image
-                src={
-                  decryptedData.imageURL?.startsWith("http")
-                    ? "/images/recCommsArt.png"
-                    : decryptedData.imageURL || "/images/recCommsArt.png"
-                }
-                maxHeight="460px"
-                alt="Post Image"
-                display={loadingImage ? "none" : "unset"}
-                onLoad={() => setLoadingImage(false)}
-                onError={() => {
-                  setLoadingImage(false);
-                }}
-              />
-            </Flex>
-          )}
-        </Stack>
-        <Flex ml={1} mb={0.5} color="gray.500" fontWeight={600}>
-          <Flex
-            align="center"
-            p="8px 10px"
-            borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
-            cursor="pointer"
-          >
-            <Icon as={BsChat} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              {post.numberOfComments}
-            </Text>
-          </Flex>
-          <Flex
-            align="center"
-            p="8px 10px"
-            borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
-            cursor="pointer"
-            onClick={handleShare}
-          >
-            <Icon as={IoArrowRedoOutline} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              Share
-            </Text>
-          </Flex>
-          <Flex
-            align="center"
-            p="8px 10px"
-            borderRadius={4}
-            _hover={{ bg: IconHoverBg }}
-            cursor="pointer"
-          >
-            <Icon as={IoBookmarkOutline} mr={2} color={IconBg} />
-            <Text fontSize="9pt" color={IconBg}>
-              Save
-            </Text>
-          </Flex>
-          {userIsCreator && (
-            <Flex
-              align="center"
-              p="8px 10px"
-              borderRadius={4}
-              _hover={{ bg: IconHoverBg }}
-              cursor="pointer"
-              onClick={handleDelete}
-            >
-              {loadingDelete ? (
-                <Spinner size="sm" />
-              ) : (
-                <>
-                  <Icon as={AiOutlineDelete} mr={2} color={IconBg} />
-                  <Text fontSize="9pt" color={IconBg}>
-                    Delete
-                  </Text>
-                </>
-              )}
-            </Flex>
-          )}
-        </Flex>
+
+        <PostActions />
       </Flex>
     </Flex>
   );
 };
+
 export default PostItem;

@@ -8,8 +8,10 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 import { Community } from "../../atoms/CommunitiesAtom";
+import { userState } from "../../atoms/userAtom";
 import SkeletonLoader from "../common/SkeletonLoader";
 import ConversationsList from "./ConversationsList";
 
@@ -37,7 +39,7 @@ function ConversationsWrapper({}: Props) {
   const {
     query: { userInCommunities },
   } = router;
-  const user = null;
+  const user = useRecoilValue(userState);
   const [chatUsers, setChatUser] = useState<Community[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
