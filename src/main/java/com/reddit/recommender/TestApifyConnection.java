@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
@@ -18,8 +19,9 @@ public class TestApifyConnection {
         HttpURLConnection connection = null;
         try {
             // --- 1. LOAD YOUR CREDENTIALS ---
-            String envContent = Files.lines(Paths.get(".env"))
+            String envContent = Files.lines(Paths.get(".env"), StandardCharsets.UTF_16)
                     .collect(Collectors.joining("\n"));
+
 
             String apiToken = extractValue(envContent, "APIFY_API_TOKEN");
             String actorId = extractValue(envContent, "APIFY_REDDIT_ACTOR_ID");
