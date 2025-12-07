@@ -19,7 +19,7 @@ public class TestApifyConnection {
         HttpURLConnection connection = null;
         try {
             // --- 1. LOAD YOUR CREDENTIALS ---
-            String envContent = Files.lines(Paths.get(".env"), StandardCharsets.UTF_16)
+            String envContent = Files.lines(Paths.get(".env"))
                     .collect(Collectors.joining("\n"));
 
 
