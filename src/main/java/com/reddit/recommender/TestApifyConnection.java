@@ -29,11 +29,9 @@ public class TestApifyConnection {
                 return;
             }
             System.out.println("[INFO] Loaded Actor ID: " + actorId);
-
+            String apiActorId = actorId.replace("/", "~");
             // --- 2. BUILD THE CORRECT URL ---
-            //String urlString = "https://api.apify.com/v2/acts/fatihtahta/reddit-scraper/runs";
-            //String urlString = "https://api.apify.com/v2/acts/fatihtahta/reddit-scraper-search-fast/runs";
-            String urlString = "https://api.apify.com/v2/acts/fatihtahta~reddit-scraper-search-fast/runs";
+            String urlString = "https://api.apify.com/v2/acts/" + apiActorId + "/runs";
 
 
             System.out.println("[INFO] Request URL: " + urlString);
