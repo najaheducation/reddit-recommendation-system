@@ -1,4 +1,4 @@
-package com.reddit.recommender.ingestion;
+package com.reddit.recommender.api;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

@@ -1,9 +1,8 @@
-package com.reddit.recommender.ingestion;
+package com.reddit.recommender.api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.List;
-import java.util.ArrayList;
 
 public class ScraperParameters {
     private JSONObject parameters;

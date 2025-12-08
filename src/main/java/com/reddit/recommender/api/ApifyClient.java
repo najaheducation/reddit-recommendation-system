@@ -1,6 +1,5 @@
-package com.reddit.recommender.ingestion;
+package com.reddit.recommender.api;
 
-import com.reddit.recommender.ingestion.ApifyConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -11,7 +10,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
-import com.reddit.recommender.ingestion.ApifyConfig;
+
 public class ApifyClient {
     private ApifyConfig config;
 

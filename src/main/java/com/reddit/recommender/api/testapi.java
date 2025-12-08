@@ -1,9 +1,6 @@
-package com.reddit.recommender.ingestion;
-import com.reddit.recommender.ingestion.ScraperParameters;
-import com.reddit.recommender.ingestion.ApifyClient;
+package com.reddit.recommender.api;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.Arrays;
 
 public class testapi {
     public static void main(String[] args) {
