@@ -1,4 +1,4 @@
-﻿// Shared utility
-// comment 1
-// comment 2
-// comment 3
+package com.reddit.recommender.utils;
+
+public class TimeUtils {
+}
