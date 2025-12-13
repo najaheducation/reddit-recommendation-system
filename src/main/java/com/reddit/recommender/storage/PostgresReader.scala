@@ -13,7 +13,7 @@ object PostgresReader {
 
   private val url = "jdbc:postgresql://localhost:5432/redditsrs"
   private val user = "postgres"
-  private val password = "0569315404"
+  private val password = "Osayd_2004"
   private val driver = "org.postgresql.Driver"
 
   def readPostScores(spark: SparkSession): Dataset[PostScore] = {

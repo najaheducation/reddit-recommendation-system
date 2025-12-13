@@ -1,9 +1,9 @@
 ﻿-- =========================
 -- Seed data
 -- =========================
-/*
+
 INSERT INTO public.users (id, username, email, password)
-VALUES (1, 'mohammad', 'mohammad@example.com', 'hashed_password')
+VALUES (1, 'osaid', 'osaid@example.com', 'hashed_password')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.user_interests (user_id, interest, weight) VALUES
@@ -17,4 +17,3 @@ INSERT INTO public.user_interests (user_id, interest, weight) VALUES
                                                                   (1, 'trading', 0.5),
                                                                   (1, 'ecommerce', 0.6)
 ON CONFLICT DO NOTHING;
-*/

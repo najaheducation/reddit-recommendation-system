@@ -11,25 +11,30 @@ object ScoreCalculator {
                     sketch: CountMinSketch
                   ): Double = {
 
-    val safeCreated   = Option(post.createdUtc).getOrElse(Instant.now())
-    val safeScore     = post.score.getOrElse(0)
-    val safeComments  = post.numComments.getOrElse(0)
-    val safeTitle     = Option(post.title).getOrElse("")
-    val safeBody      = Option(post.body).getOrElse("")
+    val safeCreated = Option(post.createdUtc).getOrElse(Instant.now())
+    val safeTitle = Option(post.title).getOrElse("")
+    val safeBody  = Option(post.body).getOrElse("")
+
+    val safeScore = post.score
+    val safeComments = post.numComments
 
     sketch.add(safeTitle)
 
-    val baseTime        = TimeScoreCalculator.compute(safeCreated)
-    val engagement      = UserEngagementCalculator.compute(safeScore, safeComments)
+    val baseTime = TimeScoreCalculator.compute(safeCreated)
+    val engagement = UserEngagementCalculator.compute(safeScore, safeComments)
     val commentActivity = CommentActivityCalculator.compute(safeComments)
-    val upvoteVelocity  = UpvoteVelocityCalculator.compute(
-      safeScore,
-      (Instant.now.toEpochMilli - safeCreated.toEpochMilli) / 3600000.0
-    )
-    val trending        = TrendingBoostCalculator.compute(sketch, safeTitle)
+
+    val ageHours =
+      (Instant.now().toEpochMilli - safeCreated.toEpochMilli) / 3600000.0
+
+    val upvoteVelocity =
+      UpvoteVelocityCalculator.compute(safeScore, ageHours)
+
+    val trending =
+      TrendingBoostCalculator.compute(sketch, safeTitle)
+
     val preferenceMatch =
       PreferenceMatchCalculator.compute(safeTitle, safeBody, prefs)
-
 
     ScoreAggregator.aggregate(
       baseTime,

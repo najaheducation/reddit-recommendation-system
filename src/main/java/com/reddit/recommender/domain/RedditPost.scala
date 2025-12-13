@@ -7,11 +7,11 @@ case class RedditPost(
                        title: String,
                        body: String,
                        author: String,
-                       score: Option[Int],
-                       numComments: Option[Int],
+                       score: Int,
+                       numComments: Int,
                        createdUtc: Instant,
                        subreddit: String,
                        url: String,
                        query: String,
-                       upvote_ratio: Option[Double]
+                       upvote_ratio: Double
                      )

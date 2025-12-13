@@ -7,7 +7,7 @@ object PostgresWriter {
 
   private val url = "jdbc:postgresql://localhost:5432/redditsrs"
   private val user = "postgres"
-  private val password = "0569315404"
+  private val password = "Osayd_2004"
 
   def write(df: DataFrame, tableName: String): Unit = {
 

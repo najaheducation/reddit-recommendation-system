@@ -10,7 +10,6 @@ final class CountMinSketch(
 
   private def hash(value: String, i: Int): Int = {
     if (value == null || value.isEmpty) return 0
-
     val h = value.hashCode ^ seeds(i)
     math.abs(h) % width
   }
@@ -33,5 +32,14 @@ final class CountMinSketch(
       min = math.min(min, table(i)(idx))
     }
     min
+  }
+
+
+  def decay(factor: Double = 0.90): Unit = {
+    for (i <- 0 until depth) {
+      for (j <- 0 until width) {
+        table(i)(j) = math.floor(table(i)(j) * factor).toLong
+      }
+    }
   }
 }

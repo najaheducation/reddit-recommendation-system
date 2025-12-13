@@ -16,6 +16,11 @@ object SparkStreamProcessor {
 
   def main(args: Array[String]): Unit = {
 
+    // ============================
+    // إضافة CountMinSketch عالمي
+    // ============================
+    val globalSketch = new CountMinSketch()
+
     val spark = SparkSession.builder()
       .appName("RedditStreamProcessor")
       .master("local[*]")
@@ -86,7 +91,8 @@ object SparkStreamProcessor {
     println("=== RedditPost expected schema ===")
     Encoders.product[RedditPost].schema.printTreeString()
 
-    val posts: Dataset[RedditPost] = postsDF.as[RedditPost]
+    implicit val enc = Encoders.product[RedditPost]
+    val posts = postsDF.as[RedditPost]
 
     // Broadcast user interests
     val userInterests = PostgresReader.readUserInterests(spark).collect()
@@ -158,6 +164,14 @@ object SparkStreamProcessor {
           // 1) write posts
           PostgresPostWriter.writePosts(df)
 
+          // =============================
+          // إضافة زيادة الـ Sketch
+          // =============================
+          df.select("title").collect().foreach { r =>
+            val t = Option(r.getAs[String]("title")).getOrElse("")
+            if (t.nonEmpty) globalSketch.add(t)
+          }
+
           // 2) trending scoring
           val postsWithKey = df.withColumn(
             "title_norm",
@@ -206,6 +220,9 @@ object SparkStreamProcessor {
           // 4) write scores
           PostgresWriter.write(scoredDF, "post_scores")
         }
+
+
+        globalSketch.decay(0.92)
       }
       .start()
 
