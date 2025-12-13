@@ -79,30 +79,20 @@ object PostgresPostWriter {
         stmt.setString(5, anyStr("body"))
         stmt.setString(6, anyStr("author"))
         stmt.setInt(7, anyInt("score"))
-
         stmt.setBigDecimal(8, ratio)
-
-        // numComments camelCase or num_comments snake_case
         stmt.setInt(9, anyInt("numComments", "num_comments"))
-
         stmt.setString(10, anyStr("subreddit"))
-
-        // createdUtc camelCase or created_utc snake_case
         stmt.setTimestamp(11, anyTimestamp("createdUtc", "created_utc"))
-
         stmt.setString(12, anyStr("url"))
         stmt.setString(13, anyStr("flair"))
-
         stmt.setBoolean(14, anyBool("over18", "over_18"))
         stmt.setBoolean(15, anyBool("isSelf", "is_self"))
         stmt.setBoolean(16, anyBool("spoiler"))
         stmt.setBoolean(17, anyBool("locked"))
         stmt.setBoolean(18, anyBool("isVideo", "is_video"))
-
         stmt.setString(19, anyStr("domain"))
         stmt.setString(20, anyStr("thumbnail"))
         stmt.setString(21, anyStr("urlOverriddenByDest", "url_overridden_by_dest"))
-
         stmt.setString(22, anyJson("media"))
         stmt.setString(23, anyJson("mediaMetadata", "media_metadata"))
         stmt.setString(24, anyJson("galleryData", "gallery_data"))

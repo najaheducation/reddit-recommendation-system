@@ -16,9 +16,7 @@ object SparkStreamProcessor {
 
   def main(args: Array[String]): Unit = {
 
-    // ============================
-    // إضافة CountMinSketch عالمي
-    // ============================
+
     val globalSketch = new CountMinSketch()
 
     val spark = SparkSession.builder()
@@ -29,7 +27,22 @@ object SparkStreamProcessor {
     spark.sparkContext.setLogLevel("WARN")
     import spark.implicits._
 
-    // Kafka read
+ 
+
+    val rawUserPrefs = PostgresReader.readUserInterests(spark) // user_id, interest, weight
+
+    val userPrefs = rawUserPrefs
+      .groupBy(col("user_id"))
+      .agg(
+        map_from_entries(
+          collect_list(
+            struct(lower(col("interest")).as("key"), col("weight").as("value"))
+          )
+        ).as("prefs_map")
+      )
+      .cache()
+
+
     val kafkaDF = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", "localhost:9092")
@@ -38,7 +51,7 @@ object SparkStreamProcessor {
       .option("failOnDataLoss", "false")
       .load()
 
-    // RAW JSON schema
+
     val rawSchema = new StructType()
       .add("kind", StringType)
       .add("query", StringType)
@@ -65,7 +78,7 @@ object SparkStreamProcessor {
       .add("media_metadata", StringType)
       .add("gallery_data", StringType)
 
-    // Parse JSON → DataFrame
+
     val parsedDF = kafkaDF
       .selectExpr("CAST(value AS STRING) AS json")
       .select(from_json(col("json"), rawSchema).as("p"))
@@ -94,12 +107,7 @@ object SparkStreamProcessor {
     implicit val enc = Encoders.product[RedditPost]
     val posts = postsDF.as[RedditPost]
 
-    // Broadcast user interests
-    val userInterests = PostgresReader.readUserInterests(spark).collect()
-    val prefsMap = userInterests.map(ui => ui.interest.toLowerCase -> ui.weight).toMap
-    val prefsBC = spark.sparkContext.broadcast(prefsMap)
 
-    // UDFs
     val timeUdf = udf((ts: Timestamp) => {
       val inst = if (ts == null) Instant.now() else ts.toInstant
       TimeScoreCalculator.compute(inst)
@@ -123,11 +131,15 @@ object SparkStreamProcessor {
       UpvoteVelocityCalculator.compute(s, hoursSince)
     })
 
-    val preferenceUdf = udf((title: String, body: String) => {
-      val t = Option(title).getOrElse("")
-      val b = Option(body).getOrElse("")
-      PreferenceMatchCalculator.compute(t, b, prefsBC.value)
-    })
+
+    val preferenceUdf = udf(
+      (title: String, body: String, prefs: Map[String, Double]) => {
+        val t = Option(title).getOrElse("")
+        val b = Option(body).getOrElse("")
+        if (prefs == null) 0.0
+        else PreferenceMatchCalculator.compute(t, b, prefs)
+      }
+    )
 
     val finalUdf = udf(
       (baseTime: Double, engagement: Double, commentAct: Double,
@@ -135,7 +147,8 @@ object SparkStreamProcessor {
         ScoreAggregator.aggregate(baseTime, engagement, commentAct, upvoteVel, trending, pref)
     )
 
-    // Debug console output
+
+
     posts.writeStream
       .format("console")
       .outputMode("append")
@@ -144,7 +157,8 @@ object SparkStreamProcessor {
       .trigger(Trigger.ProcessingTime("5 seconds"))
       .start()
 
-    // Main stream processing
+
+
     posts.writeStream
       .outputMode("append")
       .option("checkpointLocation", "checkpoint/all")
@@ -161,18 +175,16 @@ object SparkStreamProcessor {
           df.select("id", "numComments", "upvoteRatio", "createdUtc")
             .show(5, truncate = false)
 
-          // 1) write posts
+
           PostgresPostWriter.writePosts(df)
 
-          // =============================
-          // إضافة زيادة الـ Sketch
-          // =============================
+
           df.select("title").collect().foreach { r =>
             val t = Option(r.getAs[String]("title")).getOrElse("")
             if (t.nonEmpty) globalSketch.add(t)
           }
 
-          // 2) trending scoring
+
           val postsWithKey = df.withColumn(
             "title_norm",
             lower(trim(coalesce(col("title"), lit(""))))
@@ -189,13 +201,17 @@ object SparkStreamProcessor {
             .drop("title_norm")
             .na.fill(0.0, Seq("trendingScore"))
 
+
+          val enrichedWithUsers = enriched.crossJoin(userPrefs)
+
+
           val scoredDF =
-            enriched
+            enrichedWithUsers
               .withColumn("baseTimeScore", timeUdf(col("createdUtc")))
               .withColumn("engagementScore", engagementUdf(col("score"), col("numComments")))
               .withColumn("commentActivityScore", commentUdf(col("numComments")))
               .withColumn("upvoteVelocityScore", upvoteVelocityUdf(col("score"), col("createdUtc")))
-              .withColumn("preferenceScore", preferenceUdf(col("title"), col("body")))
+              .withColumn("preferenceScore", preferenceUdf(col("title"), col("body"), col("prefs_map")))
               .withColumn("finalScore",
                 finalUdf(
                   col("baseTimeScore"),
@@ -207,6 +223,7 @@ object SparkStreamProcessor {
                 )
               )
               .select(
+                col("user_id").cast("int").as("userId"),
                 col("id").cast("string"),
                 col("baseTimeScore").cast("double"),
                 col("engagementScore").cast("double"),
@@ -217,7 +234,7 @@ object SparkStreamProcessor {
                 col("finalScore").cast("double")
               )
 
-          // 4) write scores
+
           PostgresWriter.write(scoredDF, "post_scores")
         }
 

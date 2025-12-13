@@ -48,15 +48,17 @@ CREATE TABLE IF NOT EXISTS public.reddit_posts (
 );
 
 -- 4) post_scores
-CREATE TABLE IF NOT EXISTS public.post_scores (
-                                                  id                      VARCHAR(50) PRIMARY KEY REFERENCES public.reddit_posts(id) ON DELETE CASCADE,
-                                                  base_time_score         DOUBLE PRECISION,
-                                                  engagement_score        DOUBLE PRECISION,
-                                                  comment_activity_score  DOUBLE PRECISION,
-                                                  upvote_velocity_score   DOUBLE PRECISION,
-                                                  trending_score          DOUBLE PRECISION,
-                                                  preference_score        DOUBLE PRECISION,
-                                                  final_score             DOUBLE PRECISION
+CREATE TABLE IF NOT EXISTS  public.post_scores (
+                             user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                             post_id VARCHAR(50) NOT NULL REFERENCES reddit_posts(id) ON DELETE CASCADE,
+                             base_time_score DOUBLE PRECISION,
+                             engagement_score DOUBLE PRECISION,
+                             comment_activity_score DOUBLE PRECISION,
+                             upvote_velocity_score DOUBLE PRECISION,
+                             trending_score DOUBLE PRECISION,
+                             preference_score DOUBLE PRECISION,
+                             final_score DOUBLE PRECISION,
+                             PRIMARY KEY (user_id, post_id)
 );
 
 -- indexes

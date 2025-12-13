@@ -1,6 +1,5 @@
-package com.reddit.recommender.domain
-
 case class PostScore(
+                      userId: Int,
                       id: String,
                       baseTimeScore: Double,
                       engagementScore: Double,

@@ -18,10 +18,10 @@ object PostgresWriter {
       val sql =
         s"""
            INSERT INTO $tableName
-           (id, base_time_score, engagement_score, comment_activity_score,
+           (user_id, post_id, base_time_score, engagement_score, comment_activity_score,
             upvote_velocity_score, trending_score, preference_score, final_score)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT (id) DO UPDATE SET
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT (user_id, post_id) DO UPDATE SET
              base_time_score = EXCLUDED.base_time_score,
              engagement_score = EXCLUDED.engagement_score,
              comment_activity_score = EXCLUDED.comment_activity_score,
@@ -35,19 +35,19 @@ object PostgresWriter {
 
       partition.foreach { row =>
 
-        def has(name: String): Boolean = row.schema.fieldNames.contains(name)
-        def anyDouble(names: String*): Double =
-          names.collectFirst { case n if has(n) => Option(row.getAs[Any](n)).map(_.toString.toDouble) }
-            .flatten.getOrElse(0.0)
+        stmt.setInt(1, row.getAs[Int]("userId"))
+        stmt.setString(2, row.getAs[String]("id"))
 
-        stmt.setString(1, row.getAs[String]("id"))
-        stmt.setDouble(2, anyDouble("baseTimeScore", "base_time_score"))
-        stmt.setDouble(3, anyDouble("engagementScore", "engagement_score"))
-        stmt.setDouble(4, anyDouble("commentActivityScore", "comment_activity_score"))
-        stmt.setDouble(5, anyDouble("upvoteVelocityScore", "upvote_velocity_score"))
-        stmt.setDouble(6, anyDouble("trendingScore", "trending_score"))
-        stmt.setDouble(7, anyDouble("preferenceScore", "preference_score"))
-        stmt.setDouble(8, anyDouble("finalScore", "final_score"))
+        def d(name: String): Double =
+          Option(row.getAs[Any](name)).map(_.toString.toDouble).getOrElse(0.0)
+
+        stmt.setDouble(3, d("baseTimeScore"))
+        stmt.setDouble(4, d("engagementScore"))
+        stmt.setDouble(5, d("commentActivityScore"))
+        stmt.setDouble(6, d("upvoteVelocityScore"))
+        stmt.setDouble(7, d("trendingScore"))
+        stmt.setDouble(8, d("preferenceScore"))
+        stmt.setDouble(9, d("finalScore"))
 
         stmt.addBatch()
       }
