@@ -14,6 +14,7 @@ export type Post = {
   communityImageURL?: string;
   createdAt: any; // Timestamp;
   score?: number; // Calculated score for the post
+  finalScore?: number; // Personalized final score
   userUpvote?: boolean; // Indicates whether the user upvoted the item
   userCommented?: boolean; // Indicates whether the user wrote a comment
 };

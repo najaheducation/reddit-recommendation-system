@@ -5,32 +5,31 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
+import React, { useState } from "react";
+import { HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from "react-icons/hi";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth, firestore } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import { userState } from "../../../atoms/userAtom";
+import { registerUser } from "../../../utils/authClient";
+import { saveUserCache } from "../../../utils/userCache";
 import InputField from "../../common/InputField";
 import PrimaryButton from "../../common/PrimaryButton";
 
 const SignUp: React.FC = () => {
   const setAuthModelState = useSetRecoilState(authModelState);
+  const setUser = useSetRecoilState(userState);
   const router = useRouter();
   const [signUpForm, setSignUpForm] = useState({
     email: "",
+    username: "",
     password: "",
     conformPassword: "",
   });
   const [error, setError] = useState("");
   const toast = useToast();
-  const [createUserWithEmailAndPassword, userCred, loading, userError] =
-    useCreateUserWithEmailAndPassword(auth);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,11 +45,15 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    const res = await createUserWithEmailAndPassword(
-      signUpForm.email,
-      signUpForm.password
-    );
-    if (res) {
+    try {
+      setLoading(true);
+      const user = await registerUser(
+        signUpForm.email,
+        signUpForm.username,
+        signUpForm.password
+      );
+      setUser(user);
+      saveUserCache(user);
       setAuthModelState((prev) => ({ ...prev, open: false }));
       toast({
         title: "Account created",
@@ -59,36 +62,21 @@ const SignUp: React.FC = () => {
         duration: 2000,
         isClosable: true,
       });
+      router.push(`/interests?uid=${user.uid}`);
+    } catch (err: any) {
+      const message = err?.message || "Something went wrong, please try again";
+      setError(message);
+      toast({
+        title: "Signup failed",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
-
-  const saveUserData = useCallback(
-    async (user: User) => {
-      await setDoc(doc(firestore, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        createdAt: new Date(),
-      });
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (userError) {
-      const message =
-        FIREBASE_ERRORS[userError?.message as keyof typeof FIREBASE_ERRORS] ||
-        "Something went wrong, please try again";
-      setError(message);
-    }
-  }, [userError]);
-
-  useEffect(() => {
-    if (userCred) {
-      saveUserData(userCred.user);
-      setAuthModelState((prev) => ({ ...prev, open: false }));
-      router.push(`/interests?uid=${userCred.user.uid}`);
-    }
-  }, [router, saveUserData, setAuthModelState, userCred]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -101,6 +89,15 @@ const SignUp: React.FC = () => {
           onChange={(val) => setSignUpForm((prev) => ({ ...prev, email: val }))}
           placeholder="you@example.com"
           icon={HiOutlineMail}
+        />
+        <InputField
+          id="username"
+          label="Username"
+          type="text"
+          value={signUpForm.username}
+          onChange={(val) => setSignUpForm((prev) => ({ ...prev, username: val }))}
+          placeholder="your_username"
+          icon={HiOutlineUser}
         />
         <InputField
           id="password"
@@ -129,7 +126,12 @@ const SignUp: React.FC = () => {
             {error}
           </Text>
         )}
-        <PrimaryButton width="100%" height="52px" type="submit" isLoading={loading}>
+        <PrimaryButton
+          width="100%"
+          height="52px"
+          type="submit"
+          isLoading={loading}
+        >
           Create account
         </PrimaryButton>
         <Flex justify="center" fontSize="sm" color="gray.500">

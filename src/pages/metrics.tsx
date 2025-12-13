@@ -7,13 +7,15 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authModelState } from "../atoms/authModalAtom";
 import { userState } from "../atoms/userAtom";
 import MetricSlider from "../components/common/MetricSlider";
+import type { InterestsResponse, UserInterest } from "../types/interests";
 
 type Interest = {
   name: string;
@@ -43,8 +45,16 @@ const defaultWeights: Weight[] = [
 const MetricsPage = () => {
   const user = useRecoilValue(userState);
   const setAuthModal = useSetRecoilState(authModelState);
+  const toast = useToast();
   const [interests, setInterests] = useState<Interest[]>(defaultInterests);
+  const [initialInterests, setInitialInterests] = useState<Interest[]>(defaultInterests);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [weights, setWeights] = useState<Weight[]>(defaultWeights);
+  const devUserId =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("userId")
+      : null;
   const cardBg = useColorModeValue("white", "rgba(255,255,255,0.04)");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
   const accent = useColorModeValue("brand.500", "brand.300");
@@ -53,6 +63,99 @@ const MetricsPage = () => {
     "linear-gradient(135deg, rgba(30,136,255,0.12) 0%, rgba(18,180,151,0.12) 100%)",
     "linear-gradient(135deg, rgba(30,136,255,0.12) 0%, rgba(18,180,151,0.12) 100%)"
   );
+
+  const formatLabel = (value: string) =>
+    value
+      ? value
+          .toString()
+          .replace(/[_-]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .replace(/^\w/, (c) => c.toUpperCase())
+      : "";
+
+  const loadInterests = async () => {
+    if (!user && !devUserId) return;
+    setLoading(true);
+    try {
+      const query = devUserId && !user?.id ? `?userId=${devUserId}` : "";
+      const res = await fetch(`/api/interests${query}`, {
+        credentials: "include",
+        headers: {
+          ...(user?.id ? { "x-user-id": String(user.id) } : {}),
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch interests");
+      const data = (await res.json()) as InterestsResponse;
+      const mapped: Interest[] =
+        data.interests?.map((item: UserInterest) => ({
+          name: formatLabel(item.interest),
+          subreddits: 20,
+          weight: item.weight ?? 0.5,
+        })) || [];
+
+      if (mapped.length) {
+        setInterests(mapped);
+        setInitialInterests(mapped);
+      }
+    } catch (_err) {
+      // keep defaults
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user && !devUserId) {
+      setAuthModal({ open: true, view: "login" });
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = interests.map((i) => ({
+        interest: i.name.replace(/[^a-z0-9]+/gi, "").toLowerCase(),
+        weight: i.weight,
+      }));
+      const res = await fetch("/api/interests", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(user?.id ? { "x-user-id": String(user.id) } : {}),
+        },
+        body: JSON.stringify({
+          interests: payload,
+          ...(devUserId && !user?.id ? { userId: Number(devUserId) } : {}),
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as InterestsResponse;
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save interests");
+      }
+      toast({
+        title: "Saved",
+        description: "Interests updated in your account.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      setInitialInterests(interests);
+    } catch (err: any) {
+      toast({
+        title: "Failed to save",
+        description: err?.message || "Please try again",
+        status: "error",
+        duration: 2500,
+        isClosable: true,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    loadInterests();
+  }, [user?.id]);
 
   if (!user) {
     return (
@@ -105,7 +208,7 @@ const MetricsPage = () => {
                 variant="solid"
                 size="sm"
                 onClick={() => {
-                  setInterests(defaultInterests);
+                  setInterests(initialInterests.length ? initialInterests : defaultInterests);
                   setWeights(defaultWeights);
                 }}
               >
@@ -114,7 +217,8 @@ const MetricsPage = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setAuthModal({ open: true, view: "login" })}
+                isLoading={saving}
+                onClick={handleSave}
               >
                 Save to account
               </Button>
@@ -123,59 +227,61 @@ const MetricsPage = () => {
         </Box>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
-          {interests.map((interest, idx) => (
-            <Box
-              key={interest.name}
-              p={5}
-              bg={cardBg}
-              borderRadius="16px"
-              border="1px solid"
-              borderColor={borderColor}
-              boxShadow="xl"
-              _hover={{ boxShadow: "dark-lg", transform: "translateY(-2px)" }}
-              transition="all 0.2s ease"
-            >
-              <Flex justify="space-between" align="center" mb={3}>
-                <Stack spacing={1}>
-                  <Text fontWeight={700} fontSize="md">
-                    {interest.name}
-                  </Text>
-                  <Text fontSize="sm" color={muted}>
-                    {interest.subreddits} subreddits tracked
-                  </Text>
-                </Stack>
-                <Box
-                  bg="brand.50"
-                  _dark={{ bg: "whiteAlpha.100" }}
-                  borderRadius="full"
-                  px={3}
-                  py={1}
-                  fontSize="sm"
-                  fontWeight={700}
-                  color={accent}
-                >
-                  {(interest.weight * 100).toFixed(0)}%
-                </Box>
-              </Flex>
-              <MetricSlider
-                value={interest.weight}
-                min={0}
-                max={1}
-                step={0.05}
-                suffix=""
-                label="Interest weight"
-                formatValue={(val) => val.toFixed(2)}
-                onChange={(val) =>
-                  setInterests((prev) =>
-                    prev.map((item, i) =>
-                      i === idx ? { ...item, weight: val } : item
+          {(loading ? [] : interests.length ? interests : defaultInterests).map(
+            (interest, idx) => (
+              <Box
+                key={interest.name}
+                p={5}
+                bg={cardBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={borderColor}
+                boxShadow="xl"
+                _hover={{ boxShadow: "dark-lg", transform: "translateY(-2px)" }}
+                transition="all 0.2s ease"
+              >
+                <Flex justify="space-between" align="center" mb={3}>
+                  <Stack spacing={1}>
+                    <Text fontWeight={700} fontSize="md">
+                      {interest.name}
+                    </Text>
+                    <Text fontSize="sm" color={muted}>
+                      {interest.subreddits} subreddits tracked
+                    </Text>
+                  </Stack>
+                  <Box
+                    bg="brand.50"
+                    _dark={{ bg: "whiteAlpha.100" }}
+                    borderRadius="full"
+                    px={3}
+                    py={1}
+                    fontSize="sm"
+                    fontWeight={700}
+                    color={accent}
+                  >
+                    {(interest.weight * 100).toFixed(0)}%
+                  </Box>
+                </Flex>
+                <MetricSlider
+                  value={interest.weight}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  suffix=""
+                  label="Interest weight"
+                  formatValue={(val) => val.toFixed(2)}
+                  onChange={(val) =>
+                    setInterests((prev) =>
+                      prev.map((item, i) =>
+                        i === idx ? { ...item, weight: val } : item
+                      )
                     )
-                  )
-                }
-                hint="Higher values elevate this topic in rankings."
-              />
-            </Box>
-          ))}
+                  }
+                  hint="Higher values elevate this topic in rankings."
+                />
+              </Box>
+            )
+          )}
         </SimpleGrid>
 
         <Box

@@ -30,7 +30,11 @@
     "react-firebase-hooks": "^5.0.3",
     "react-icons": "^4.4.0",
     "recoil": "^0.7.5",
-    "safe-json-stringify": "^1.2.0"
+    "safe-json-stringify": "^1.2.0",
+    "pg": "^8.13.1",
+    "bcryptjs": "^2.4.3",
+    "cookie": "^0.6.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/node": "18.7.13",

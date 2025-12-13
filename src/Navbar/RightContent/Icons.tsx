@@ -31,8 +31,7 @@ import {
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userState } from "../../atoms/userAtom";
 import { authModelState } from "../../atoms/authModalAtom";
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "../../firebase/clientApp";
+import type { InterestsResponse } from "../../types/interests";
 
 const animationKeyframes = keyframes`
   0% { transform: scale(1) rotate(0); border-radius: 20%; }
@@ -56,7 +55,7 @@ const Icons: React.FC = () => {
   } = useDisclosure();
   const [interests, setInterests] = useState<string[]>([]);
   const [loadingInterests, setLoadingInterests] = useState(false);
-  const sampleInterests = ["Web Dev", "Gaming", "AI/ML", "Music", "Fitness"];
+  const sampleInterests = ["vr", "gaming", "pchardware", "ai", "crypto"];
 
   const goToMetrics = () => {
     if (!user) {
@@ -75,7 +74,9 @@ const Icons: React.FC = () => {
       onInterestsOpen();
       setLoadingInterests(true);
       if (typeof window !== "undefined") {
-        const cached = localStorage.getItem("user_interests");
+        const cached =
+          localStorage.getItem(`user_interests_${user.uid}`) ||
+          localStorage.getItem("user_interests");
         if (cached) {
           try {
             setInterests(JSON.parse(cached));
@@ -84,9 +85,21 @@ const Icons: React.FC = () => {
           }
         }
       }
-      const snap = await getDoc(doc(firestore, "users", user.uid));
-      const data = snap.data();
-      setInterests((data?.interests as string[]) || []);
+      const res = await fetch("/api/interests", {
+        credentials: "include",
+        headers: user?.id ? { "x-user-id": String(user.id) } : undefined,
+      });
+      if (res.ok) {
+        const data = (await res.json()) as InterestsResponse;
+        const names = (data.interests || []).map((i) => i.interest);
+        setInterests(names);
+        if (typeof window !== "undefined" && names.length) {
+          localStorage.setItem(
+            `user_interests_${user.uid}`,
+            JSON.stringify(names)
+          );
+        }
+      }
     } catch (err: any) {
       // gracefully fall back to cached/sample interests
     } finally {

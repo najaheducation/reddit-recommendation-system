@@ -13,9 +13,24 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const firestore = getFirestore(app);
-const storage = getStorage(app);
+const hasFirebaseEnv = Boolean(firebaseConfig.apiKey);
+
+let app: ReturnType<typeof initializeApp> | undefined;
+let auth: ReturnType<typeof getAuth> | undefined;
+let firestore: ReturnType<typeof getFirestore> | undefined;
+let storage: ReturnType<typeof getStorage> | undefined;
+
+if (hasFirebaseEnv) {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  firestore = getFirestore(app);
+  storage = getStorage(app);
+} else {
+  // provide undefined exports to avoid runtime crashes when env is missing
+  app = undefined as any;
+  auth = undefined as any;
+  firestore = undefined as any;
+  storage = undefined as any;
+}
 
 export { app, auth, firestore, storage };

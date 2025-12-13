@@ -28,7 +28,13 @@ export const defaultCommunityState: CommunityState = {
   snippetsFetched: false,
 };
 
-export const CommunityState = atom<CommunityState>({
-  key: "communityState",
-  default: defaultCommunityState,
-});
+const globalForCommunity = globalThis as typeof globalThis & {
+  __communityState?: ReturnType<typeof atom<CommunityState>>;
+};
+
+export const CommunityState =
+  globalForCommunity.__communityState ||
+  (globalForCommunity.__communityState = atom<CommunityState>({
+    key: "communityState",
+    default: defaultCommunityState,
+  }));

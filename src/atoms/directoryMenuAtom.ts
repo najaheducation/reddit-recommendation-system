@@ -27,7 +27,13 @@ export const defaultMenuState: DirectoryMenuState = {
   selectedMenuItem: defaultMenuItem,
 };
 
-export const directoryMenuState = atom({
-  key: "directoryMenuState",
-  default: defaultMenuState,
-});
+const globalForDirectory = globalThis as typeof globalThis & {
+  __directoryMenuState?: ReturnType<typeof atom<DirectoryMenuState>>;
+};
+
+export const directoryMenuState =
+  globalForDirectory.__directoryMenuState ||
+  (globalForDirectory.__directoryMenuState = atom({
+    key: "directoryMenuState",
+    default: defaultMenuState,
+  }));

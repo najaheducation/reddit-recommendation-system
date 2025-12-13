@@ -27,21 +27,33 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
   const getPost = async () => {
     try {
       setLoading(true);
+      const queryParam = communityData?.id
+        ? `?communityId=${encodeURIComponent(communityData.id)}`
+        : "";
+      const response = await fetch(`/api/posts${queryParam}`, {
+        headers: user?.id ? { "x-user-id": String(user.id) } : undefined,
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`);
+      }
+      const data = await response.json();
+      setPostStateValue((prev) => ({
+        ...prev,
+        posts: (data.posts as Post[]) || [],
+      }));
+    } catch (error: any) {
+      console.log("get post error", error.message);
       setPostStateValue((prev) => ({
         ...prev,
         posts: [],
       }));
-
-      //console.log(posts);
-    } catch (error: any) {
-      console.log("get post error", error.message);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     getPost();
-  }, [communityData]);
+  }, [communityData, setPostStateValue, user?.id]);
 
   return (
     <>

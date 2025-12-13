@@ -1,45 +1,40 @@
 import { Flex, Link, Stack, Text, useToast } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import React, { useState } from "react";
 import { HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
-import { FIREBASE_ERRORS } from "../../../firebase/errors";
+import { userState } from "../../../atoms/userAtom";
+import { login } from "../../../utils/authClient";
+import { saveUserCache } from "../../../utils/userCache";
 import InputField from "../../common/InputField";
 import PrimaryButton from "../../common/PrimaryButton";
 
 const Login: React.FC = () => {
-  const [signInWithEmailAndPassword, userCred, loading, hookError] =
-    useSignInWithEmailAndPassword(auth);
   const setAuthModelState = useSetRecoilState(authModelState);
+  const setUser = useSetRecoilState(userState);
   const toast = useToast();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setLoading(true);
     try {
-      const res = await signInWithEmailAndPassword(
-        loginForm.email,
-        loginForm.password
-      );
-      if (res) {
-        setAuthModelState((prev) => ({ ...prev, open: false }));
-        toast({
-          title: "Logged in successfully",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-      }
+      const user = await login(loginForm.email, loginForm.password);
+      setUser(user);
+      saveUserCache(user);
+      setAuthModelState((prev) => ({ ...prev, open: false }));
+      toast({
+        title: "Logged in successfully",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
     } catch (err: any) {
-      const message =
-        FIREBASE_ERRORS[err?.message as keyof typeof FIREBASE_ERRORS] ||
-        err?.message ||
-        "Invalid email or password";
+      const message = err?.message || "Invalid email or password";
       setError(message);
       toast({
         title: "Login failed",
@@ -48,23 +43,10 @@ const Login: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (hookError) {
-      const message =
-        FIREBASE_ERRORS[hookError?.message as keyof typeof FIREBASE_ERRORS] ||
-        hookError.message;
-      setError(message);
-    }
-  }, [hookError]);
-
-  useEffect(() => {
-    if (userCred) {
-      setAuthModelState((prev) => ({ ...prev, open: false }));
-    }
-  }, [setAuthModelState, userCred]);
 
   return (
     <form onSubmit={onSubmit}>
