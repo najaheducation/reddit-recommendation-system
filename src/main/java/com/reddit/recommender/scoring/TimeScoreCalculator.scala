@@ -3,11 +3,18 @@ package com.reddit.recommender.scoring
 import java.time.{Duration, Instant}
 
 object TimeScoreCalculator {
-  def compute(createdAt: Instant, now: Instant = Instant.now()): Double = {
-    if (createdAt == null) 0.0
-    else {
-      val hours = math.max(1.0, Duration.between(createdAt, now).toHours.toDouble)
-      1.0 / (1.0 + math.log10(hours + 1.0))
+
+  def compute(createdUtc: Instant): Double = {
+    if (createdUtc == null) {
+
+      return 0.5
     }
+
+    val ageSeconds =
+      try Duration.between(createdUtc, Instant.now()).getSeconds
+      catch { case _: Throwable => return 0.5 }
+
+    val hours = ageSeconds / 3600.0
+    math.exp(-hours / 12.0)
   }
 }

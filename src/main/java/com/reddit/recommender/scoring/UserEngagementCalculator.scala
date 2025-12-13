@@ -1,10 +1,9 @@
 package com.reddit.recommender.scoring
 
 object UserEngagementCalculator {
-  def compute(likedByUser: Boolean, commentedByUser: Boolean): Double = {
-    var value = 0.0
-    if (likedByUser) value += 0.6
-    if (commentedByUser) value += 0.4
-    value
+
+  def compute(score: Int, numComments: Int): Double = {
+    val engagement = score * 0.7 + numComments * 0.3
+    math.log(engagement + 1)
   }
 }

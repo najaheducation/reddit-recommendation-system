@@ -1,11 +1,12 @@
 package com.reddit.recommender.domain
 
-final case class PostScore(
-       timeScore: Double,
-       upvoteVelocityScore: Double,
-       commentActivityScore: Double,
-       engagementScore: Double,
-       interestMatchScore: Double,
-       trendingBoostScore: Double,
-       finalScore: Double
-                          )
+case class PostScore(
+                      id: String,
+                      baseTimeScore: Double,
+                      engagementScore: Double,
+                      commentActivityScore: Double,
+                      upvoteVelocityScore: Double,
+                      trendingScore: Double,
+                      preferenceScore: Double,
+                      finalScore: Double
+                    )

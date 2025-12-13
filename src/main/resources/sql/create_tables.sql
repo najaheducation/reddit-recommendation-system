@@ -1,118 +1,65 @@
-﻿-- Core tables for Reddit SRS
+﻿-- =========================
+-- Schema for Reddit SRS (YOUR TABLES)
+-- =========================
+CREATE SCHEMA IF NOT EXISTS public;
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- 1) users
+CREATE TABLE IF NOT EXISTS public.users (
+                                            id        SERIAL PRIMARY KEY,
+                                            username  VARCHAR(50) NOT NULL UNIQUE,
+                                            email     VARCHAR(100) UNIQUE,
+                                            password  VARCHAR(100)
+);
 
--- Users and preferences
+-- 2) user_interests
+CREATE TABLE IF NOT EXISTS public.user_interests (
+                                                     id       SERIAL PRIMARY KEY,
+                                                     user_id  INTEGER NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+                                                     interest VARCHAR(100) NOT NULL,
+                                                     weight   DOUBLE PRECISION NOT NULL
+);
 
-CREATE TABLE IF NOT EXISTS app_users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ DEFAULT now()
-    );
+-- 3) reddit_posts
+CREATE TABLE IF NOT EXISTS public.reddit_posts (
+                                                   id                      VARCHAR(50) PRIMARY KEY,
+                                                   kind                    VARCHAR(20),
+                                                   query                   VARCHAR(200),
+                                                   title                   TEXT,
+                                                   body                    TEXT,
+                                                   author                  VARCHAR(100),
+                                                   score                   INTEGER,
+                                                   upvote_ratio            DOUBLE PRECISION,
+                                                   num_comments            INTEGER,
+                                                   subreddit               VARCHAR(100),
+                                                   created_utc             TIMESTAMPTZ,
+                                                   url                     TEXT,
+                                                   flair                   VARCHAR(100),
+                                                   over_18                 BOOLEAN,
+                                                   is_self                 BOOLEAN,
+                                                   spoiler                 BOOLEAN,
+                                                   locked                  BOOLEAN,
+                                                   is_video                BOOLEAN,
+                                                   domain                  VARCHAR(200),
+                                                   thumbnail               TEXT,
+                                                   url_overridden_by_dest  TEXT,
+                                                   media                   JSONB,
+                                                   media_metadata          JSONB,
+                                                   gallery_data            JSONB
+);
 
+-- 4) post_scores
+CREATE TABLE IF NOT EXISTS public.post_scores (
+                                                  id                      VARCHAR(50) PRIMARY KEY REFERENCES public.reddit_posts(id) ON DELETE CASCADE,
+                                                  base_time_score         DOUBLE PRECISION,
+                                                  engagement_score        DOUBLE PRECISION,
+                                                  comment_activity_score  DOUBLE PRECISION,
+                                                  upvote_velocity_score   DOUBLE PRECISION,
+                                                  trending_score          DOUBLE PRECISION,
+                                                  preference_score        DOUBLE PRECISION,
+                                                  final_score             DOUBLE PRECISION
+);
 
-CREATE TABLE IF NOT EXISTS user_preferences (
-    user_id UUID PRIMARY KEY REFERENCES app_users(id) ON DELETE CASCADE,
-    weights JSONB NOT NULL,
-    topics JSONB NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT now()
-    );
-
--- Posts
-
-CREATE TABLE IF NOT EXISTS reddit_posts (
-    id VARCHAR(50) PRIMARY KEY,
-    kind VARCHAR(20),
-    query VARCHAR(100),
-    title TEXT,
-    body TEXT,
-    author VARCHAR(100),
-    score INTEGER,
-    upvote_ratio NUMERIC(4,2),
-    num_comments INTEGER,
-    subreddit VARCHAR(100),
-    created_utc TIMESTAMPTZ,
-    url TEXT,
-    flair VARCHAR(100),
-    over_18 BOOLEAN,
-    is_self BOOLEAN,
-    spoiler BOOLEAN,
-    locked BOOLEAN,
-    is_video BOOLEAN,
-    domain VARCHAR(200),
-    thumbnail TEXT,
-    url_overridden_by_dest TEXT,
-    media JSONB,
-    media_metadata JSONB,
-    gallery_data JSONB,
-    liked_by_user BOOLEAN DEFAULT FALSE,
-    commented_by_user BOOLEAN DEFAULT FALSE,
-
-    -- scoring components
-    time_score DOUBLE PRECISION,
-    upvote_velocity_score DOUBLE PRECISION,
-    comment_activity_score DOUBLE PRECISION,
-    engagement_score DOUBLE PRECISION,
-    interest_match_score DOUBLE PRECISION,
-    trending_boost_score DOUBLE PRECISION,
-    final_score DOUBLE PRECISION,
-
-    features JSONB,
-    inserted_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
-    );
-
-CREATE INDEX IF NOT EXISTS idx_reddit_posts_subreddit ON reddit_posts(subreddit);
-CREATE INDEX IF NOT EXISTS idx_reddit_posts_created ON reddit_posts(created_utc);
-CREATE INDEX IF NOT EXISTS idx_reddit_posts_final_score ON reddit_posts(final_score DESC);
-
--- Comments
-
-CREATE TABLE IF NOT EXISTS reddit_comments (
-    id TEXT PRIMARY KEY,
-    kind TEXT,
-    query TEXT,
-    post_id TEXT REFERENCES reddit_posts(id) ON DELETE CASCADE,
-    post_url TEXT,
-    parent_id TEXT,
-    body TEXT,
-    author TEXT,
-    score INT,
-    created_utc TIMESTAMPTZ,
-    url TEXT
-    );
-
-CREATE INDEX IF NOT EXISTS idx_reddit_comments_post ON reddit_comments(post_id);
-
--- Post topics
-
-CREATE TABLE IF NOT EXISTS post_topics (
-    post_id TEXT REFERENCES reddit_posts(id) ON DELETE CASCADE,
-    topic TEXT NOT NULL,
-    weight DOUBLE PRECISION DEFAULT 1.0,
-    PRIMARY KEY (post_id, topic)
-    );
-
--- Trending state snapshot (from Count-Min)
-
-CREATE TABLE IF NOT EXISTS topic_trends (
-    topic TEXT NOT NULL,
-    window_start TIMESTAMPTZ NOT NULL,
-    window_end TIMESTAMPTZ NOT NULL,
-    approx_count BIGINT NOT NULL,
-    PRIMARY KEY (topic, window_start)
-    );
-
--- Optional: score history for analytics
-
-CREATE TABLE IF NOT EXISTS post_score_history (
-    post_id TEXT REFERENCES reddit_posts(id) ON DELETE CASCADE,
-    calculated_at TIMESTAMPTZ DEFAULT now(),
-    time_score DOUBLE PRECISION,
-    upvote_velocity_score DOUBLE PRECISION,
-    comment_activity_score DOUBLE PRECISION,
-    engagement_score DOUBLE PRECISION,
-    interest_match_score DOUBLE PRECISION,
-    trending_boost_score DOUBLE PRECISION,
-    final_score DOUBLE PRECISION
-    );
+-- indexes
+CREATE INDEX IF NOT EXISTS idx_posts_subreddit ON public.reddit_posts(subreddit);
+CREATE INDEX IF NOT EXISTS idx_posts_created   ON public.reddit_posts(created_utc);
+CREATE INDEX IF NOT EXISTS idx_posts_query     ON public.reddit_posts(query);
