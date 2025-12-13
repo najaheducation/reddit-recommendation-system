@@ -33,7 +33,6 @@ object SparkStreamProcessor {
       .option("failOnDataLoss", "false")
       .load()
 
-
     // RAW JSON schema
     val rawSchema = new StructType()
       .add("kind", StringType)
@@ -61,41 +60,35 @@ object SparkStreamProcessor {
       .add("media_metadata", StringType)
       .add("gallery_data", StringType)
 
-
-    // Parse JSON -> DF
+    // Parse JSON → DataFrame
     val parsedDF = kafkaDF
-      .selectExpr("CAST(value AS STRING) as json")
+      .selectExpr("CAST(value AS STRING) AS json")
       .select(from_json(col("json"), rawSchema).as("p"))
       .select("p.*")
 
-    val postsDF: DataFrame =
-      parsedDF
-        .withColumn("numComments", col("num_comments"))
-        .withColumn("createdUtc", to_timestamp(col("created_utc")))
-        .withColumn("upvoteRatio", col("upvote_ratio"))
-        .withColumn("urlOverriddenByDest", col("url_overridden_by_dest"))
-        .withColumn("over18", col("over_18"))
-        .withColumn("isSelf", col("is_self"))
-        .withColumn("isVideo", col("is_video"))
-        .withColumn("mediaMetadata", col("media_metadata"))
-        .withColumn("galleryData", col("gallery_data"))
-        .withColumn("score", coalesce(col("score"), lit(0)))
-        .withColumn("num_comments", coalesce(col("num_comments"), lit(0)))
-        .withColumn("numComments", coalesce(col("numComments"), lit(0)))
-        .withColumn("upvote_ratio", coalesce(col("upvote_ratio"), lit(0.0)))
-        .withColumn("upvoteRatio", coalesce(col("upvoteRatio"), lit(0.0)))
-        .withColumn("title", coalesce(col("title"), lit("")))
-        .withColumn("body", coalesce(col("body"), lit("")))
-        .withColumn("author", coalesce(col("author"), lit("")))
-        .withColumn("subreddit", coalesce(col("subreddit"), lit("")))
-        .withColumn("url", coalesce(col("url"), lit("")))
+    val postsDF = parsedDF
+      .withColumn("numComments", coalesce(col("num_comments"), lit(0)))
+      .withColumn("createdUtc", to_timestamp(col("created_utc")))
+      .withColumn("upvoteRatio", coalesce(col("upvote_ratio"), lit(0.0)))
+      .withColumn("urlOverriddenByDest", col("url_overridden_by_dest"))
+      .withColumn("over18", col("over_18"))
+      .withColumn("isSelf", col("is_self"))
+      .withColumn("isVideo", col("is_video"))
+      .withColumn("mediaMetadata", col("media_metadata"))
+      .withColumn("galleryData", col("gallery_data"))
+      .withColumn("score", coalesce(col("score"), lit(0)))
+      .withColumn("title", coalesce(col("title"), lit("")))
+      .withColumn("body", coalesce(col("body"), lit("")))
+      .withColumn("author", coalesce(col("author"), lit("")))
+      .withColumn("subreddit", coalesce(col("subreddit"), lit("")))
+      .withColumn("url", coalesce(col("url"), lit("")))
 
     println("=== RedditPost expected schema ===")
     Encoders.product[RedditPost].schema.printTreeString()
 
     val posts: Dataset[RedditPost] = postsDF.as[RedditPost]
 
-    // Preferences broadcast
+    // Broadcast user interests
     val userInterests = PostgresReader.readUserInterests(spark).collect()
     val prefsMap = userInterests.map(ui => ui.interest.toLowerCase -> ui.weight).toMap
     val prefsBC = spark.sparkContext.broadcast(prefsMap)
@@ -120,8 +113,8 @@ object SparkStreamProcessor {
     val upvoteVelocityUdf = udf((score: java.lang.Integer, created: Timestamp) => {
       val s = Option(score).map(_.toInt).getOrElse(0)
       val createdInst = if (created == null) Instant.now() else created.toInstant
-      val hoursSincePost = (Instant.now().toEpochMilli - createdInst.toEpochMilli) / 3600000.0
-      UpvoteVelocityCalculator.compute(s, hoursSincePost)
+      val hoursSince = (Instant.now().toEpochMilli - createdInst.toEpochMilli) / 3600000.0
+      UpvoteVelocityCalculator.compute(s, hoursSince)
     })
 
     val preferenceUdf = udf((title: String, body: String) => {
@@ -130,16 +123,13 @@ object SparkStreamProcessor {
       PreferenceMatchCalculator.compute(t, b, prefsBC.value)
     })
 
-    val finalUdf = udf((
-                         baseTime: Double,
-                         engagement: Double,
-                         commentAct: Double,
-                         upvoteVel: Double,
-                         trending: Double,
-                         pref: Double
-                       ) => ScoreAggregator.aggregate(baseTime, engagement, commentAct, upvoteVel, trending, pref))
+    val finalUdf = udf(
+      (baseTime: Double, engagement: Double, commentAct: Double,
+       upvoteVel: Double, trending: Double, pref: Double) =>
+        ScoreAggregator.aggregate(baseTime, engagement, commentAct, upvoteVel, trending, pref)
+    )
 
-    // Debug
+    // Debug console output
     posts.writeStream
       .format("console")
       .outputMode("append")
@@ -148,7 +138,7 @@ object SparkStreamProcessor {
       .trigger(Trigger.ProcessingTime("5 seconds"))
       .start()
 
-    // One foreachBatch: write posts + scores
+    // Main stream processing
     posts.writeStream
       .outputMode("append")
       .option("checkpointLocation", "checkpoint/all")
@@ -157,57 +147,65 @@ object SparkStreamProcessor {
 
         val count = batch.count()
         println(s"[BATCH] batchId=$batchId count=$count")
-        if (count == 0) return
 
-        val df = batch.toDF()
+        if (count > 0) {
 
-        df.select("id", "numComments", "num_comments", "upvoteRatio", "upvote_ratio", "createdUtc").show(5, truncate = false)
+          val df = batch.toDF()
 
-        // 1) write posts
-        PostgresPostWriter.writePosts(df)
+          df.select("id", "numComments", "upvoteRatio", "createdUtc")
+            .show(5, truncate = false)
 
-        // 2) trending on the same post batch
-        val postsWithKey = df.withColumn("title_norm", lower(trim(coalesce(col("title"), lit("")))))
+          // 1) write posts
+          PostgresPostWriter.writePosts(df)
 
-        val freqDF = postsWithKey
-          .groupBy("title_norm")
-          .count()
-          .withColumn("trendingScore", log(col("count") + lit(1.0)))
-          .select("title_norm", "trendingScore")
+          // 2) trending scoring
+          val postsWithKey = df.withColumn(
+            "title_norm",
+            lower(trim(coalesce(col("title"), lit(""))))
+          )
 
-        val enriched = postsWithKey
-          .join(freqDF, Seq("title_norm"), "left")
-          .drop("title_norm")
-          .na.fill(0.0, Seq("trendingScore"))
+          val freqDF = postsWithKey
+            .groupBy("title_norm")
+            .count()
+            .withColumn("trendingScore", log(col("count") + lit(1.0)))
+            .select("title_norm", "trendingScore")
 
-        val scoredDF =
-          enriched
-            .withColumn("baseTimeScore", timeUdf(col("createdUtc")))
-            .withColumn("engagementScore", engagementUdf(col("score"), col("numComments")))
-            .withColumn("commentActivityScore", commentUdf(col("numComments")))
-            .withColumn("upvoteVelocityScore", upvoteVelocityUdf(col("score"), col("createdUtc")))
-            .withColumn("preferenceScore", preferenceUdf(col("title"), col("body")))
-            .withColumn("finalScore", finalUdf(
-              col("baseTimeScore"),
-              col("engagementScore"),
-              col("commentActivityScore"),
-              col("upvoteVelocityScore"),
-              col("trendingScore"),
-              col("preferenceScore")
-            ))
-            .select(
-              col("id").cast("string").as("id"),
-              col("baseTimeScore").cast("double"),
-              col("engagementScore").cast("double"),
-              col("commentActivityScore").cast("double"),
-              col("upvoteVelocityScore").cast("double"),
-              col("trendingScore").cast("double"),
-              col("preferenceScore").cast("double"),
-              col("finalScore").cast("double")
-            )
+          val enriched = postsWithKey
+            .join(freqDF, Seq("title_norm"), "left")
+            .drop("title_norm")
+            .na.fill(0.0, Seq("trendingScore"))
 
-        // 4) write scores
-        PostgresWriter.write(scoredDF, "post_scores")
+          val scoredDF =
+            enriched
+              .withColumn("baseTimeScore", timeUdf(col("createdUtc")))
+              .withColumn("engagementScore", engagementUdf(col("score"), col("numComments")))
+              .withColumn("commentActivityScore", commentUdf(col("numComments")))
+              .withColumn("upvoteVelocityScore", upvoteVelocityUdf(col("score"), col("createdUtc")))
+              .withColumn("preferenceScore", preferenceUdf(col("title"), col("body")))
+              .withColumn("finalScore",
+                finalUdf(
+                  col("baseTimeScore"),
+                  col("engagementScore"),
+                  col("commentActivityScore"),
+                  col("upvoteVelocityScore"),
+                  col("trendingScore"),
+                  col("preferenceScore")
+                )
+              )
+              .select(
+                col("id").cast("string"),
+                col("baseTimeScore").cast("double"),
+                col("engagementScore").cast("double"),
+                col("commentActivityScore").cast("double"),
+                col("upvoteVelocityScore").cast("double"),
+                col("trendingScore").cast("double"),
+                col("preferenceScore").cast("double"),
+                col("finalScore").cast("double")
+              )
+
+          // 4) write scores
+          PostgresWriter.write(scoredDF, "post_scores")
+        }
       }
       .start()
 
