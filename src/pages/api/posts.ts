@@ -120,11 +120,7 @@ export default async function handler(
       sql += ` WHERE ${conditions.join(" AND ")}`;
     }
 
-    if (userId !== null) {
-      sql += " ORDER BY ps.final_score DESC NULLS LAST, p.created_utc DESC";
-    } else {
-      sql += " ORDER BY p.created_utc DESC";
-    }
+    sql += " ORDER BY COALESCE(ps.final_score, p.score) DESC NULLS LAST, p.created_utc DESC";
 
     const limitNumber = limitParam ? parseInt(limitParam, 10) : undefined;
     if (limitNumber && !Number.isNaN(limitNumber)) {

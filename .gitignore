@@ -12,6 +12,8 @@
 .next/cache/
 .next/server/
 .next/static/
+# Ignore dependencies
+node_modules/
 
 # next.js
 
