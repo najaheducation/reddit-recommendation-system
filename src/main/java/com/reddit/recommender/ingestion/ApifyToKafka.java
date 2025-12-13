@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 public class ApifyToKafka {
     public static void main(String[] args) {
-        // Backward compatibility - can still run with command line args
         if (args.length == 0) {
             runDefaultPipeline();
         } else {
@@ -27,7 +26,6 @@ public class ApifyToKafka {
     }
 
     private static void runWithArgs(String[] args) {
-        // Example: java ApifyToKafka --subreddits programming technology --posts 50 --comments
         ScrapeConfig.Builder builder = new ScrapeConfig.Builder();
 
         for (int i = 0; i < args.length; i++) {
@@ -47,7 +45,6 @@ public class ApifyToKafka {
                 case "--timeframe":
                     builder.timeframe(args[++i]);
                     break;
-                // Add more argument handling as needed
             }
         }
 
