@@ -10,16 +10,15 @@ public class UsageExamples {
         // Example 1: Simple one-off scrape
         example1_simpleScrape();
 
-        // Example 2: Complex configuration
-//        example2_complexScrape();
+       // // Example 2: Complex configuration
+//      example2_complexScrape();
+ //      // Example 3: Scheduled job
+     //  example3_scheduledScrape();
 //
-//        // Example 3: Scheduled job
-//        example3_scheduledScrape();
-//
-//        // Example 4: Using factory methods
-//        example4_factoryConfigs();
-//
-//        scheduleAt1148PM();
+//       // Example 4: Using factory methods
+//      example4_factoryConfigs();
+
+    //    scheduleAt1148PM();
     }
 
     private static void example1_simpleScrape() {
@@ -42,12 +41,12 @@ public class UsageExamples {
         ScrapeConfig config = new ScrapeConfig.Builder()
                 .subreddits("datascience", "MachineLearning", "artificial")
                 .keywords("deep learning", "neural network", "LLM")
-                .postsPerSource(5)
+                .postsPerSource(10)
                 .scrapeComments(true)
                 .maxCommentsPerPost(3)
                 .timeframe("week")
                 .sort("top")
-                .includeNsfw(false)
+                //.includeNsfw(false)
                 .maxRetries(3)
                 .delayBetweenSourcesMs(3000)
                 .build();
@@ -58,15 +57,15 @@ public class UsageExamples {
         result.printReport();
     }
     private static void scheduleAt1148PM() {
-        System.out.println("\n=== Scheduling Daily Job at 11:48 PM ===");
+        System.out.println("\n=== Scheduling Daily Job at 0:15 AM ===");
 
         ScrapeConfig trendingConfig = ScrapeConfig.trendingTechConfig();
         ScrapeJobScheduler scheduler = new ScrapeJobScheduler();
 
         // Schedule daily at 11:48 PM (23:48)
-        scheduler.scheduleDailyAt(23, 48, trendingConfig);
+        scheduler.scheduleDailyAt(17, 32, trendingConfig);
 
-        System.out.println("Job scheduled to run daily at 11:48 PM");
+        System.out.println("Job scheduled to run daily at 0:15 AM");
         System.out.println("The scheduler will keep running in the background.");
 
         // Keep the program alive (or run as a service)

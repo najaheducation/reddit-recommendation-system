@@ -30,8 +30,7 @@ public class testapi {
             JSONArray results1 = client.scrapeReddit(params1);
             System.out.println("Scraped " + results1.length() + " items.");
 
-            // Example 2: Using the ScraperParameters builder
-            System.out.println("\n=== Example 2: Using Builder ===");
+            //  builder method
             JSONObject params2 = new ScraperParameters()
                     .addQuery("palestine")
                     .addQuery("gaza")
@@ -40,7 +39,7 @@ public class testapi {
                     .setMaxPosts(20)
                     .setMaxComments(5)
                     .setScrapeComments(true)
-                    .setIncludeNsfw(false)
+                    //.setIncludeNsfw(false)
                     .setSort("new")
                     .setTimeframe("week")
                     .build();
@@ -66,17 +65,26 @@ public class testapi {
             for (int i = 0; i < Math.min(5, results2.length()); i++) {
                 JSONObject post = results2.getJSONObject(i);
                 System.out.println("\nPost " + (i + 1) + ":");
-                System.out.println("Title: " + post.optString("title", "N/A"));
-                System.out.println("Subreddit: " + post.optString("subreddit", "N/A"));
-                System.out.println("Upvotes: " + post.optInt("upvotes", 0));
-                System.out.println("URL: https://reddit.com" + post.optString("url", ""));
+                System.out.println("Raw JSON data:");
+                System.out.println(post.toString(4)); // Using toString(4) for pretty printing with 4-space indentation
 
-                // Check if there are comments
-                if (post.has("comments") && post.getJSONArray("comments").length() > 0) {
-                    JSONObject comment = post.getJSONArray("comments").getJSONObject(0);
-                    System.out.println("Top comment: " + comment.optString("text", "").substring(0, Math.min(100, comment.optString("text", "").length())) + "...");
-                }
+                // Alternative option without pretty printing:
+                // System.out.println(post.toString());
             }
+//            for (int i = 0; i < Math.min(5, results2.length()); i++) {
+//                JSONObject post = results2.getJSONObject(i);
+//                System.out.println("\nPost " + (i + 1) + ":");
+//                System.out.println("Title: " + post.optString("title", "N/A"));
+//                System.out.println("Subreddit: " + post.optString("subreddit", "N/A"));
+//                System.out.println("Upvotes: " + post.optInt("upvotes", 0));
+//                System.out.println("URL: https://reddit.com" + post.optString("url", ""));
+//
+//                // Check if there are comments
+//                if (post.has("comments") && post.getJSONArray("comments").length() > 0) {
+//                    JSONObject comment = post.getJSONArray("comments").getJSONObject(0);
+//                    System.out.println("Top comment: " + comment.optString("text", "").substring(0, Math.min(100, comment.optString("text", "").length())) + "...");
+//                }
+//            }
 
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
