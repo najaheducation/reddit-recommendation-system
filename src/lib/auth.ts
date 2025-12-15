@@ -3,7 +3,7 @@ import { parse, serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 
-import { DbUserRow } from "./db";
+import { UserDocument } from "./db";
 
 export const AUTH_COOKIE = "redditpulse_token";
 
@@ -21,16 +21,16 @@ export const verifyPassword = async (input: string, stored: string) => {
   return input === stored;
 };
 
-export const signAuthToken = (user: DbUserRow) =>
+export const signAuthToken = (user: UserDocument) =>
   jwt.sign(
-    { sub: user.id, email: user.email, username: user.username },
+    { sub: user._id.toString(), email: user.email, username: user.username },
     getJwtSecret(),
     { expiresIn: "7d" }
   );
 
-export const mapDbUserToClient = (user: DbUserRow) => ({
-  id: user.id,
-  uid: user.id.toString(),
+export const mapDbUserToClient = (user: UserDocument) => ({
+  id: user._id.toString(),
+  uid: user._id.toString(),
   username: user.username,
   email: user.email,
   displayName: user.username || user.email,
@@ -68,7 +68,7 @@ export const getAuthToken = (req: NextApiRequest) => {
 
 export const verifyAuthToken = (token: string) =>
   jwt.verify(token, getJwtSecret()) as {
-    sub: number;
+    sub: string;
     email: string;
     username: string;
     iat: number;

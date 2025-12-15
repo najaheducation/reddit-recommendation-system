@@ -1,33 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getAuthToken, verifyAuthToken } from "../../lib/auth";
-import { query } from "../../lib/db";
-
-type DbInterestRow = {
-  id: number;
-  user_id: number;
-  interest: string;
-  weight: number;
-};
+import { getInterestsCollection, toObjectId } from "../../lib/db";
 
 export type UserInterest = {
-  id?: number;
+  id?: string;
   interest: string;
+  subInterest?: string;
   weight: number;
 };
 
-const INTERESTS_TABLE =
-  (process.env.INTERESTS_TABLE || "user_interests").replace(
-    /[^a-zA-Z0-9_]/g,
-    ""
-  ) || "user_interests";
-
-const getUserIdFromRequest = (req: NextApiRequest): number | null => {
+const getUserIdFromRequest = (req: NextApiRequest) => {
   const token = getAuthToken(req);
   if (token) {
     try {
       const payload = verifyAuthToken(token);
-      return typeof payload.sub === "string" ? Number(payload.sub) : payload.sub;
+      const objectId = toObjectId(String(payload.sub));
+      if (objectId) return objectId;
     } catch {
       // fall through to dev fallback
     }
@@ -35,18 +24,13 @@ const getUserIdFromRequest = (req: NextApiRequest): number | null => {
   if (process.env.NODE_ENV !== "production") {
     const headerId = req.headers["x-user-id"];
     const candidate = headerId ?? (req.body as any)?.userId ?? req.query.userId;
-    const num = Number(candidate);
-    if (!Number.isNaN(num) && num > 0) {
-      return num;
-    }
+    const objectId = toObjectId(candidate ? String(candidate) : "");
+    if (objectId) return objectId;
   }
   return null;
 };
 
-const sanitizeInterest = (value: string) => {
-  const cleaned = value.toLowerCase().replace(/[^a-z0-9]+/g, "");
-  return cleaned;
-};
+const sanitizeInterest = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 
 const normalizeInterests = (raw: any): UserInterest[] => {
   if (!Array.isArray(raw)) return [];
@@ -54,44 +38,53 @@ const normalizeInterests = (raw: any): UserInterest[] => {
   const seen = new Set<string>();
 
   return raw
-    .map((item) => ({
-      interest: sanitizeInterest(
+    .map((item) => {
+      const interestInput =
         typeof item?.interest === "string"
           ? item.interest
           : typeof item === "string"
             ? item
-            : ""
-      ),
-      weight: Number.isNaN(Number(item?.weight)) ? 0.6 : Number(item?.weight),
-    }))
+            : "";
+      const subInterestInput = typeof item?.subInterest === "string" ? item.subInterest : "";
+      return {
+        interest: sanitizeInterest(interestInput),
+        subInterest: subInterestInput ? sanitizeInterest(subInterestInput) : undefined,
+        weight: Number.isNaN(Number(item?.weight)) ? 0.6 : Number(item?.weight),
+      };
+    })
     .filter((item) => item.interest.length > 0)
     .filter((item) => {
-      if (seen.has(item.interest)) return false;
-      seen.add(item.interest);
+      const key = `${item.interest}::${item.subInterest || ""}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     })
-    .slice(0, 50)
+    .slice(0, 100)
     .map((item) => ({
       ...item,
       weight: Math.min(1, Math.max(0, Number(item.weight))),
     }));
 };
 
-const readUserInterests = async (userId: number) => {
-  const result = await query<DbInterestRow>(
-    `SELECT id, user_id, interest, weight FROM ${INTERESTS_TABLE} WHERE user_id = $1 ORDER BY weight DESC, interest ASC`,
-    [userId]
-  );
-  return result.rows.map((row) => ({
-    id: row.id,
-    interest: row.interest,
-    weight: row.weight,
+const readUserInterests = async (userId: ReturnType<typeof toObjectId>) => {
+  if (!userId) return [];
+  const col = await getInterestsCollection();
+  const docs = await col
+    .find({ userId })
+    .sort({ weight: -1, interest: 1, subInterest: 1 })
+    .toArray();
+
+  return docs.map((doc) => ({
+    id: doc._id.toString(),
+    interest: doc.interest,
+    subInterest: doc.subInterest || undefined,
+    weight: doc.weight,
   })) as UserInterest[];
 };
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ interests: UserInterest[]; userId?: number } | { error: string }>
+  res: NextApiResponse<{ interests: UserInterest[]; userId?: string } | { error: string }>
 ) {
   if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -105,7 +98,7 @@ export default async function handler(
   try {
     if (req.method === "GET") {
       const interests = await readUserInterests(userId);
-      return res.status(200).json({ interests, userId });
+      return res.status(200).json({ interests, userId: userId.toString() });
     }
 
     const incoming = normalizeInterests(req.body?.interests);
@@ -116,26 +109,21 @@ export default async function handler(
         .json({ error: "At least one interest is required" });
     }
 
-    await query(`DELETE FROM ${INTERESTS_TABLE} WHERE user_id = $1`, [userId]);
+    const col = await getInterestsCollection();
+    await col.deleteMany({ userId });
 
-    const values: any[] = [];
-    const placeholders: string[] = [];
-
-    incoming.forEach((item, idx) => {
-      const base = idx * 3;
-      placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3})`);
-      values.push(userId, item.interest, item.weight);
-    });
-
-    await query(
-      `INSERT INTO ${INTERESTS_TABLE} (user_id, interest, weight) VALUES ${placeholders.join(
-        ", "
-      )}`,
-      values
+    await col.insertMany(
+      incoming.map((item) => ({
+        userId,
+        interest: item.interest,
+        subInterest: item.subInterest,
+        weight: item.weight,
+        createdAt: new Date(),
+      }))
     );
 
     const interests = await readUserInterests(userId);
-    return res.status(200).json({ interests, userId });
+    return res.status(200).json({ interests, userId: userId.toString() });
   } catch (error) {
     console.error("Interests API error", error);
     return res.status(500).json({ error: "Failed to process interests" });

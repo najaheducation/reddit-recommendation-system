@@ -1,11 +1,12 @@
 export type UserInterest = {
-  id?: number;
+  id?: string;
   interest: string;
+  subInterest?: string;
   weight: number;
 };
 
 export type InterestsResponse = {
   interests: UserInterest[];
-  userId?: number;
+  userId?: string;
   error?: string;
 };

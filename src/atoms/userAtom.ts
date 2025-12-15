@@ -1,7 +1,7 @@
 import { atom } from "recoil";
 
 export interface BasicUser {
-  id: number;
+  id: string;
   uid: string; // legacy-friendly string id
   username?: string;
   email: string | null;

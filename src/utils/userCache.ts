@@ -14,7 +14,12 @@ export const loadUserCache = (): BasicUser | null => {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as BasicUser;
+    const parsed = JSON.parse(raw) as Partial<BasicUser> & { id?: string | number };
+    if (parsed && parsed.id !== undefined && parsed.id !== null) {
+      parsed.id = String(parsed.id);
+      parsed.uid = parsed.uid || String(parsed.id);
+    }
+    return parsed as BasicUser;
   } catch {
     return null;
   }

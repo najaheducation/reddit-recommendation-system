@@ -6,11 +6,7 @@ import {
   signAuthToken,
   verifyPassword,
 } from "../../../lib/auth";
-import { DbUserRow, query } from "../../../lib/db";
-
-const USER_TABLE =
-  (process.env.AUTH_USER_TABLE || "users").replace(/[^a-zA-Z0-9_]/g, "") ||
-  "users";
+import { getUsersCollection } from "../../../lib/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,12 +23,9 @@ export default async function handler(
   }
 
   try {
-    const userResult = await query<DbUserRow>(
-      `SELECT * FROM ${USER_TABLE} WHERE email = $1 LIMIT 1`,
-      [email]
-    );
-
-    const user = userResult.rows[0];
+    const users = await getUsersCollection();
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const user = await users.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });

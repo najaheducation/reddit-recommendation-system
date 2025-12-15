@@ -6,11 +6,7 @@ import {
   setAuthCookie,
   signAuthToken,
 } from "../../../lib/auth";
-import { DbUserRow, query } from "../../../lib/db";
-
-const USER_TABLE =
-  (process.env.AUTH_USER_TABLE || "users").replace(/[^a-zA-Z0-9_]/g, "") ||
-  "users";
+import { getUsersCollection } from "../../../lib/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,31 +25,38 @@ export default async function handler(
   }
 
   try {
+    const users = await getUsersCollection();
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedUsername = String(username).trim();
+
     const [existingByEmail, existingByUsername] = await Promise.all([
-      query<DbUserRow>(`SELECT * FROM ${USER_TABLE} WHERE email = $1 LIMIT 1`, [
-        email,
-      ]),
-      query<DbUserRow>(`SELECT * FROM ${USER_TABLE} WHERE username = $1 LIMIT 1`, [
-        username,
-      ]),
+      users.findOne({ email: normalizedEmail }),
+      users.findOne({ username: normalizedUsername }),
     ]);
 
-    if (existingByEmail.rowCount && existingByEmail.rows[0]) {
+    if (existingByEmail) {
       return res.status(409).json({ error: "A user with that email already exists" });
     }
 
-    if (existingByUsername.rowCount && existingByUsername.rows[0]) {
+    if (existingByUsername) {
       return res.status(409).json({ error: "Username is already taken" });
     }
 
     const hashedPassword = await hashPassword(password);
 
-    const insertResult = await query<DbUserRow>(
-      `INSERT INTO ${USER_TABLE} (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email, password`,
-      [username, email, hashedPassword]
-    );
+    const insertResult = await users.insertOne({
+      username: normalizedUsername,
+      email: normalizedEmail,
+      password: hashedPassword,
+      createdAt: new Date(),
+    });
 
-    const newUser = insertResult.rows[0];
+    const newUser = {
+      _id: insertResult.insertedId,
+      username: normalizedUsername,
+      email: normalizedEmail,
+      password: hashedPassword,
+    };
     const token = signAuthToken(newUser);
     setAuthCookie(res, token);
 

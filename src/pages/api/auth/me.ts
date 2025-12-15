@@ -1,11 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { clearAuthCookie, getAuthToken, mapDbUserToClient, verifyAuthToken } from "../../../lib/auth";
-import { DbUserRow, query } from "../../../lib/db";
-
-const USER_TABLE =
-  (process.env.AUTH_USER_TABLE || "users").replace(/[^a-zA-Z0-9_]/g, "") ||
-  "users";
+import { getUsersCollection, toObjectId } from "../../../lib/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,12 +19,14 @@ export default async function handler(
 
   try {
     const payload = verifyAuthToken(token);
-    const userResult = await query<DbUserRow>(
-      `SELECT id, username, email, password FROM ${USER_TABLE} WHERE id = $1 LIMIT 1`,
-      [payload.sub]
-    );
+    const userId = toObjectId(String(payload.sub));
+    if (!userId) {
+      clearAuthCookie(res);
+      return res.status(200).json({ user: null });
+    }
 
-    const user = userResult.rows[0];
+    const users = await getUsersCollection();
+    const user = await users.findOne({ _id: userId });
 
     if (!user) {
       clearAuthCookie(res);
