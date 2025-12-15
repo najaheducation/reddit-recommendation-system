@@ -45,7 +45,7 @@ object RedditPipelineTest {
       )
       .withStorage(
         AppConfig(
-          mongo = MongoConfig("${sys.env.getOrElse(\"MONGO_URI\", \"mongodb://localhost:27017\")}", "reddit_test", None, None),
+          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
           kafka = KafkaConfig("localhost:9092"),
           topics = List("reddit-posts", "reddit-comments")
         )
@@ -88,7 +88,7 @@ object RedditPipelineTest {
     val storageOnly = new RedditPipelineBuilder()
       .withStorage(
         AppConfig(
-          mongo = MongoConfig("${sys.env.getOrElse(\"MONGO_URI\", \"mongodb://localhost:27017\")}", "reddit_test", None, None),
+          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
           kafka = KafkaConfig("localhost:9092")
         )
       )

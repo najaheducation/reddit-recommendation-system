@@ -381,7 +381,7 @@ object RedditPipeline {
 
     // Minimal storage config
     val storageConfig = AppConfig(
-      mongo = MongoConfig("${sys.env.getOrElse(\"MONGO_URI\", \"mongodb://localhost:27017\")}", "reddit_test", None, None),
+      mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
       kafka = KafkaConfig("localhost:9092", "test-group"),
       topics = List("reddit-posts", "reddit-comments")
     )

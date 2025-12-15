@@ -29,7 +29,7 @@ object SimpleUsage {
       )
       .withStorage(
         AppConfig(
-          mongo = MongoConfig("${sys.env.getOrElse(\"MONGO_URI\", \"mongodb://localhost:27017\")}", "reddit_custom", None, None),
+          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_custom", None, None),
           kafka = KafkaConfig("localhost:9092"),
           topics = List("reddit-posts", "reddit-comments"),
           featureExtractor = Some(
