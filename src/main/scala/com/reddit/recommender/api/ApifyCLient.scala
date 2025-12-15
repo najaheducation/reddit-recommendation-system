@@ -16,7 +16,7 @@ class ApifyClient {
     try {
       println("[INFO] Starting Reddit scraper...")
 
-      val urlString = s"https://api.apify.com/v2/acts/${config.getApiActorId}/runs?token=${config.getApiToken}"
+      val urlString: String = s"https://api.apify.com/v2/acts/${config.getApiActorId}/runs?token=${config.getApiToken}"
       println("[INFO] Request URL: " + urlString)
       println("[INFO] Parameters: " + parameters.toString)
 
@@ -27,7 +27,7 @@ class ApifyClient {
       connection.setRequestProperty("Authorization", s"Bearer ${config.getApiToken}")
       connection.setDoOutput(true)
       connection.setConnectTimeout(10000)
-      connection.setReadTimeout(600000)  // 10 minutes
+      connection.setReadTimeout(600000)
 
       val writer = new OutputStreamWriter(connection.getOutputStream)
       try writer.write(parameters.toString)
@@ -71,7 +71,8 @@ class ApifyClient {
         fetchResults(datasetId)
       } else {
         System.err.println("[ERROR] API Request Failed!")
-        throw new RuntimeException(s"API request failed with status $status: $responseBody")
+        val message: String = s"API request failed with status $status: $responseBody"
+        throw new RuntimeException(message)
       }
     } finally {
       if (connection != null) {
@@ -90,7 +91,7 @@ class ApifyClient {
       Thread.sleep(10000)
       attempts += 1
 
-      val statusUrl = s"https://api.apify.com/v2/actor-runs/$runId?token=${config.getApiToken}"
+      val statusUrl: String = s"https://api.apify.com/v2/actor-runs/$runId?token=${config.getApiToken}"
       val statusConnection = new URL(statusUrl).openConnection().asInstanceOf[HttpURLConnection]
       statusConnection.setRequestMethod("GET")
 
@@ -108,19 +109,21 @@ class ApifyClient {
           println("[INFO] Actor run completed successfully!")
         } else if ("FAILED" == runStatus || "ABORTED" == runStatus) {
           val errorMessage = statusData.optString("errorMessage", "No error message")
-          throw new RuntimeException(s"Actor run failed with status $runStatus: $errorMessage")
+          val message: String = s"Actor run failed with status $runStatus: $errorMessage"
+          throw new RuntimeException(message)
         }
       }
       statusConnection.disconnect()
     }
 
     if (!isCompleted) {
-      throw new RuntimeException(s"Actor run timed out after $maxAttempts attempts.")
+      val message: String = s"Actor run timed out after $maxAttempts attempts."
+      throw new RuntimeException(message)
     }
   }
 
   private def fetchResults(datasetId: String): JSONArray = {
-    val dataUrl = s"https://api.apify.com/v2/datasets/$datasetId/items?token=${config.getApiToken}"
+    val dataUrl: String = s"https://api.apify.com/v2/datasets/$datasetId/items?token=${config.getApiToken}"
     println("[INFO] Fetching results from: " + dataUrl)
 
     val dataConnection = new URL(dataUrl).openConnection().asInstanceOf[HttpURLConnection]
@@ -145,7 +148,7 @@ class ApifyClient {
   }
 
   def getRunStatus(runId: String): JSONObject = {
-    val statusUrl = s"https://api.apify.com/v2/actor-runs/$runId?token=${config.getApiToken}"
+    val statusUrl: String = s"https://api.apify.com/v2/actor-runs/$runId?token=${config.getApiToken}"
     val connection = new URL(statusUrl).openConnection().asInstanceOf[HttpURLConnection]
     connection.setRequestMethod("GET")
 
@@ -166,10 +169,12 @@ class ApifyClient {
   def getDatasetItems(datasetId: String): JSONArray = fetchResults(datasetId)
 
   private def readStream(inputStream: java.io.InputStream): String = {
-    if (inputStream == null) return ""
-    val reader = new BufferedReader(new InputStreamReader(inputStream))
-    try reader.lines().collect(java.util.stream.Collectors.joining("\n"))
-    finally reader.close()
+    if (inputStream == null) ""
+    else {
+      val reader = new BufferedReader(new InputStreamReader(inputStream))
+      try reader.lines().collect(java.util.stream.Collectors.joining("\n"))
+      finally reader.close()
+    }
   }
 
   private def getStatusMessage(status: Int): String = status match {

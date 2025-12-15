@@ -35,16 +35,38 @@ services:
       # Optional but nice
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: redditsrs
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
+
+  mongodb:
+    image: mongo:6  # This is just for consistency; you won't use this container's DB
+    container_name: reddit-mongodb
+    ports:
+      - "27017:27017"  # Optional: exposes the container's MongoDB (but we'll connect to host)
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    command: [ "--bind_ip_all" ]  # Allows external connections (including from mongo-express)
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      # Connect to your HOST machine's local MongoDB (not the container or Atlas)
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@host.docker.internal:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin  # Optional: adds basic auth to the mongo-express UI
+      ME_CONFIG_BASICAUTH_PASSWORD: your_secure_password_here
+    depends_on:
+      - mongodb
+    extra_hosts: # Helps ensure resolution on some Windows setups
+      - "host.docker.internal:host-gateway"
+
+# Add to volumes section:
 volumes:
-  postgres_data:
+  mongodb_data:  # Add this line
+

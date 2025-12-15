@@ -5,54 +5,55 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/scala_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/IngestionController.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipeline.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipelineTest.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/SimpleUsage.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/StorageController.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkatomongo.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/main.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/FeatureExtractor.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/RedditMongoPipeline.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/scala_compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/RedditRecommendationApp.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/api/ApifyClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/api/ApifyConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/api/ScraperParameters.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/api/testapi.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/domain/PostScore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/domain/RedditPost.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/domain/TrendingTopic.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/domain/UserPreference.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/ingestion/ApifyToKafka.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/ingestion/ApifyToKafkaService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/ingestion/ScrapeConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/ingestion/ScrapeJobScheduler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/ingestion/ScrapeResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/kafka/KafkaConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/kafka/SimpleKafkaProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/processing/KeywordExtractor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/processing/PostParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/processing/SparkStreamProcessor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/processing/window/SlidingWindowProcessor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/processing/window/TumblingWindowProcessor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/CommentActivityCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/CountMinSketch.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/PreferenceMatchCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/ScoreAggregator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/ScoreCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/TimeScoreCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/TrendingBoostCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/UpvoteVelocityCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/scoring/UserEngagementCalculator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/storage/PostgresReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/storage/PostgresWriter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/storage/RedisTrendStore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/storage/StateStoreManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/test/ApifyMockTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/test/IntegrationTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/test/KafkaConnectionTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/test/UsageExamples.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/testAPI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/utils/JsonParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/utils/Logger.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/utils/TimeUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reddit/recommender/utils/ValidationUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommendationApp.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/domain/PostScore.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/domain/RedditPost.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/domain/TrendingTopic.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/domain/UserPreference.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/Models.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/processing/KeywordExtractor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/processing/PostParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/processing/SparkStreamProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/processing/window/SlidingWindowProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/processing/window/TumblingWindowProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/CommentActivityCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/CountMinSketch.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/PreferenceMatchCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/ScoreAggregator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/ScoreCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/TimeScoreCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/TrendingBoostCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/UpvoteVelocityCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/scoring/UserEngagementCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/PostgresReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/PostgresWriter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/RedisTrendStore.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/StateStoreManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/testAPI.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/utils/JsonParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/utils/Logger.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/utils/TimeUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/utils/ValidationUtils.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +75,18 @@
     &quot;accountId&quot;: &quot;ed687ca6-229b-4508-b3ba-736ca14f1ca5&quot;
   }
 }</component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="downloadAnnotationsAutomatically" value="true" />
+        <option name="downloadDocsAutomatically" value="true" />
+        <option name="downloadSourcesAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
@@ -82,26 +95,77 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="36peUye0avuyKssGuhYh23m4Kh1" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;BE&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.KafkaConnectionTest.executor": "Run",
+    "Application.KafkaToMongoOnly.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Application.SimpleUsage.executor": "Run",
+    "Application.UsageExamples.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "BE",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15332031",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager">
+}]]></component>
+  <component name="RunManager" selected="Application.KafkaToMongoOnly">
+    <configuration name="KafkaToMongoOnly" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.examples.KafkaToMongoOnly" />
+      <module name="reddit-srs" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.reddit.recommender.examples.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.Main" />
+      <module name="reddit-srs" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.reddit.recommender.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SimpleUsage" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.examples.SimpleUsage" />
+      <module name="reddit-srs" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.reddit.recommender.examples.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="bigdatareddit" />
       <method v="2">
@@ -113,6 +177,37 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.KafkaToMongoOnly" />
+        <item itemvalue="Application.SimpleUsage" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ScalaProjectSettings">
+    <option name="compilerHighlightingScala2" value="true" />
+    <option name="intInjectionMapping">
+      <map>
+        <entry key="css" value="CSS" />
+        <entry key="html" value="HTML" />
+        <entry key="java" value="JAVA" />
+        <entry key="js" value="JavaScript" />
+        <entry key="json" value="JSON" />
+        <entry key="json5" value="JSON5" />
+        <entry key="less" value="LESS" />
+        <entry key="md" value="Markdown" />
+        <entry key="protobuf" value="protobuf" />
+        <entry key="scala" value="Scala" />
+        <entry key="sql" value="SQL" />
+        <entry key="sqlu" value="SQL" />
+        <entry key="svg" value="SVG" />
+        <entry key="xhtml" value="XHTML" />
+        <entry key="xml" value="XML" />
+        <entry key="xpath" value="XPath" />
+        <entry key="yaml" value="yaml" />
+      </map>
+    </option>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -131,11 +226,18 @@
       <option name="presentableId" value="Default" />
       <updated>1765707961228</updated>
       <workItem from="1765707964002" duration="1333000" />
-      <workItem from="1765709346941" duration="1171000" />
+      <workItem from="1765709346941" duration="5218000" />
+      <workItem from="1765723940749" duration="21151000" />
+      <workItem from="1765819773085" duration="1165000" />
+      <workItem from="1765821748876" duration="4542000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

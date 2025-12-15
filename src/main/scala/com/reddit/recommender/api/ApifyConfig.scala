@@ -1,51 +1,55 @@
 package com.reddit.recommender.api
 
-import java.nio.file.{Files, Paths}
-import scala.collection.JavaConverters._
+import scala.io.Source
 
-class ApifyConfig(apiToken: String, actorId: String) {
+class ApifyConfig(private val apiToken: String, private val actorId: String) {
 
   def this() = this({
-    val (token, actor) = ApifyConfig.loadFromEnv()
+    val (token, _) = ApifyConfig.loadFromEnv()
     token
   }, {
-    val (token, actor) = ApifyConfig.loadFromEnv()
+    val (_, actor) = ApifyConfig.loadFromEnv()
     actor
   })
 
   def getApiToken: String = apiToken
+
   def getActorId: String = actorId
+
   def getApiActorId: String = actorId.replace("/", "~")
 }
 
 object ApifyConfig {
+
   private def loadFromEnv(): (String, String) = {
+    var source: Source = null
     try {
-      val envContent = Files.lines(Paths.get(".env"))
-        .iterator()
-        .asScala
-        .mkString("\n")
+      source = Source.fromFile(".env")
+      val lines = source.getLines().map(_.trim).toList
 
-      val token = extractValue(envContent, "APIFY_API_TOKEN")
-      val actor = extractValue(envContent, "APIFY_REDDIT_ACTOR_ID")
+      val token = findValue(lines, "APIFY_API_TOKEN")
+      val actor = findValue(lines, "APIFY_REDDIT_ACTOR_ID")
 
-      if (token == null || actor == null) {
-        throw new RuntimeException("Missing APIFY_API_TOKEN or APIFY_REDDIT_ACTOR_ID in .env")
+      if (token.isEmpty || actor.isEmpty) {
+        throw new RuntimeException("Missing APIFY_API_TOKEN or APIFY_REDDIT_ACTOR_ID in .env file")
       }
 
       (token, actor)
     } catch {
       case e: Exception =>
-        throw new RuntimeException("Failed to load configuration: " + e.getMessage, e)
+        throw new RuntimeException("Failed to load .env file: " + e.getMessage, e)
+    } finally {
+      if (source != null) {
+        source.close()
+      }
     }
   }
 
-  private def extractValue(envContent: String, key: String): String = {
-    if (envContent == null) return null
-
-    envContent.split("\n")
-      .find(_.startsWith(key + "="))
-      .map(_.substring(key.length + 1).trim)
-      .orNull
+  private def findValue(lines: List[String], key: String): String = {
+    val prefix = key + "="
+    lines
+      .find { line => line.startsWith(prefix) }
+      .map { line => line.substring(prefix.length) }
+      .getOrElse("")
   }
 }
