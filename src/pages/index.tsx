@@ -21,7 +21,7 @@ import usePosts from "../hooks/usePosts";
 const Home: NextPage = () => {
   const user = useRecoilValue(userState);
   const loadingUser = false;
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const {
     postStateValue,
     setPostStateValue,
@@ -34,12 +34,34 @@ const Home: NextPage = () => {
   //const communityStateValue = useRecoilValue(CommunityState);
 
   useEffect(() => {
-    // Seed UI with provided mock posts.
-    setPostStateValue((prev) => ({
-      ...prev,
-      posts: mockPosts as Post[],
-    }));
-  }, [setPostStateValue]);
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/posts", {
+          headers: user?.id ? { "x-user-id": String(user.id) } : undefined,
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch posts: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setPostStateValue((prev) => ({
+          ...prev,
+          posts: (data.posts as Post[]) || [],
+        }));
+      } catch (error) {
+        console.error("Error loading posts from PostgreSQL, using mock data", error);
+        setPostStateValue((prev) => ({
+          ...prev,
+          posts: mockPosts as Post[],
+        }));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [setPostStateValue, user?.id]);
 
   return (
     <motion.div

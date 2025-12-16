@@ -1,17 +1,14 @@
 import { Flex, Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/react";
-import React, { useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+import React from "react";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
 import { authModelState } from "../../../atoms/authModalAtom";
-import { auth } from "../../../firebase/clientApp";
 import AuthInput from "./AuthInput";
 import ResetPassword from "./ResetPassword";
 
 const AuthModel: React.FC = () => {
   const [modelState, setModelState] = useRecoilState(authModelState);
-  const [user] = useAuthState(auth);
 
   const handleClose = () => {
     setModelState((prev) => ({
@@ -19,10 +16,6 @@ const AuthModel: React.FC = () => {
       open: false,
     }));
   };
-
-  useEffect(() => {
-    // Keep modal open after signup to allow post-registration flows (e.g., interests).
-  }, [user]);
 
   const MotionContent = motion(ModalContent);
 

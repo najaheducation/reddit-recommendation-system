@@ -15,20 +15,21 @@ import { BsChatDots } from "react-icons/bs";
 import { FiBell, FiChevronDown, FiHome, FiMoon, FiPlusCircle, FiSun } from "react-icons/fi";
 import { IoHeartOutline, IoBarChartOutline } from "react-icons/io5";
 import { useRouter } from "next/router";
-import { signOut } from "firebase/auth";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { defaultMenuItem } from "../atoms/directoryMenuAtom";
 import { authModelState } from "../atoms/authModalAtom";
 import { userState } from "../atoms/userAtom";
-import { auth } from "../firebase/clientApp";
 import useDirectory from "../hooks/useDirectory";
+import { logout } from "../utils/authClient";
+import { clearUserCache } from "../utils/userCache";
 import PrimaryButton from "../components/common/PrimaryButton";
 import AuthModel from "../components/Modal/Auth/AuthModel";
 import SearchInput from "./SearchInput";
 
 const Navbar: React.FC = () => {
   const user = useRecoilValue(userState);
+  const setUser = useSetRecoilState(userState);
   const setAuthModalState = useSetRecoilState(authModelState);
   const { onSelectMenuItem } = useDirectory();
   const router = useRouter();
@@ -89,8 +90,16 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
-    setProfileOpen(false);
+    try {
+      await logout();
+      setUser(null);
+      clearUserCache();
+    } catch (error) {
+      setUser(null);
+      clearUserCache();
+    } finally {
+      setProfileOpen(false);
+    }
   };
 
   return (

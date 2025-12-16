@@ -7,9 +7,16 @@
 .env
 # testing
 /coverage
+.next
+.next/
+.next/cache/
+.next/server/
+.next/static/
+# Ignore dependencies
+node_modules/
 
 # next.js
-/.next/
+
 /out/
 
 # production
