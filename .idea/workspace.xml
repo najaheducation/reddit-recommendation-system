@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipeline.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipelineTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipelineTest.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/SimpleUsage.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/SimpleUsage.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkatomongo.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkatomongo.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,7 +183,7 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
-      <workItem from="1765821748876" duration="9444000" />
+      <workItem from="1765821748876" duration="11316000" />
     </task>
     <servers />
   </component>

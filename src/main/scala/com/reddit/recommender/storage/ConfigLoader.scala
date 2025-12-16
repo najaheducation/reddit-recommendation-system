@@ -30,7 +30,6 @@ object ConfigLoader {
     try {
       source = Source.fromFile(".env")
       val lines = source.getLines().map(_.trim).filter(!_.startsWith("#")).toList
-
       val mongoUri = findValue(lines, "MONGO_URI")
         .getOrElse(throw new RuntimeException("MONGO_URI is missing in .env file"))
 
