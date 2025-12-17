@@ -1,8 +1,7 @@
 import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 
 const mongoUri =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://s12217950_db_user:ZrQ7gm4EthPMEB6m@bigdatareddit.szfetsy.mongodb.net/?appName=bigdatareddit";
+  process.env.MONGODB_URI ;
 
 const dbName = process.env.MONGODB_DB || "reddit_recommender";
 
