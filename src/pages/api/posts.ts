@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import type { Post } from "../../atoms/PostAtom";
-import { mockPosts as staticPosts } from "../../data/mockPosts";
 import { getAuthToken, verifyAuthToken } from "../../lib/auth";
-import { getInterestsCollection, toObjectId } from "../../lib/db";
+import { getConfigCollection, getInterestsCollection, toObjectId } from "../../lib/db";
+import { getRecommendations } from "../../lib/recommendationService";
 import type { UserInterest } from "./interests";
 
 const getUserIdFromRequest = (req: NextApiRequest): string | null => {
@@ -46,23 +46,100 @@ const fetchUserInterests = async (userId?: string | null): Promise<UserInterest[
   }));
 };
 
-const computeInterestBoost = (post: Post, interests: UserInterest[]) => {
-  if (!interests.length) return 0;
-  const haystack = sanitize(
-    `${post.title || ""} ${post.body || ""} ${post.communityId || ""}`.toLowerCase()
-  );
+const mapInterestsToTopics = (interests: UserInterest[]) =>
+  interests.map((item) => {
+    const base = sanitize(item.interest);
+    const sub = sanitize(item.subInterest || "");
+    const keywords = [base, sub].filter(Boolean);
+    return {
+      name: base || "topic",
+      weight: Number.isFinite(item.weight) ? Math.max(0, Math.min(1, item.weight)) : 0.5,
+      subreddits: keywords,
+      keywords,
+    };
+  });
 
-  return interests.reduce((acc, item) => {
-    const key = sanitize(item.subInterest || item.interest);
-    if (!key) return acc;
-    const match = haystack.includes(key);
-    return acc + (match ? Math.max(0.1, item.weight || 0) * 10 : 0);
-  }, 0);
+const mapStringsToTopics = (topics: string[] = []) =>
+  topics.map((t) => {
+    const clean = sanitize(t);
+    return {
+      name: clean || "topic",
+      weight: 0.5,
+      subreddits: clean ? [clean] : [],
+      keywords: clean ? [clean] : [],
+    };
+  });
+
+const normalizeWeightValue = (value: any) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return 0;
+  if (num > 1) return Math.max(0, Math.min(1, num / 100));
+  return Math.max(0, Math.min(1, num));
 };
 
-const mapPostToClient = (post: Post): Post => ({
-  ...post,
-  createdAt: toSecondsTimestamp(post.createdAt),
+const mapWeightsFromConfig = (weightsMap: Record<string, number>) => {
+  const defaults = {
+    upvotes: 0.2,
+    comments: 0.2,
+    ratio: 0.2,
+    image: 0.2,
+    video: 0.1,
+    freshness: 0.1,
+  };
+  const mapped = { ...defaults };
+  Object.entries(weightsMap || {}).forEach(([label, value]) => {
+    const normalizedLabel = label.toLowerCase();
+    const normalizedValue = normalizeWeightValue(value);
+    if (normalizedLabel.includes("ratio")) mapped.ratio = normalizedValue;
+    else if (normalizedLabel.includes("comment")) mapped.comments = normalizedValue;
+    else if (normalizedLabel.includes("image")) mapped.image = normalizedValue;
+    else if (normalizedLabel.includes("video")) mapped.video = normalizedValue;
+    else if (normalizedLabel.includes("fresh")) mapped.freshness = normalizedValue;
+    else if (normalizedLabel.includes("upvote")) mapped.upvotes = normalizedValue;
+  });
+  return mapped;
+};
+
+const sanitizeText = (value?: string | null) => (value || "").toString().trim();
+
+const buildDescription = (post: any): string => {
+  const body = sanitizeText(post.body);
+  if (body) return body;
+  const topic = sanitizeText(post.text_features?.topic_category);
+  const keywords = Array.isArray(post.text_features?.keywords)
+    ? post.text_features.keywords.map((k: any) => sanitizeText(k)).filter(Boolean)
+    : [];
+  if (keywords.length) {
+    const clipped = keywords.slice(0, 8).join(", ");
+    const summary = topic ? `${topic}: ${clipped}` : clipped;
+    return summary.length > 160 ? `${summary.slice(0, 157)}...` : summary;
+  }
+  return topic || "";
+};
+
+const resolveImageUrl = (post: any) => {
+  const candidate = sanitizeText(post.imageURL || post.thumbnail);
+  if (!candidate) return undefined;
+  if (/^https?:\/\//i.test(candidate)) return candidate;
+  return undefined;
+};
+
+const mapApiPostToClient = (post: any): Post => ({
+  id: post._id?.toString?.() || post.id || "",
+  communityId: post.subreddit || "global",
+  creatorId: post.subreddit || "system",
+  creatorDisplayName: post.subreddit || "system",
+  title: post.title || "",
+  body: buildDescription(post),
+  numberOfComments: post.num_comments ?? post.numberOfComments ?? 0,
+  voteStatus: post.score ?? post.voteStatus ?? 0,
+  imageURL: resolveImageUrl(post),
+  communityImageURL: post.communityImageURL,
+  createdAt: toSecondsTimestamp(post.createdAt || post.created_utc),
+  score: post.score,
+  finalScore: post.finalScore,
+  userUpvote: false,
+  userCommented: false,
 });
 
 export default async function handler(
@@ -75,50 +152,63 @@ export default async function handler(
 
   try {
     const userId = getUserIdFromRequest(req);
-    const [userInterests] = await Promise.all([fetchUserInterests(userId)]);
-
-    const communityIdParam = Array.isArray(req.query.communityId)
-      ? req.query.communityId[0]
-      : req.query.communityId;
+    const userInterests = await fetchUserInterests(userId);
 
     const limitParam = Array.isArray(req.query.limit)
       ? req.query.limit[0]
       : req.query.limit;
 
-    let posts = staticPosts;
+    const limitNumber = limitParam ? parseInt(limitParam, 10) : undefined;
 
-    if (communityIdParam) {
-      const normalizedCommunity = sanitize(communityIdParam);
-      posts = posts.filter(
-        (p) => sanitize(p.communityId) === normalizedCommunity
-      );
-    }
+    const configCol = await getConfigCollection();
+    const configDoc = userId ? await configCol.findOne({ userId: toObjectId(userId) }) : null;
 
-    const enriched = posts.map((post) => {
-      const baseScore = post.score ?? post.voteStatus ?? 0;
-      const boost = computeInterestBoost(post, userInterests);
-      return {
-        ...post,
-        finalScore: baseScore + boost,
-        score: baseScore,
-      };
+    const topicsFromInterests = mapInterestsToTopics(userInterests).filter((t) => t.keywords.length);
+    const topicsFromConfigRaw = configDoc?.topics;
+    const topicsFromConfig =
+      Array.isArray(topicsFromConfigRaw) &&
+      topicsFromConfigRaw.some((t: any) => t && typeof t === "object" && (t.keywords || t.subreddits))
+        ? (topicsFromConfigRaw as any[]).map((item) => {
+            const keywords = Array.isArray(item.keywords)
+              ? item.keywords
+                  .map((k: any) =>
+                    k?.toString?.().toLowerCase?.().replace(/[^a-z0-9]+/g, "").trim?.()
+                  )
+                  .filter(Boolean)
+              : [];
+            const subreddits = Array.isArray(item.subreddits)
+              ? item.subreddits
+                  .map((k: any) =>
+                    k?.toString?.().toLowerCase?.().replace(/[^a-z0-9]+/g, "").trim?.()
+                  )
+                  .filter(Boolean)
+              : [];
+            return {
+              name:
+                item.name?.toString?.().toLowerCase?.().replace(/[^a-z0-9]+/g, "").trim?.() ||
+                keywords[0] ||
+                subreddits[0] ||
+                "topic",
+              weight: normalizeWeightValue(item.weight ?? 0.5),
+              keywords,
+              subreddits,
+            };
+          })
+        : mapStringsToTopics(topicsFromConfigRaw as any);
+    const topics = topicsFromInterests.length ? topicsFromInterests : topicsFromConfig;
+
+    const weights = mapWeightsFromConfig(configDoc?.weights || {});
+
+    const recommended = await getRecommendations({
+      weights,
+      topics,
+      limit: limitNumber,
     });
 
-    enriched.sort(
-      (a, b) =>
-        (b.finalScore ?? b.score ?? 0) - (a.finalScore ?? a.score ?? 0)
-    );
-
-    const limitNumber = limitParam ? parseInt(limitParam, 10) : undefined;
-    const limited = limitNumber && !Number.isNaN(limitNumber)
-      ? enriched.slice(0, limitNumber)
-      : enriched;
-
-    const postsResponse: Post[] = limited.map(mapPostToClient);
+    const postsResponse: Post[] = recommended.map(mapApiPostToClient);
 
     return res.status(200).json({ posts: postsResponse });
   } catch (error) {
-    console.error("Failed to fetch posts", error);
     return res.status(500).json({ error: "Failed to fetch posts" });
   }
 }

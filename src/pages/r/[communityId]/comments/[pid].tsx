@@ -1,10 +1,7 @@
-// import { User } from "firebase/auth";
-// import { doc, getDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-// import { useAuthState } from "react-firebase-hooks/auth";
 
 import { useRecoilValue } from "recoil";
 import { Post } from "../../../../atoms/PostAtom";
@@ -13,12 +10,10 @@ import About from "../../../../components/Community/About";
 import PageContent from "../../../../components/Layout/PageContent";
 import Comments from "../../../../components/posts/Comments/Comments";
 import PostItem from "../../../../components/posts/PostItem";
-// import { auth, firestore } from "../../../../firebase/clientApp";
 import useCommunityData from "../../../../hooks/useCommunityData";
 import usePosts from "../../../../hooks/usePosts";
 
 const PostPage: React.FC = () => {
-  // const [user] = useAuthState(auth);
   const user = useRecoilValue(userState);
   const router = useRouter();
   const { communityStateValue } = useCommunityData();
@@ -27,18 +22,19 @@ const PostPage: React.FC = () => {
 
   const fetchPost = async (postId: string) => {
     try {
-      // Use mock posts for frontend-only mode
-      const { mockPosts } = await import("../../../../data/mockPosts");
-      const post = mockPosts.find((p) => p.id === postId);
+      const response = await fetch("/api/posts");
+      if (!response.ok) return;
+      const data = await response.json();
+      const post = (data.posts as Post[] | undefined)?.find(
+        (p) => p.id === postId || (p as any)?._id === postId
+      );
       if (post) {
         setPostStateValue((prev) => ({
           ...prev,
           selectedPost: post,
         }));
       }
-    } catch (error) {
-      console.log("FetchPost Error", error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {

@@ -81,6 +81,11 @@ const PostItem: React.FC<PostItemProps> = ({
   const metaTextColor = useColorModeValue("gray.600", "gray.400");
   const titleColor = useColorModeValue("#0F172A", "white");
   const bodyTextColor = useColorModeValue("gray.700", "gray.300");
+  const placeholderGradient = useColorModeValue(
+    "linear(to-br, rgba(30,136,255,0.14), rgba(18,180,151,0.14))",
+    "linear(to-br, rgba(30,136,255,0.18), rgba(18,180,151,0.2))"
+  );
+  const placeholderBorder = useColorModeValue("blue.100", "whiteAlpha.200");
 
   const handleDelete = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
@@ -220,25 +225,53 @@ const PostItem: React.FC<PostItemProps> = ({
     </Flex>
   );
 
-  const PostImage = () =>
-    decryptedData.imageURL ? (
-      <Box borderRadius="14px" overflow="hidden" border="1px solid" borderColor={borderColor}>
-        {loadingImage && (
-          <Skeleton height="320px" width="100%" startColor="gray.100" endColor="gray.200" borderRadius="14px" />
-        )}
-        <Image
-          src={decryptedData.imageURL}
-          alt={decryptedData.title}
-          maxHeight="460px"
-          width="100%"
-          objectFit="cover"
-          display={loadingImage ? "none" : "block"}
-          onLoad={() => setLoadingImage(false)}
-          borderRadius="14px"
-          boxShadow="md"
-        />
-      </Box>
-    ) : null;
+  const PostImage = () => {
+    if (decryptedData.imageURL) {
+      return (
+        <Box borderRadius="14px" overflow="hidden" border="1px solid" borderColor={borderColor}>
+          {loadingImage && (
+            <Skeleton height="320px" width="100%" startColor="gray.100" endColor="gray.200" borderRadius="14px" />
+          )}
+          <Image
+            src={decryptedData.imageURL}
+            alt={decryptedData.title}
+            maxHeight="460px"
+            width="100%"
+            objectFit="cover"
+            display={loadingImage ? "none" : "block"}
+            onLoad={() => setLoadingImage(false)}
+            borderRadius="14px"
+            boxShadow="md"
+          />
+        </Box>
+      );
+    }
+
+    return (
+      <Flex
+        borderRadius="14px"
+        border="1px solid"
+        borderColor={placeholderBorder}
+        bgGradient={placeholderGradient}
+        minH="220px"
+        align="center"
+        justify="center"
+        textAlign="center"
+        px={6}
+        py={8}
+      >
+        <Stack spacing={2} align="center">
+          <Icon as={FaReddit} fontSize={34} color="brand.500" />
+          <Text fontWeight={800} fontSize="lg" color={titleColor}>
+            r/{post.communityId}
+          </Text>
+          <Text fontSize="sm" color={metaTextColor} maxW="420px">
+            {decryptedData.title || "Community update"}
+          </Text>
+        </Stack>
+      </Flex>
+    );
+  };
 
   const PostActions = () => (
     <Flex

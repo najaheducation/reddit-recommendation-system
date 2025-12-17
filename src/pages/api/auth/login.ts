@@ -1,12 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import {
-  mapDbUserToClient,
-  setAuthCookie,
-  signAuthToken,
-  verifyPassword,
-} from "../../../lib/auth";
-import { getUsersCollection } from "../../../lib/db";
+import { setAuthCookie } from "../../../lib/auth";
+import { loginAccount } from "../../../lib/services/authService";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,26 +18,12 @@ export default async function handler(
   }
 
   try {
-    const users = await getUsersCollection();
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const user = await users.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    const isValid = await verifyPassword(password, user.password);
-
-    if (!isValid) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    const token = signAuthToken(user);
+    const { user, token } = await loginAccount(email, password);
     setAuthCookie(res, token);
-
-    return res.status(200).json({ user: mapDbUserToClient(user) });
+    return res.status(200).json({ user });
   } catch (error: any) {
-    console.error("Login error", error);
-    return res.status(500).json({ error: "Failed to login" });
+    const message = error?.message || "Failed to login";
+    const status = message === "Invalid email or password" ? 401 : 500;
+    return res.status(status).json({ error: message });
   }
 }

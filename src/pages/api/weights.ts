@@ -9,8 +9,15 @@ type WeightPayload = {
   hint?: string;
 };
 
+type TopicPayload = {
+  name: string;
+  weight: number;
+  subreddits: string[];
+  keywords: string[];
+};
+
 type WeightsResponse =
-  | { weights: WeightPayload[]; userId?: string; topics?: string[] }
+  | { weights: WeightPayload[]; userId?: string; topics?: TopicPayload[] }
   | { error: string };
 
 const toCamelLabel = (label: string) => {
@@ -74,28 +81,49 @@ const normalizeWeights = (raw: any): Record<string, number> => {
   return weights;
 };
 
-const normalizeTopics = (raw: any): string[] => {
+const normalizeTopicObjects = (raw: any): TopicPayload[] => {
   if (!Array.isArray(raw)) return [];
-  const seen = new Set<string>();
-  const topics: string[] = [];
+  const dedup = new Set<string>();
+  const clean = raw
+    .map((item) => ({
+      name: toCamelLabel(item?.name || ""),
+      weight: Number.isFinite(Number(item?.weight)) ? Math.max(0, Math.min(1, Number(item.weight))) : 0.5,
+      subreddits: Array.isArray(item?.subreddits)
+        ? item.subreddits
+            .map((s: any) =>
+              s
+                ?.toString?.()
+                ?.toLowerCase?.()
+                ?.replace(/[^a-z0-9]+/g, "")
+                ?.trim?.()
+            )
+            .filter(Boolean)
+        : [],
+      keywords: Array.isArray(item?.keywords)
+        ? item.keywords
+            .map((s: any) =>
+              s
+                ?.toString?.()
+                ?.toLowerCase?.()
+                ?.replace(/[^a-z0-9]+/g, "")
+                ?.trim?.()
+            )
+            .filter(Boolean)
+        : [],
+    }))
+    .filter((t) => t.name.length || t.subreddits.length || t.keywords.length)
+    .map((t) => ({
+      ...t,
+      name: t.name || (t.keywords[0] || t.subreddits[0] || "topic"),
+    }))
+    .slice(0, 100);
 
-  raw
-    .map((item) => (typeof item === "string" ? item : ""))
-    .map((item) =>
-      item
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "")
-    )
-    .filter(Boolean)
-    .forEach((topic) => {
-      if (seen.has(topic)) return;
-      seen.add(topic);
-      topics.push(topic);
-    });
-
-  return topics.slice(0, 100);
+  return clean.filter((t) => {
+    const key = `${t.name}::${t.subreddits.join(",")}::${t.keywords.join(",")}`;
+    if (dedup.has(key)) return false;
+    dedup.add(key);
+    return true;
+  });
 };
 
 export default async function handler(
@@ -135,13 +163,12 @@ export default async function handler(
     }
 
     const weightsMap = normalizeWeights(req.body?.weights);
-    const hasWeights = Object.keys(weightsMap).length > 0;
+    const topics =
+      normalizeTopicObjects(req.body?.topics) || [];
 
-    if (!hasWeights) {
+    if (Object.keys(weightsMap).length === 0 && topics.length === 0) {
       return res.status(400).json({ error: "At least one weight is required" });
     }
-
-    const topics = normalizeTopics(req.body?.topics);
 
     const update: Record<string, unknown> = {
       weights: weightsMap,

@@ -61,51 +61,103 @@ const toPercent = (value: number | undefined) =>
   Math.round(((typeof value === "number" ? value : 0) || 0) * 100);
 
 const subInterestOptions: Record<string, string[]> = {
-  spark: ["databricks", "pyspark", "sparkstreaming", "sparkml", "sparkstructured"],
-  phone: ["samsung", "iphone", "googlepixel", "xiaomi", "oneplus"],
-  smartphones: ["samsung", "iphone", "googlepixel", "xiaomi", "oneplus"],
-  mobile: ["android", "ios", "samsung", "iphone"],
-  laptop: ["macbook", "windows", "chromebook", "gaminglaptop"],
-  laptops: ["macbook", "windows", "chromebook", "gaminglaptop"],
-  gaming: ["playstation", "xbox", "pcgaming", "nintendo"],
-  pchardware: ["gpu", "cpu", "ssd", "monitors"],
-  ai: ["llm", "cv", "robotics", "mlops"],
-  programming: ["javascript", "python", "java", "rust"],
-  ecommerce: ["shopify", "amazon", "dropshipping"],
-  trading: ["stocks", "crypto", "options"],
-  design: ["uiux", "graphic", "motion"],
+  politics: [
+    "palestine",
+    "israel",
+    "genocide",
+    "imperialism",
+    "socialist",
+    "capitalism",
+    "propaganda",
+    "fascist",
+    "nazi",
+    "gaza",
+    "resistance",
+    "communist",
+    "leftist",
+    "revolution",
+    "war",
+    "china",
+    "government",
+    "democracy",
+    "election",
+    "policy",
+    "protest",
+    "rights",
+    "freedom",
+  ],
+  technology: [
+    "ai",
+    "machine",
+    "learning",
+    "programming",
+    "technology",
+    "video",
+    "youtube",
+    "media",
+    "content",
+    "computer",
+    "software",
+    "algorithm",
+    "data",
+    "internet",
+    "digital",
+    "code",
+    "developer",
+    "app",
+    "phone",
+    "device",
+    "hardware",
+    "network",
+  ],
+  entertainment: [
+    "movie",
+    "trailer",
+    "film",
+    "video",
+    "youtube",
+    "media",
+    "documentary",
+    "series",
+    "show",
+    "music",
+    "game",
+    "gaming",
+    "stream",
+    "tv",
+    "netflix",
+    "hbo",
+    "disney",
+    "marvel",
+    "starwars",
+  ],
+  social: [
+    "discussion",
+    "question",
+    "ask",
+    "opinion",
+    "view",
+    "think",
+    "community",
+    "society",
+    "culture",
+    "people",
+    "human",
+    "social",
+    "relationship",
+    "family",
+    "friend",
+    "life",
+    "experience",
+    "story",
+  ],
 };
 
 const defaultInterests: Interest[] = [
-  { label: "vr", description: "VR / AR / MR / Meta Quest", selected: false, weight: 0.6, subInterests: [] },
-  { label: "metaquest", description: "Meta Quest ecosystem", selected: false, weight: 0.6, subInterests: [] },
-  { label: "ar", description: "Augmented reality", selected: false, weight: 0.6, subInterests: [] },
-  { label: "mr", description: "Mixed reality", selected: false, weight: 0.6, subInterests: [] },
-  { label: "gaming", description: "Gaming / Consoles", selected: false, weight: 0.6, subInterests: [] },
-  { label: "pcgaming", description: "PC gaming", selected: false, weight: 0.6, subInterests: [] },
-  { label: "consoles", description: "Console gaming", selected: false, weight: 0.6, subInterests: [] },
-  { label: "pchardware", description: "PC hardware / components", selected: false, weight: 0.6, subInterests: [] },
-  { label: "components", description: "GPUs, CPUs, parts", selected: false, weight: 0.6, subInterests: [] },
-  { label: "smartphones", description: "Smartphones / mobile", selected: false, weight: 0.6, subInterests: [] },
-  { label: "laptops", description: "Laptops / notebooks", selected: false, weight: 0.6, subInterests: [] },
-  { label: "ai", description: "AI / ML / general AI topics", selected: false, weight: 0.6, subInterests: [] },
-  { label: "programming", description: "Programming / coding", selected: false, weight: 0.6, subInterests: [] },
-  { label: "tech", description: "General tech", selected: false, weight: 0.6, subInterests: [] },
-  { label: "spark", description: "Apache Spark / big data", selected: false, weight: 0.6, subInterests: [] },
-  { label: "kafka", description: "Apache Kafka / streaming", selected: false, weight: 0.6, subInterests: [] },
-  { label: "trading", description: "Trading / markets", selected: false, weight: 0.6, subInterests: [] },
-  { label: "crypto", description: "Crypto / web3", selected: false, weight: 0.6, subInterests: [] },
-  { label: "ecommerce", description: "Ecommerce / online stores", selected: false, weight: 0.6, subInterests: [] },
-  { label: "store", description: "Store ops / retail", selected: false, weight: 0.6, subInterests: [] },
-  { label: "mobile", description: "Mobile / phone topics", selected: false, weight: 0.6, subInterests: [] },
-  { label: "phone", description: "Phones & accessories", selected: false, weight: 0.6, subInterests: [] },
-  { label: "notebook", description: "Notebook PCs", selected: false, weight: 0.6, subInterests: [] },
-  { label: "laptop", description: "Laptops", selected: false, weight: 0.6, subInterests: [] },
-  { label: "hardware", description: "Hardware engineering", selected: false, weight: 0.6, subInterests: [] },
-  { label: "computer", description: "General computing", selected: false, weight: 0.6, subInterests: [] },
-  { label: "pc", description: "Personal computers", selected: false, weight: 0.6, subInterests: [] },
-  { label: "design", description: "Design / UI-UX", selected: false, weight: 0.6, subInterests: [] },
-  { label: "photography", description: "Photography", selected: false, weight: 0.6, subInterests: [] },
+  { label: "politics", description: "Politics / policy / governance", selected: false, weight: 0.6, subInterests: [] },
+  { label: "technology", description: "Technology / software / devices", selected: false, weight: 0.6, subInterests: [] },
+  { label: "entertainment", description: "Movies / games / streaming", selected: false, weight: 0.6, subInterests: [] },
+  { label: "social", description: "Society / culture / discussion", selected: false, weight: 0.6, subInterests: [] },
 ];
 
 const InterestsPage = () => {
@@ -119,6 +171,7 @@ const InterestsPage = () => {
     defaultInterests[0]?.label || ""
   );
   const [subInput, setSubInput] = useState<string>("");
+  const [customInterestInput, setCustomInterestInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
@@ -128,7 +181,6 @@ const InterestsPage = () => {
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("userId")
       : null;
-
   const selectedInterests = useMemo(
     () =>
       interests
@@ -169,7 +221,9 @@ const InterestsPage = () => {
     [activeInterestData]
   );
 
+
   const toggleInterest = (label: string) => {
+    if (!label) return;
     setInterests((prev) =>
       prev.map((item) => {
         if (item.label !== label) return item;
@@ -191,7 +245,31 @@ const InterestsPage = () => {
     setActiveInterest(label);
   };
 
+  const addCustomInterest = () => {
+    const clean = sanitizeSlug(customInterestInput);
+    if (!clean) return;
+    setInterests((prev) => {
+      const exists = prev.find((item) => item.label === clean);
+      if (exists) {
+        return prev.map((item) =>
+          item.label === clean ? { ...item, selected: true } : item
+        );
+      }
+      const created: Interest = {
+        label: clean,
+        description: formatLabel(clean),
+        selected: true,
+        weight: DEFAULT_WEIGHT,
+        subInterests: [],
+      };
+      return [...prev, created];
+    });
+    setActiveInterest(clean);
+    setCustomInterestInput("");
+  };
+
   const deselectInterest = (label: string) => {
+    if (!label) return;
     setInterests((prev) => {
       const updated = prev.map((item) =>
         item.label === label
@@ -453,6 +531,34 @@ const InterestsPage = () => {
               </GridItem>
             ))}
           </Grid>
+
+          <Stack spacing={2}>
+            <Text fontSize="sm" textTransform="uppercase" letterSpacing="0.1em" color="gray.500">
+              Create your own topic
+            </Text>
+            <Flex gap={2} wrap="wrap">
+              <Input
+                placeholder="Add a custom topic (e.g., robotics)"
+                value={customInterestInput}
+                onChange={(e) => setCustomInterestInput(e.target.value)}
+                maxW={{ base: "100%", md: "320px" }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomInterest();
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={addCustomInterest}
+                isDisabled={!customInterestInput.trim()}
+              >
+                Create
+              </Button>
+            </Flex>
+          </Stack>
 
           <Stack spacing={3}>
             <Text fontSize="sm" textTransform="uppercase" letterSpacing="0.1em" color="gray.500">

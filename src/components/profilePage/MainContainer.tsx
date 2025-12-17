@@ -1,11 +1,8 @@
 import { Stack } from "@chakra-ui/react";
-// import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-// import { useAuthState } from "react-firebase-hooks/auth";
 
 import { Post, PostVote } from "../../atoms/PostAtom";
-// import { auth, firestore } from "../../firebase/clientApp";
 import useCommunityData from "../../hooks/useCommunityData";
 import usePosts from "../../hooks/usePosts";
 import Recommendation from "../Community/Recommendation";
@@ -19,7 +16,8 @@ import ProfileTopBar from "./ProfileTopBar";
 type Props = {};
 
 function MainContainer({}: Props) {
-  const [user, loadingUser] = [null as any, false]; // useAuthState(auth);
+  const user = null;
+  const loadingUser = false;
   const router = useRouter();
   const { uid } = router.query;
   const [loading, setLoading] = useState(false);
@@ -35,16 +33,16 @@ function MainContainer({}: Props) {
   //const communityStateValue = useRecoilValue(CommunityState);
 
   const buildUserHomeFeed = async () => {
-    // Firebase-backed profile feed logic commented out for static demo mode.
+    // Populate personalized feed with your backend data here.
   };
   const buildNoUserHomeFeed = async () => {
     setLoading(true);
-    // Firebase-backed profile feed logic commented out for static demo mode.
+    // Populate public feed with your backend data here.
     setLoading(false);
   };
 
   const getUserPostVotes = async () => {
-    // Firebase-backed vote fetching commented out for static demo mode.
+    // Fetch user vote data from your backend here.
   };
 
   useEffect(() => {

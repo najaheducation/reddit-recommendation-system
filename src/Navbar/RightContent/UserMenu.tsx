@@ -20,9 +20,7 @@ import { VscAccount } from "react-icons/vsc";
 import { useRouter } from "next/router";
 import { IoSparkles } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
-import { signOut } from "firebase/auth";
 import { authModelState } from "../../atoms/authModalAtom";
-import { auth } from "../../firebase/clientApp";
 import { BasicUser, userState } from "../../atoms/userAtom";
 
 type UserMenuProps = {
@@ -46,10 +44,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
     }
   };
 
-  const logout = async () => {
-    await signOut(auth);
-    setUser(null);
-  };
+  const logout = () => setUser(null);
 
   return (
     <Menu>

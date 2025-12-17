@@ -24,7 +24,8 @@ const AuthStateLoader: React.FC<{ children: React.ReactNode }> = ({
 
     const loadUser = async () => {
       try {
-        const user = await fetchCurrentUser();
+        const cachedId = cached?.id || cached?.uid;
+        const user = await fetchCurrentUser(cachedId ? String(cachedId) : null);
         if (mounted) {
           setUser(user as BasicUser | null);
           if (user) {

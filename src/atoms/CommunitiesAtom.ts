@@ -1,4 +1,3 @@
-// import { Timestamp } from "firebase/firestore";
 import { atom } from "recoil";
 
 export interface Community {
@@ -6,7 +5,7 @@ export interface Community {
   creatorId: string;
   numberOfMembers: number;
   privacyType: "public" | "restricted" | "private";
-  createdAt?: any; // Timestamp;
+  createdAt?: any; // date metadata
   imageURL?: string;
 }
 
@@ -14,7 +13,7 @@ export interface CommunitySnippet {
   communityId: string;
   isModerator?: boolean;
   imageURL?: string;
-  updateTimeStamp?: any; // Timestamp;
+  updateTimeStamp?: any; // last update timestamp
 }
 
 interface CommunityState {

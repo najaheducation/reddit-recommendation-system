@@ -7,15 +7,6 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import CryptoJS from "crypto-js";
-// import { User } from "firebase/auth";
-// import {
-//   addDoc,
-//   collection,
-//   serverTimestamp,
-//   Timestamp,
-//   updateDoc,
-// } from "firebase/firestore";
-// import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { BiPoll } from "react-icons/bi";
@@ -23,7 +14,6 @@ import { BsLink45Deg, BsMic } from "react-icons/bs";
 import { IoDocumentText, IoImageOutline } from "react-icons/io5";
 
 import { Post } from "../../atoms/PostAtom";
-// import { firestore, storage } from "../../firebase/clientApp";
 import useSelectFile from "../../hooks/useSelectFile";
 import ImageUpload from "./postsForm/ImageUpload";
 import TextInput from "./postsForm/TextInput";
@@ -87,7 +77,6 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
 
   const handleCreatePost = async () => {
     const { communityId } = router.query;
-    // create new post
 
     const splitName = user.email!.split("@")[0];
 
@@ -109,33 +98,7 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
       score: 0,
       userUpvote: false,
       userCommented: false,
-      // createdAt: serverTimestamp() as Timestamp,
     };
-
-    // setLoading(true);
-    // try {
-    //   const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
-    //
-    //   if (selectedFile) {
-    //     const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
-    //     await uploadString(imageRef, selectedFile, "data_url");
-    //     const downloadURL = await getDownloadURL(imageRef);
-    //
-    //     const encryptDownloadURL = CryptoJS.AES.encrypt(
-    //       JSON.stringify(downloadURL),
-    //       process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-    //     ).toString();
-    //
-    //     await updateDoc(postDocRef, {
-    //       imageURL: encryptDownloadURL,
-    //     });
-    //   }
-    //   router.back();
-    // } catch (error: any) {
-    //   console.log(error.message);
-    //   setError(true);
-    // }
-    // setLoading(false);
   };
 
   /*

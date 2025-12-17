@@ -2,9 +2,9 @@ import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 
 const mongoUri =
   process.env.MONGODB_URI ||
-  "mongodb+srv://redditUser:v4AaD3CbFdhPEAco@cluster0.pbit9.mongodb.net/?appName=Cluster0";
+  "mongodb+srv://s12217950_db_user:ZrQ7gm4EthPMEB6m@bigdatareddit.szfetsy.mongodb.net/?appName=bigdatareddit";
 
-const dbName = process.env.MONGODB_DB || "redditpulse";
+const dbName = process.env.MONGODB_DB || "reddit_recommender";
 
 if (!mongoUri) {
   throw new Error("Missing MONGODB_URI environment variable");

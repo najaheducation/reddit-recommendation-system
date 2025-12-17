@@ -1,19 +1,15 @@
 import { Flex } from "@chakra-ui/react";
-// import { User } from "firebase/auth";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
-// import { useAuthState } from "react-firebase-hooks/auth";
 
 import ConversationsWrapper from "../components/Conversations/ConversationsWrapper";
 import FeedWrapper from "../components/Feed/FeedWrapper";
 import NoConversationSelected from "../components/Feed/NoConversationSelected";
-// import { auth } from "../firebase/clientApp";
 
 type Props = {};
 
 function ChatRoom({}: Props) {
-  // const [user] = useAuthState(auth);
   const router = useRouter();
   const {
     query: { userInCommunities, member },

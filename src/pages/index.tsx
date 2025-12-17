@@ -14,7 +14,6 @@ import Recommendation from "../components/Community/Recommendation";
 import PageContent from "../components/Layout/PageContent";
 import PostItem from "../components/posts/PostItem";
 import PostLoader from "../components/posts/PostLoader";
-import { mockPosts } from "../data/mockPosts";
 import useCommunityData from "../hooks/useCommunityData";
 import usePosts from "../hooks/usePosts";
 
@@ -45,15 +44,37 @@ const Home: NextPage = () => {
         }
 
         const data = await response.json();
+        const mappedPosts =
+          (data.posts as any[])?.map((p) => ({
+            id: p.id || p._id?.toString?.() || "",
+            communityId: p.subreddit || p.communityId || "global",
+            creatorId: p.creatorId || p.subreddit || "system",
+            creatorDisplayName: p.creatorDisplayName || p.subreddit || "system",
+            title: p.title || "",
+            body: p.body || "",
+            numberOfComments: p.num_comments ?? p.numberOfComments ?? 0,
+            voteStatus: p.score ?? p.voteStatus ?? 0,
+            imageURL: p.imageURL || p.thumbnail || undefined,
+            communityImageURL: p.communityImageURL,
+            createdAt:
+              p.createdAt ||
+              (p.created_utc
+                ? { seconds: Math.floor(new Date(p.created_utc).getTime() / 1000) }
+                : { seconds: Math.floor(Date.now() / 1000) }),
+            score: p.score,
+            finalScore: p.finalScore,
+            userUpvote: p.userUpvote ?? false,
+            userCommented: p.userCommented ?? false,
+          })) || [];
+
         setPostStateValue((prev) => ({
           ...prev,
-          posts: (data.posts as Post[]) || [],
+          posts: mappedPosts as Post[],
         }));
       } catch (error) {
-        console.error("Error loading posts from PostgreSQL, using mock data", error);
         setPostStateValue((prev) => ({
           ...prev,
-          posts: mockPosts as Post[],
+          posts: [],
         }));
       } finally {
         setLoading(false);

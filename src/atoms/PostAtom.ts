@@ -1,4 +1,3 @@
-// import { Timestamp } from "firebase/firestore";
 import { atom } from "recoil";
 
 export type Post = {
@@ -12,7 +11,7 @@ export type Post = {
   voteStatus: number;
   imageURL?: string;
   communityImageURL?: string;
-  createdAt: any; // Timestamp;
+  createdAt: any; // date metadata
   score?: number; // Calculated score for the post
   finalScore?: number; // Personalized final score
   userUpvote?: boolean; // Indicates whether the user upvoted the item

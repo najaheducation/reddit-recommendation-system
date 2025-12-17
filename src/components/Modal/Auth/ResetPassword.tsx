@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { authModelState } from "../../../atoms/authModalAtom";
 import { BsDot, BsReddit } from "react-icons/bs";
-import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
-import { auth } from "../../../firebase/clientApp";
 import { HiOutlineMail } from "react-icons/hi";
 import InputField from "../../common/InputField";
 
@@ -18,15 +16,13 @@ const ResetPassword: React.FC = () => {
   const setAuthModalState = useSetRecoilState(authModelState);
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
-  const [sendPasswordResetEmail, sending, error] =
-    useSendPasswordResetEmail(auth);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (email) {
-      const res = await sendPasswordResetEmail(email);
-      if (res) setSuccess(true);
+      // Firebase reset flow removed; emulate confirmation for now.
+      setSuccess(true);
     }
   };
 
@@ -52,9 +48,8 @@ const ResetPassword: React.FC = () => {
               onChange={(val) => setEmail(val)}
               placeholder="you@example.com"
               icon={HiOutlineMail}
-              error={error?.message}
             />
-            <Button width="100%" height="44px" type="submit" isLoading={sending}>
+            <Button width="100%" height="44px" type="submit">
               Send reset link
             </Button>
           </Stack>

@@ -5,7 +5,7 @@
   <h1>Reddit Clone with REACT.JS</h1>
   
   <p>
-Reddit Clone with REACTJS (Next.js, Firebase v9, Chakra UI, TypeScript, Recoil, (Image Uploading, Google Authentication, Create Community, Join Community, Leave Community, Upvote and Downvote Posts), Dark Mode & Light Mode, Data Encryption and Decryption)
+Reddit Clone with REACTJS (Next.js, Chakra UI, TypeScript, Recoil, MongoDB, (Image Uploading, Community Management, Join Community, Leave Community, Upvote and Downvote Posts), Dark Mode & Light Mode, Data Encryption and Decryption)
   </p>
   
   
@@ -110,14 +110,14 @@ Reddit Clone with REACTJS (Next.js, Firebase v9, Chakra UI, TypeScript, Recoil, 
 <details>
 <summary>Database</summary>
   <ul>
-    <li><a href="https://firebase.google.com">Firebase</a></li>
+    <li><a href="https://www.mongodb.com/">MongoDB</a></li>
   </ul>
 </details>
 
 <details>
-  <summary>Functions</summary>
+  <summary>Backend</summary>
   <ul>
-    <li><a href="https://firebase.google.com/docs/functions">Cloud Functions for Firebase</a></li>
+    <li><a href="https://nextjs.org/docs/api-routes/introduction">Next.js API Routes</a></li>
   </ul>
 </details>
 
@@ -150,8 +150,8 @@ Reddit Clone with REACTJS (Next.js, Firebase v9, Chakra UI, TypeScript, Recoil, 
 
 ### :bangbang: Prerequisites
 
-- Sign up for a Firebase account <a href='https://firebase.google.com'>HERE</a>
-- Install Node JS in your computer <a href='https://nodejs.org/en/'>HERE</a>
+- Install Node JS on your computer <a href='https://nodejs.org/en/'>HERE</a>
+- Prepare a MongoDB connection string (local instance or Atlas)
 
 <!-- Env Variables -->
 
@@ -159,19 +159,11 @@ Reddit Clone with REACTJS (Next.js, Firebase v9, Chakra UI, TypeScript, Recoil, 
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`NEXT_PUBLIC_FIREBASE_API_KEY`
+`MONGODB_URI`
 
-`NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+`MONGODB_DB`
 
-`NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-
-`NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-
-`NEXT_PUBLIC_FIREBASE_MESSAGING_SET`
-
-`NEXT_PUBLIC_FIREBASE_APP_ID`
-
-`NEXT_PUBLIC_BASE_URL`
+`AUTH_JWT_SECRET`
 
 `NEXT_PUBLIC_CRYPTO_SECRET_PASS`
 

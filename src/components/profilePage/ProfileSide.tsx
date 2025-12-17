@@ -8,10 +8,8 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-// import { doc, getDoc, Timestamp } from "firebase/firestore";
 import moment from "moment";
 import { useEffect, useState } from "react";
-// import { useAuthState } from "react-firebase-hooks/auth";
 import { FaRedditAlien, FaUserCheck } from "react-icons/fa";
 import { GiCakeSlice, GiCheckedShield } from "react-icons/gi";
 import { IoRocketSharp, IoShirtOutline } from "react-icons/io5";
@@ -19,7 +17,6 @@ import { MdVerified } from "react-icons/md";
 import { useSetRecoilState } from "recoil";
 
 import { authModelState } from "../../atoms/authModalAtom";
-// import { auth, firestore } from "../../firebase/clientApp";
 import useDirectory from "../../hooks/useDirectory";
 
 interface RedditUserDocument {
@@ -34,7 +31,7 @@ interface RedditUserDocument {
 type Props = {};
 
 function ProfileSide({}: Props) {
-  const [user] = [null as any]; // useAuthState(auth);
+  const user = null;
   const [redditUser, setRedditUser] = useState<RedditUserDocument>();
   const { toggleMenuOpen } = useDirectory();
   const setAuthModelState = useSetRecoilState(authModelState);
@@ -42,27 +39,12 @@ function ProfileSide({}: Props) {
   const borderColor = useColorModeValue("gray.300", "#2D3748");
 
   const fetchRedditUser = async (userId: any) => {
-    // if (!userId) return;
-    //
-    // try {
-    //   const docRef = doc(firestore, "redditUser", userId);
-    //   const docSnap = await getDoc(docRef);
-    //
-    //   if (docSnap.exists()) {
-    //     setRedditUser(docSnap.data() as RedditUserDocument);
-    //   } else return;
-    // } catch (error: any) {
-    //   console.log(error.message);
-    // }
+    // Integrate profile fetching with your backend here.
   };
 
   const onClick = () => {
-    // if (!user) {
-    //   setAuthModelState({ open: true, view: "login" });
-    //   return;
-    // }
-    //
-    // toggleMenuOpen();
+    setAuthModelState({ open: true, view: "login" });
+    toggleMenuOpen();
   };
 
   useEffect(() => {

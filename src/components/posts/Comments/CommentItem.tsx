@@ -26,6 +26,17 @@ export type Comment = {
   postTitle: string;
   text: string;
   createdAt: { seconds: number };
+  score?: number | null;
+  url?: string | null;
+  postUrl?: string | null;
+  parentId?: string | null;
+  query?: string | null;
+  keywords?: string[];
+  commentDepth?: number | null;
+  textFeatures?: Record<string, any> | null;
+  createdUtc?: string | null;
+  hasLinks?: boolean | null;
+  hasMentions?: boolean | null;
 };
 
 type CommentItemProps = {
@@ -47,32 +58,32 @@ const CommentItem: React.FC<CommentItemProps> = ({
   });
 
   useEffect(() => {
-    const arr = [comment.text, comment.creatorDisplayText];
-    const arrName = ["text", "creatorDisplayText"];
-
-    try {
-      for (let index = 0; index < arr.length; index++) {
-        if (arr[index]) {
-          const bytes = CryptoJS.AES.decrypt(
-            arr[index]!,
-            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-          );
-          const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-          setDecryptedData((prev) => ({
-            ...prev,
-            [arrName[index]]: data,
-          }));
-        } else return;
+    const decryptValue = (value?: string | null) => {
+      if (!value) return "";
+      try {
+        const bytes = CryptoJS.AES.decrypt(
+          value,
+          process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
+        );
+        const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        return data || value;
+      } catch {
+        return value;
       }
-    } catch (error) {
-      console.log(error);
-    }
+    };
+
+    setDecryptedData({
+      text: decryptValue(comment.text),
+      creatorDisplayText: decryptValue(comment.creatorDisplayText),
+    });
   }, [comment]);
 
   const textColor = useColorModeValue("gray.700", "gray.300");
   const metaColor = useColorModeValue("gray.500", "gray.400");
   const hoverBg = useColorModeValue("gray.50", "gray.800");
+  const showScore = typeof comment.score === "number";
+  const isUrl = (value?: string | null) =>
+    typeof value === "string" && /^https?:\/\//i.test(value);
 
   return (
     <Flex
@@ -99,16 +110,30 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <Text color={metaColor} fontSize="11px">
             {moment(new Date(comment.createdAt?.seconds * 1000)).fromNow()}
           </Text>
+          {showScore && (
+            <Text color={metaColor} fontSize="11px">
+              • {comment.score} points
+            </Text>
+          )}
           {isLoading && <Spinner size="sm" color="accent.500" />}
         </Stack>
-        <Text 
-          fontSize="14px" 
-          color={textColor}
-          lineHeight="1.6"
-          wordBreak="break-word"
-        >
-          {decryptedData.text}
-        </Text>
+        {isUrl(decryptedData.text) ? (
+          <Text
+            as="a"
+            href={decryptedData.text}
+            target="_blank"
+            rel="noreferrer"
+            fontSize="14px"
+            color="blue.400"
+            wordBreak="break-all"
+          >
+            {decryptedData.text}
+          </Text>
+        ) : (
+          <Text fontSize="14px" color={textColor} lineHeight="1.6" wordBreak="break-word">
+            {decryptedData.text}
+          </Text>
+        )}
         <Stack 
           direction="row" 
           align="center" 

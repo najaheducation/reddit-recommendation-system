@@ -2,17 +2,13 @@ import { Box, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import React from "react";
-// import { useAuthState } from "react-firebase-hooks/auth";
 
 import About from "../../../components/Community/About";
 import PageContent from "../../../components/Layout/PageContent";
 import NewPostForm from "../../../components/posts/NewPostForm";
-// import { auth } from "../../../firebase/clientApp";
 import useCommunityData from "../../../hooks/useCommunityData";
 
 const SubmitPostPage: React.FC = () => {
-  // const [user] = useAuthState(auth);
-
   const { communityStateValue } = useCommunityData();
 
   return (

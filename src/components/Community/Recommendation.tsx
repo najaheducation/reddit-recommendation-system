@@ -10,13 +10,11 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-// import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { FaReddit } from "react-icons/fa";
 
 import { Community } from "../../atoms/CommunitiesAtom";
-// import { firestore } from "../../firebase/clientApp";
 import useCommunityData from "../../hooks/useCommunityData";
 
 const demoRecommendations: Community[] = [

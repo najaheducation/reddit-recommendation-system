@@ -1,4 +1,3 @@
-// import { doc, getDoc } from "firebase/firestore";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import React, { useEffect } from "react";
@@ -13,7 +12,6 @@ import Header from "../../../components/Community/Header";
 import NotFound from "../../../components/Community/NotFound";
 import PageContent from "../../../components/Layout/PageContent";
 import Posts from "../../../components/posts/Posts";
-// import { firestore } from "../../../firebase/clientApp";
 
 type CommunityProps = {
   communityData: Community;

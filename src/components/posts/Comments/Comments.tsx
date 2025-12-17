@@ -7,27 +7,11 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import CryptoJS from "crypto-js";
-// import { User } from "firebase/auth";
-// import {
-//   collection,
-//   doc,
-//   getDoc,
-//   getDocs,
-//   increment,
-//   orderBy,
-//   query,
-//   serverTimestamp,
-//   Timestamp,
-//   where,
-//   writeBatch,
-// } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import { Post, postState } from "../../../atoms/PostAtom";
 import { userState } from "../../../atoms/userAtom";
-// import { firestore } from "../../../firebase/clientApp";
 import CommentInput from "./CommentInput";
 import CommentItem, { Comment } from "./CommentItem";
 
@@ -54,7 +38,6 @@ const Comments: React.FC<CommentsProps> = ({
   const userFromState = useRecoilValue(userState);
   const user = propUser || userFromState;
   const [commentText, setCommentText] = useState("");
-  const [encryptedData, setEncryptedData] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingDeleteId, setLoadingDeleteId] = useState("");
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -65,7 +48,7 @@ const Comments: React.FC<CommentsProps> = ({
   const lineBorderColor = useColorModeValue("gray.100", "#171923");
   const emptyTextColor = useColorModeValue("gray.400", "gray.500");
 
-  //console.log(comments);
+
 
   const fetchRedditUser = async (userId: any) => {
     if (!userId) return;
@@ -82,28 +65,21 @@ const Comments: React.FC<CommentsProps> = ({
   };
 
   const onCreateComments = async () => {
+    setCreateLoading(true);
     try {
-      setCreateLoading(true);
-
       if (!user || !selectedPost) return;
 
       const splitName = user.email?.split("@")[0] || "anonymous";
 
-      const dataName = CryptoJS.AES.encrypt(
-        JSON.stringify(splitName),
-        process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-      ).toString();
-
-      // Create new comment for frontend-only mode
       const newComment: Comment = {
         id: `comment-${Date.now()}`,
         creatorId: user.uid || "anonymous",
-        creatorDisplayText: dataName,
+        creatorDisplayText: splitName,
         creatorPhotoURL: redditUser?.redditImage || "/images/redditlogo.png",
         communityId,
         postId: selectedPost.id!,
         postTitle: selectedPost.title,
-        text: encryptedData,
+        text: commentText,
         createdAt: { seconds: Math.floor(Date.now() / 1000) },
       };
 
@@ -114,13 +90,12 @@ const Comments: React.FC<CommentsProps> = ({
         selectedPost: {
           ...prev.selectedPost,
           numberOfComments: (prev.selectedPost?.numberOfComments || 0) + 1,
-          userCommented: true, // Mark that user has commented
+          userCommented: true,
         } as Post,
       }));
-    } catch (error) {
-      console.log("📝", error);
+    } finally {
+      setCreateLoading(false);
     }
-    setCreateLoading(false);
   };
 
   const onDeleteComment = async (comment: Comment) => {
@@ -140,47 +115,69 @@ const Comments: React.FC<CommentsProps> = ({
 
       setComments((prev) => prev.filter((item) => item.id !== comment.id));
     } catch (error) {
-      console.log("CommentDelete Error", error);
+
     }
     setLoadingDeleteId("");
   };
 
   const getPostComments = async () => {
+    setFetchLoading(true);
     try {
-      // Use mock comments for frontend-only mode
-      if (selectedPost?.id) {
-        const { getMockCommentsByPostId } = await import(
-          "../../../data/mockComments"
-        );
-        const mockComments = getMockCommentsByPostId(selectedPost.id);
-        setComments(mockComments);
-      } else {
+      if (!selectedPost?.id) {
         setComments([]);
+        return;
       }
+      const res = await fetch(`/api/comments?postId=${encodeURIComponent(selectedPost.id)}`);
+      if (!res.ok) {
+        setComments([]);
+        return;
+      }
+      const data = await res.json();
+      const mapped: Comment[] = Array.isArray(data?.comments)
+        ? data.comments.map((c: any) => {
+            const keywords = Array.isArray(c.keywords)
+              ? c.keywords
+              : Array.isArray(c.text_features?.keywords)
+                ? c.text_features.keywords
+                : [];
+            return {
+              id: c._id,
+              creatorId: c.author || "unknown",
+              creatorDisplayText: c.author || "unknown",
+              creatorPhotoURL: "/images/redditlogo.png",
+              communityId,
+              postId: selectedPost.id!,
+              postTitle: selectedPost.title,
+              text: c.body || c.url || "",
+              createdAt: c.created_utc
+                ? { seconds: Math.floor(new Date(c.created_utc).getTime() / 1000) }
+                : { seconds: Math.floor(Date.now() / 1000) },
+              score: typeof c.score === "number" ? c.score : null,
+              url: c.url ?? null,
+              postUrl: c.postUrl ?? null,
+              parentId: c.parentId ?? null,
+              query: c.query ?? null,
+              keywords,
+              commentDepth: typeof c.comment_depth === "number" ? c.comment_depth : null,
+              textFeatures: c.text_features ?? null,
+              createdUtc: c.created_utc ?? null,
+              hasLinks: typeof c.has_links === "boolean" ? c.has_links : null,
+              hasMentions: typeof c.has_mentions === "boolean" ? c.has_mentions : null,
+            };
+          })
+        : [];
+      setComments(mapped);
     } catch (error) {
-      console.log("GetPostComments Error", error);
       setComments([]);
+    } finally {
+      setFetchLoading(false);
     }
-    setFetchLoading(false);
   };
 
   useEffect(() => {
     if (!selectedPost) return;
     getPostComments();
   }, [selectedPost]);
-
-  useEffect(() => {
-    try {
-      const data = CryptoJS.AES.encrypt(
-        JSON.stringify(commentText),
-        process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS as string
-      ).toString();
-
-      setEncryptedData(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }, [commentText]);
 
   useEffect(() => {
     fetchRedditUser(user?.uid);

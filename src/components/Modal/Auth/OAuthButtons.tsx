@@ -1,25 +1,12 @@
 import { Button, Flex, Image, Text, useColorModeValue } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import React, { useEffect } from "react";
-import { useSignInWithGoogle } from "react-firebase-hooks/auth";
-
-import { auth, firestore } from "../../../firebase/clientApp";
+import React from "react";
 
 const OAuthButtons: React.FC = () => {
-  const [signInWithGoogle, userCred, loading, error] =
-    useSignInWithGoogle(auth);
   const hoverBg = useColorModeValue("gray.50", "#2A4365");
-  const createUserDocument = async (user: any /* User */) => {
-    const userDocRef = doc(firestore, "users", user.uid);
-    await setDoc(userDocRef, JSON.parse(JSON.stringify(user)));
-  };
 
-  useEffect(() => {
-    if (userCred) {
-      createUserDocument(userCred.user as User);
-    }
-  }, [userCred]);
+  const handleUnavailableClick = () => {
+    // OAuth sign-in removed with Firebase; placeholder hook for future provider.
+  };
 
   return (
     <Flex direction="column" width="100%" mb={4}>
@@ -27,20 +14,18 @@ const OAuthButtons: React.FC = () => {
         variant="oauth"
         _hover={{ bg: hoverBg }}
         mb={2}
-        isLoading={loading}
-        onClick={() => signInWithGoogle()}
+        isDisabled
+        onClick={handleUnavailableClick}
       >
         <Image src="/images/googlelogo.png" height="20px" mr={4} />
-        Continue with Google
+        Google sign-in unavailable
       </Button>
-      <Button variant="oauth" _hover={{ bg: hoverBg }}>
-        Some Other Provider
+      <Button variant="oauth" _hover={{ bg: hoverBg }} isDisabled>
+        OAuth provider not configured
       </Button>
-      {error && (
-        <Text color="red.400" fontSize="10pt" textAlign="center" mt={2}>
-          {error.message}
-        </Text>
-      )}
+      <Text color="gray.400" fontSize="10pt" textAlign="center" mt={2}>
+        OAuth sign-in is currently disabled now that Firebase was removed.
+      </Text>
     </Flex>
   );
 };

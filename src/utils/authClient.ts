@@ -36,8 +36,12 @@ export const registerUser = async (
   return data.user as AuthUser;
 };
 
-export const fetchCurrentUser = async () => {
-  const res = await fetch("/api/auth/me", { credentials: "include" });
+export const fetchCurrentUser = async (userId?: string | null) => {
+  const headers: Record<string, string> = {};
+  if (userId) {
+    headers["x-user-id"] = userId;
+  }
+  const res = await fetch("/api/auth/me", { credentials: "include", headers });
   const data = await parseResponse(res);
   return data.user as AuthUser | null;
 };
