@@ -1,17 +1,36 @@
 package com.reddit.recommender.storage
 
+import com.reddit.recommender.analytics.CmsPipeline
 import com.reddit.recommender.mongo.MongoConnection
 import org.apache.spark.sql._
 import org.apache.spark.sql.streaming._
 import org.mongodb.scala.bson.Document
-import scala.util.control.NonFatal
+import org.mongodb.scala.model.{ReplaceOneModel, ReplaceOptions}
+import org.mongodb.scala.model.Filters._
+
+import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.collection.mutable
+import scala.util.control.NonFatal
 
 class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Serializable {
 
   @transient lazy private val mongoConnection = new MongoConnection(config.mongo)
+
+  private val checkpointLocation: String =
+    "C:/Users/User/OneDrive/Desktop/final/reddit-recommendation-system/checkpoints/reddit-mongo"
+
+  private val stopWordsPath: String = "stopwords.txt"
+  @transient private lazy val cms =
+    new CmsPipeline(
+      mongoConnection = mongoConnection,
+      stopWordsPath = stopWordsPath,
+      windowDays = 7,
+      bucketSizeMillis = 5L * 60L * 1000L,
+      epsilon = 0.001,
+      delta = 1e-5,
+      topN = 10
+    )
 
   @transient private val metrics = mutable.Map[String, Long](
     "processed" -> 0L,
@@ -21,72 +40,117 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
   def start(): Unit = {
     mongoConnection.connect()
     createIndexes()
+    cms.ensureIndexes()
 
-    println(s"Starting consumer for topics: ${config.topics.mkString(", ")}")
+    println(s"[START] topics: ${config.topics.mkString(", ")}")
+    println(s"[START] checkpointLocation: $checkpointLocation")
 
     val kafkaDF = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", config.kafka.bootstrapServers)
       .option("subscribe", config.topics.mkString(","))
-      .option("startingOffsets", "earliest")
+      .option("startingOffsets", "latest")
       .load()
 
-    val query = kafkaDF.selectExpr("CAST(value AS STRING) as json", "topic")
+    val query = kafkaDF
+      .selectExpr("CAST(value AS STRING) as json", "topic")
       .writeStream
       .foreachBatch { (batchDF: Dataset[Row], batchId: Long) =>
-        processBatch(batchDF.collect(), batchId)
+        processBatch(batchDF, batchId)
       }
-      .option("checkpointLocation", "/tmp/checkpoints/reddit-mongo")
-      .trigger(Trigger.ProcessingTime("30 seconds"))
+      .option("checkpointLocation", checkpointLocation)
+      .trigger(Trigger.ProcessingTime("10 seconds"))
       .start()
 
     query.awaitTermination()
   }
 
-  private def processBatch(rows: Array[Row], batchId: Long): Unit = {
+  private def processBatch(batchDF: Dataset[Row], batchId: Long): Unit = {
     metrics("batches") += 1
 
-    val posts = mutable.ListBuffer[Document]()
-    val comments = mutable.ListBuffer[Document]()
+    val posts = mutable.ListBuffer[(String, Document)]()
+    val comments = mutable.ListBuffer[(String, Document)]()
 
-    rows.foreach { row =>
+    val rows = batchDF.toLocalIterator()
+    var batchCount = 0
+
+    while (rows.hasNext) {
+      val row = rows.next()
       val json = row.getString(0)
       val topic = row.getString(1)
-      if (json.nonEmpty) {
-        topic match {
-          case "reddit-posts" => posts += Document(json)
-          case "reddit-comments" => comments += Document(json)
-          case _ => // ignore
+
+      if (json != null && json.nonEmpty) {
+        cms.onMessage(topic, json)
+
+        val redditIdOpt = extractRedditId(json)
+        redditIdOpt match {
+          case Some(redditId) =>
+            val doc = Document(json)
+            topic match {
+              case "reddit-posts"    => posts += ((redditId, doc))
+              case "reddit-comments" => comments += ((redditId, doc))
+              case _ =>
+            }
+            batchCount += 1
+
+          case None =>
+            println(s"[WARN] No Reddit ID found, skipping insert: ${json.take(200)}...")
         }
       }
     }
 
-    if (posts.nonEmpty) insert("posts", posts.toList)
-    if (comments.nonEmpty) insert("comments", comments.toList)
+    if (posts.nonEmpty) upsertMany("posts", posts.toList)
+    if (comments.nonEmpty) upsertMany("comments", comments.toList)
 
-    metrics("processed") += posts.size + comments.size
+    metrics("processed") += batchCount
+    if (batchCount > 0) {
+      println(s"[BATCH $batchId] processed=$batchCount total=${metrics("processed")} batches=${metrics("batches")}")
+    }
+    cms.onBatchEnd()
+  }
 
-    if (metrics("processed") % 500 == 0) {
-      println(s"Processed ${metrics("processed")} items (${metrics("batches")} batches)")
+  private def upsertMany(collectionName: String, items: List[(String, Document)]): Unit = {
+    val collection = mongoConnection.getCollection(collectionName)
+    val operations = items.map { case (redditId, doc) =>
+      val filter = equal("id", redditId)
+      ReplaceOneModel(filter, doc, new ReplaceOptions().upsert(true))
+    }
+
+    if (operations.nonEmpty) {
+      try {
+        Await.result(collection.bulkWrite(operations).toFuture(), 60.seconds)
+        println(s"[UPSERT] $collectionName: ${operations.size} documents processed (with upsert)")
+      } catch {
+        case NonFatal(e) =>
+          println(s"[ERROR] Bulk upsert failed for $collectionName: ${e.getMessage}")
+      }
     }
   }
 
-  private def insert(collectionName: String, documents: List[Document]): Unit = {
-    val collection = mongoConnection.getCollection(collectionName)
-    try {
-      Await.result(collection.insertMany(documents).toFuture(), 30.seconds)
-    } catch {
-      case NonFatal(e) =>
-        println(s"Insert failed for $collectionName: ${e.getMessage}")
-    }
+  private def extractRedditId(json: String): Option[String] = {
+    extractField(json, List("id", "name"))
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map(id => if (id.startsWith("t3_") || id.startsWith("t1_")) id.drop(3) else id)
+  }
+
+  private def extractField(json: String, fields: List[String]): Option[String] = {
+    fields.view.flatMap { f =>
+      val r1 = (""""""" + f + """"\s*:\s*"([^"]*)"""").r
+      val r2 = (""""""" + f + """"\s*:\s*([0-9]+)""").r
+      r1.findFirstMatchIn(json).map(_.group(1))
+        .orElse(r2.findFirstMatchIn(json).map(_.group(1)))
+    }.headOption
   }
 
   private def createIndexes(): Unit = {
     val posts = mongoConnection.getCollection("posts")
     val comments = mongoConnection.getCollection("comments")
-    posts.createIndex(Document("_id" -> 1)).toFuture()
-    comments.createIndex(Document("_id" -> 1)).toFuture()
-    println("Indexes ready")
+
+    Await.result(posts.createIndex(Document("id" -> 1)).toFuture(), 10.seconds)
+    Await.result(comments.createIndex(Document("id" -> 1)).toFuture(), 10.seconds)
+
+    println("[START] Indexes ready")
   }
 
   def stop(): Unit = {
