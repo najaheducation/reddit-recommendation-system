@@ -18,8 +18,8 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
   @transient lazy private val mongoConnection = new MongoConnection(config.mongo)
 
   private val checkpointLocation: String =
-    "C:/Users/User/OneDrive/Desktop/final/reddit-recommendation-system/checkpoints/reddit-mongo"
-
+    sys.props.getOrElse("java.io.tmpdir", "/tmp") + "/checkpoints/reddit-mongo"
+    
   private val stopWordsPath: String = "stopwords.txt"
   @transient private lazy val cms =
     new CmsPipeline(
