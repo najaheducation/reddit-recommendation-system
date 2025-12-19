@@ -5,54 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j2.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommenderApp.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/FeatureExtractor.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/dep RedditMongoPipeline.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafka.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafkaService.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/IngestionController.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeConfig.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeJobScheduler.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeResult.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/IngestionController.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipeline.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipelineTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipelineTest.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/SimpleUsage.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/SimpleUsage.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/StorageController.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/StorageController.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/testapi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/testapi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafka.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafka.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafkaService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafkaService.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeConfig.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeJobScheduler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeJobScheduler.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeResult.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/KafkaConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkatomongo.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/kafkaToMongoConsumer.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/main.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/FeatureExtractor.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/RedditMongoPipeline.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/UsageExamples.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/UsageExamples.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -195,7 +148,7 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
-      <workItem from="1765821748876" duration="62978000" />
+      <workItem from="1765821748876" duration="69596000" />
     </task>
     <servers />
   </component>
