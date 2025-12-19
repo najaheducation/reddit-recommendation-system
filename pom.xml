@@ -23,52 +23,48 @@
 
         <kafka.version>3.4.0</kafka.version>
 
-        <!-- Updated to version compatible with Spark 3.3.0 -->
         <json4s.version>3.7.0-M11</json4s.version>
-
         <postgres.version>42.5.0</postgres.version>
         <orgjson.version>20240303</orgjson.version>
     </properties>
+
+    <!-- ✅ Spark/Kafka deps here WITHOUT scope
+         (so IntelliJ + java run works) -->
     <dependencies>
 
-        <!-- Spark dependencies - provided by spark-submit -->
+        <!-- Spark (LOCAL default) -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-token-provider-kafka-0-10_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- Kafka client - also provided by Spark in streaming jobs -->
+        <!-- Kafka client (LOCAL default) -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- All other dependencies - normal compile scope (included in JAR) -->
+        <!-- Scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
@@ -139,14 +135,14 @@
             <version>5.5.0</version>
         </dependency>
 
-        <!-- org.json (for JSONObject/JSONArray) -->
+        <!-- org.json -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${orgjson.version}</version>
         </dependency>
 
-        <!-- JRAW (Reddit API wrapper) -->
+        <!-- JRAW -->
         <dependency>
             <groupId>com.github.ThatJavaNerd</groupId>
             <artifactId>JRAW</artifactId>
@@ -173,8 +169,65 @@
         </repository>
     </repositories>
 
+    <!-- ✅ PROFILES:
+         - local: default (works in IntelliJ)
+         - cluster: make spark+kafka provided for spark-submit -->
+    <profiles>
+
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>cluster</id>
+            <dependencies>
+                <!-- Override Spark + Kafka to PROVIDED in cluster mode -->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-core_${scala.binary.version}</artifactId>
+                    <version>${spark.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                    <version>${spark.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>
+                    <version>${spark.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-token-provider-kafka-0-10_${scala.binary.version}</artifactId>
+                    <version>${spark.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
+                    <version>${kafka.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
+
     <build>
         <plugins>
+
+            <!-- Assembly: jar-with-dependencies -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.7.1</version>
@@ -198,6 +251,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Scala compile -->
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -225,6 +280,7 @@
                 </configuration>
             </plugin>
 
+            <!-- Java compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -234,6 +290,8 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>

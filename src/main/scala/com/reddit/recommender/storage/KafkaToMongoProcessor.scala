@@ -12,6 +12,7 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
+import java.nio.file.{Files, Paths}
 
 class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Serializable {
 
@@ -42,6 +43,8 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
     createIndexes()
     cms.ensureIndexes()
 
+    ensureCheckpointDir()
+
     println(s"[START] topics: ${config.topics.mkString(", ")}")
     println(s"[START] checkpointLocation: $checkpointLocation")
 
@@ -56,17 +59,43 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
       .selectExpr("CAST(value AS STRING) as json", "topic")
       .writeStream
       .foreachBatch { (batchDF: Dataset[Row], batchId: Long) =>
-        processBatch(batchDF, batchId)
+        val rowsCount = batchDF.count()
+        println(s"[BATCH $batchId] rows=$rowsCount")
+
+        processBatch(batchDF, batchId, rowsCount)
       }
       .option("checkpointLocation", checkpointLocation)
       .trigger(Trigger.ProcessingTime("10 seconds"))
       .start()
 
+    println(s"[STREAM] started id=${query.id} runId=${query.runId} isActive=${query.isActive}")
+
     query.awaitTermination()
   }
 
-  private def processBatch(batchDF: Dataset[Row], batchId: Long): Unit = {
+  private def ensureCheckpointDir(): Unit = {
+    try {
+      val p = Paths.get(checkpointLocation)
+      if (!Files.exists(p)) {
+        Files.createDirectories(p)
+        println(s"[CHECKPOINT] directory created: $checkpointLocation")
+      } else {
+        println(s"[CHECKPOINT] directory exists: $checkpointLocation")
+      }
+    } catch {
+      case NonFatal(e) =>
+        println(s"[ERROR] Cannot create checkpoint directory: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  private def processBatch(batchDF: Dataset[Row], batchId: Long, rowsCount: Long): Unit = {
     metrics("batches") += 1
+
+    if (rowsCount == 0) {
+      cms.onBatchEnd()
+      return
+    }
 
     val posts = mutable.ListBuffer[(String, Document)]()
     val comments = mutable.ListBuffer[(String, Document)]()
@@ -82,14 +111,13 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
       if (json != null && json.nonEmpty) {
         cms.onMessage(topic, json)
 
-        val redditIdOpt = extractRedditId(json)
-        redditIdOpt match {
+        extractRedditId(json) match {
           case Some(redditId) =>
             val doc = Document(json)
             topic match {
               case "reddit-posts"    => posts += ((redditId, doc))
               case "reddit-comments" => comments += ((redditId, doc))
-              case _ =>
+              case _                 =>
             }
             batchCount += 1
 
@@ -103,9 +131,8 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
     if (comments.nonEmpty) upsertMany("comments", comments.toList)
 
     metrics("processed") += batchCount
-    if (batchCount > 0) {
-      println(s"[BATCH $batchId] processed=$batchCount total=${metrics("processed")} batches=${metrics("batches")}")
-    }
+    println(s"[BATCH $batchId] processed=$batchCount total=${metrics("processed")} batches=${metrics("batches")}")
+
     cms.onBatchEnd()
   }
 
