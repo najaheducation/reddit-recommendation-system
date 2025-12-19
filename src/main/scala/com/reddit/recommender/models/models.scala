@@ -1,10 +1,8 @@
 package com.reddit.recommender.models
 
 import io.circe._
-import io.circe.generic.semiauto._
 import java.time.Instant
 
-// Raw JSON models matching your data structure
 case class RawRedditPost(
                           kind: String,
                           query: String,
@@ -46,7 +44,6 @@ case class RawRedditComment(
                              url: String
                            )
 
-// Processed models for MongoDB
 case class ProcessedPost(
                           _id: String, // Using Reddit ID as _id for easier lookup
                           kind: String,
@@ -104,25 +101,3 @@ case class TextFeatures(
                          has_mentions: Boolean = false
                        )
 
-// JSON decoders
-object JsonDecoders {
-  implicit val rawPostDecoder: Decoder[RawRedditPost] = deriveDecoder[RawRedditPost]
-  implicit val rawCommentDecoder: Decoder[RawRedditComment] = deriveDecoder[RawRedditComment]
-
-  // Encoders for MongoDB documents
-  import io.circe.syntax._
-  implicit val textFeaturesEncoder: Encoder[TextFeatures] = deriveEncoder[TextFeatures]
-  implicit val processedPostEncoder: Encoder[ProcessedPost] = deriveEncoder[ProcessedPost]
-  implicit val processedCommentEncoder: Encoder[ProcessedComment] = deriveEncoder[ProcessedComment]
-}
-
-
-//
-//case class TextFeatures(
-//                         text_length: Int,
-//                         word_count: Int,
-//                         topic_category: Option[String] = None,
-//                         keywords: List[String] = List.empty,
-//                         has_links: Boolean = false,
-//                         has_mentions: Boolean = false
-//                       )

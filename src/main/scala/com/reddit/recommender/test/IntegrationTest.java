@@ -18,7 +18,7 @@ public class IntegrationTest {
         System.out.println("Next steps:");
         System.out.println("  1. Run: docker exec kafka kafka-topics --list --bootstrap-server localhost:9092");
         System.out.println("  2. Should see: reddit-posts and reddit-comments");
-        System.out.println("  3. Run: mvn compile exec:java -Dexec.mainClass='com.reddit.recommender.ingestion.ApifyToKafka'");
+        System.out.println("  3. Run: mvn compile exec:java -Dexec.mainClass='com.reddit.recommender.test.ingestion.ApifyToKafka'");
     }
 
     private static void testKafkaConnectivity() throws Exception {

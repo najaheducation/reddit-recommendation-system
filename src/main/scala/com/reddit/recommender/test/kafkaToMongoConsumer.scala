@@ -1,7 +1,7 @@
 // File: src/main/scala/com/reddit/recommender/examples/KafkaToMongoOnly.scala
-package com.reddit.recommender.examples
+package com.reddit.recommender.test
 
-import com.reddit.recommender.storage.{AppConfig, ConfigLoader, KafkaConfig, KafkaToMongoProcessor, MongoConfig}
+import com.reddit.recommender.storage.{ConfigLoader, KafkaToMongoProcessor}
 import org.apache.spark.sql.SparkSession
 
 object KafkaToMongoOnly {

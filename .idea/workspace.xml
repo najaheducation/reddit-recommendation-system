@@ -5,9 +5,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j2.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommenderApp.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/FeatureExtractor.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/dep RedditMongoPipeline.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafka.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafkaService.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/IngestionController.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeConfig.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeJobScheduler.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeResult.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/IngestionController.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipeline.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditPipelineTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipelineTest.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/SimpleUsage.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/SimpleUsage.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/StorageController.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/StorageController.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/testapi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/testapi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafka.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafka.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafkaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ApifyToKafkaService.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeConfig.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeJobScheduler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeJobScheduler.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeResult.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/ingestion/ScrapeResult.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/KafkaConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkatomongo.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/kafkaToMongoConsumer.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/main.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/FeatureExtractor.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/RedditMongoPipeline.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/UsageExamples.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/UsageExamples.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +74,10 @@
     &quot;accountId&quot;: &quot;ed687ca6-229b-4508-b3ba-736ca14f1ca5&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="importingSettings">
       <MavenImportingSettings>
@@ -39,7 +88,7 @@
     </option>
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
@@ -61,11 +110,14 @@
     "Application.KafkaConnectionTest.executor": "Run",
     "Application.KafkaToMongoOnly.executor": "Run",
     "Application.Main.executor": "Run",
+    "Application.RedditRecommenderApp.executor": "Run",
     "Application.SimpleUsage.executor": "Run",
     "Application.UsageExamples.executor": "Run",
+    "Application.testapi.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "dart.analysis.tool.window.visible": "false",
+    "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "BE",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
@@ -76,50 +128,17 @@
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15332031",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
+    "settings.editor.selected.configurable": "profiler.jvm",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.KafkaToMongoOnly">
-    <configuration name="KafkaToMongoOnly" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.examples.KafkaToMongoOnly" />
-      <module name="reddit-srs" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.reddit.recommender.examples.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.Main" />
-      <module name="reddit-srs" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.reddit.recommender.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SimpleUsage" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.examples.SimpleUsage" />
-      <module name="reddit-srs" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.reddit.recommender.examples.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\CLICK\IdeaProjects\bigdatareddit\src\main\scala\com\reddit\recommender\test" />
+      <recent name="C:\Users\CLICK\IdeaProjects\bigdatareddit\src\main\scala\com\reddit\recommender\kafka" />
+    </key>
+  </component>
+  <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="bigdatareddit" />
       <method v="2">
@@ -131,13 +150,6 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.KafkaToMongoOnly" />
-        <item itemvalue="Application.SimpleUsage" />
-        <item itemvalue="Application.Main" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ScalaProjectSettings">
     <option name="compilerHighlightingScala2" value="true" />
@@ -183,12 +195,23 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
-      <workItem from="1765821748876" duration="11316000" />
+      <workItem from="1765821748876" duration="62978000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

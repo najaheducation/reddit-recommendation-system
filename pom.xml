@@ -29,46 +29,59 @@
         <postgres.version>42.5.0</postgres.version>
         <orgjson.version>20240303</orgjson.version>
     </properties>
-
     <dependencies>
 
+        <!-- Spark dependencies - provided by spark-submit -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-token-provider-kafka-0-10_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
 
+        <!-- Kafka client - also provided by Spark in streaming jobs -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
+            <scope>provided</scope>
         </dependency>
 
+        <!-- All other dependencies - normal compile scope (included in JAR) -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
 
-        <!-- Circe (cleaned up — use property only) -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+
+        <!-- Circe -->
         <dependency>
             <groupId>io.circe</groupId>
             <artifactId>circe-core_${scala.binary.version}</artifactId>
@@ -92,18 +105,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgres.version}</version>
         </dependency>
 
-        <!-- Updated json4s for Spark 3.3.0 compatibility -->
+        <!-- json4s -->
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
@@ -125,18 +132,21 @@
             <version>${json4s.version}</version>
         </dependency>
 
+        <!-- MongoDB Scala driver -->
         <dependency>
             <groupId>org.mongodb.scala</groupId>
             <artifactId>mongo-scala-driver_2.12</artifactId>
             <version>5.5.0</version>
         </dependency>
 
+        <!-- org.json (for JSONObject/JSONArray) -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${orgjson.version}</version>
         </dependency>
 
+        <!-- JRAW (Reddit API wrapper) -->
         <dependency>
             <groupId>com.github.ThatJavaNerd</groupId>
             <artifactId>JRAW</artifactId>
@@ -165,6 +175,29 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.reddit.recommender.RedditRecommenderApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -204,258 +237,3 @@
         </plugins>
     </build>
 </project>
-
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<project xmlns="http://maven.apache.org/POM/4.0.0"-->
-<!--         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
-<!--         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0-->
-<!--         http://maven.apache.org/xsd/maven-4.0.0.xsd">-->
-
-<!--    <modelVersion>4.0.0</modelVersion>-->
-
-<!--    <groupId>com.reddit.recommender</groupId>-->
-<!--    <artifactId>reddit-srs</artifactId>-->
-<!--    <version>1.0-SNAPSHOT</version>-->
-
-<!--    <properties>-->
-<!--        <circe.version>0.14.6</circe.version>-->
-<!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-
-<!--        <maven.compiler.source>11</maven.compiler.source>-->
-<!--        <maven.compiler.target>11</maven.compiler.target>-->
-
-<!--        <spark.version>3.3.0</spark.version>-->
-
-<!--        <scala.version>2.12.18</scala.version>-->
-<!--        <scala.binary.version>2.12</scala.binary.version>-->
-
-<!--        <kafka.version>3.4.0</kafka.version>-->
-
-<!--        <json4s.version>3.6.6</json4s.version>-->
-
-<!--        <postgres.version>42.5.0</postgres.version>-->
-
-<!--        <orgjson.version>20240303</orgjson.version>-->
-<!--    </properties>-->
-
-<!--    <dependencyManagement>-->
-<!--        <dependencies>-->
-<!--            <dependency>-->
-<!--                <groupId>org.json4s</groupId>-->
-<!--                <artifactId>json4s-jackson_${scala.binary.version}</artifactId>-->
-<!--                <version>${json4s.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.json4s</groupId>-->
-<!--                <artifactId>json4s-core_${scala.binary.version}</artifactId>-->
-<!--                <version>${json4s.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.json4s</groupId>-->
-<!--                <artifactId>json4s-ast_${scala.binary.version}</artifactId>-->
-<!--                <version>${json4s.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.json4s</groupId>-->
-<!--                <artifactId>json4s-scalap_${scala.binary.version}</artifactId>-->
-<!--                <version>${json4s.version}</version>-->
-<!--            </dependency>-->
-<!--        </dependencies>-->
-<!--    </dependencyManagement>-->
-
-<!--    <dependencies>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.spark</groupId>-->
-<!--            <artifactId>spark-core_${scala.binary.version}</artifactId>-->
-<!--            <version>${spark.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.spark</groupId>-->
-<!--            <artifactId>spark-sql_${scala.binary.version}</artifactId>-->
-<!--            <version>${spark.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.spark</groupId>-->
-<!--            <artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>-->
-<!--            <version>${spark.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.spark</groupId>-->
-<!--            <artifactId>spark-token-provider-kafka-0-10_${scala.binary.version}</artifactId>-->
-<!--            <version>${spark.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.kafka</groupId>-->
-<!--            <artifactId>kafka-clients</artifactId>-->
-<!--            <version>${kafka.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.scala-lang</groupId>-->
-<!--            <artifactId>scala-library</artifactId>-->
-<!--            <version>${scala.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-core_2.12</artifactId>-->
-<!--            <version>0.14.6</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-generic_2.12</artifactId>-->
-<!--            <version>0.14.6</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-parser_2.12</artifactId>-->
-<!--            <version>0.14.6</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-core_${scala.binary.version}</artifactId>-->
-<!--            <version>${circe.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-generic_${scala.binary.version}</artifactId>-->
-<!--            <version>${circe.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.circe</groupId>-->
-<!--            <artifactId>circe-parser_${scala.binary.version}</artifactId>-->
-<!--            <version>${circe.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.typelevel</groupId>-->
-<!--            <artifactId>cats-core_${scala.binary.version}</artifactId>-->
-<!--            <version>2.10.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.scala-lang</groupId>-->
-<!--            <artifactId>scala-reflect</artifactId>-->
-<!--            <version>${scala.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.postgresql</groupId>-->
-<!--            <artifactId>postgresql</artifactId>-->
-<!--            <version>${postgres.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.json4s</groupId>-->
-<!--            <artifactId>json4s-jackson_${scala.binary.version}</artifactId>-->
-<!--            <version>${json4s.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.mongodb.scala</groupId>-->
-<!--            <artifactId>mongo-scala-driver_2.12</artifactId>-->
-<!--            <version>5.5.0</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.json4s</groupId>-->
-<!--            <artifactId>json4s-scalap_${scala.binary.version}</artifactId>-->
-<!--            <version>${json4s.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.json</groupId>-->
-<!--            <artifactId>json</artifactId>-->
-<!--            <version>${orgjson.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>com.github.ThatJavaNerd</groupId>-->
-<!--            <artifactId>JRAW</artifactId>-->
-<!--            <version>1.1.0</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.json4s</groupId>-->
-<!--                    <artifactId>json4s-core_${scala.binary.version}</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.json4s</groupId>-->
-<!--                    <artifactId>json4s-ast_${scala.binary.version}</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.json4s</groupId>-->
-<!--                    <artifactId>json4s-jackson_${scala.binary.version}</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.json4s</groupId>-->
-<!--                    <artifactId>json4s-scalap_${scala.binary.version}</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-<!--    </dependencies>-->
-
-<!--    <repositories>-->
-
-<!--            <repository>-->
-<!--                <id>central</id>-->
-<!--                <name>Maven Central</name>-->
-<!--                <url>https://repo1.maven.org/maven2/</url>-->
-<!--            </repository>-->
-<!--            <repository>-->
-<!--                <id>jitpack.io</id>-->
-<!--                <url>https://jitpack.io</url>-->
-<!--            </repository>-->
-
-<!--        <repository>-->
-<!--            <id>jitpack.io</id>-->
-<!--            <url>https://jitpack.io</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
-
-<!--    <build>-->
-<!--        <plugins>-->
-
-<!--            <plugin>-->
-<!--                <groupId>net.alchim31.maven</groupId>-->
-<!--                <artifactId>scala-maven-plugin</artifactId>-->
-<!--                <version>4.8.1</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>scala-compile</id>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>add-source</goal>-->
-<!--                            <goal>compile</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <id>scala-test-compile</id>-->
-<!--                        <phase>test-compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>add-source</goal>-->
-<!--                            <goal>testCompile</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <scalaVersion>${scala.version}</scalaVersion>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
-
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                <version>3.11.0</version>-->
-<!--                <configuration>-->
-<!--                    <source>${maven.compiler.source}</source>-->
-<!--                    <target>${maven.compiler.target}</target>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
-<!--        </plugins>-->
-<!--    </build>-->
-
-<!--</project>-->

@@ -1,12 +1,14 @@
-package com.reddit.recommender.storage
+package com.reddit.recommender.mongo
 
+import com.reddit.recommender.storage.MongoConfig
 import org.mongodb.scala.bson.Document
 import org.mongodb.scala.connection.{ClusterSettings, SocketSettings}
 import org.mongodb.scala.{ConnectionString, MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
+
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 class MongoConnection(config: MongoConfig) {
   private var client: MongoClient = _
@@ -37,24 +39,13 @@ class MongoConnection(config: MongoConfig) {
       } match {
         case Success(_) =>
           isConnected = true
-          println(s"✅ Connected to MongoDB: ${config.database}")
+          println(s"Connected to MongoDB: ${config.database}")
         case Failure(e) =>
           throw new RuntimeException(s"Failed to connect to MongoDB: ${e.getMessage}")
       }
     }
   }
 
-  def healthCheck(): Boolean = {
-    if (!isConnected) return false
-
-    Try {
-      Await.result(database.runCommand(Document("ping" -> 1)).toFuture(), 5.seconds)
-      true
-    }.getOrElse {
-      println("⚠️  MongoDB health check failed")
-      false
-    }
-  }
 
   private def buildConnectionString(): String = {
     val baseUri = config.uri

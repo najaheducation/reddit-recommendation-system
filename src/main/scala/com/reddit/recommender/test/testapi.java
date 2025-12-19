@@ -1,4 +1,6 @@
-package com.reddit.recommender.api;
+package com.reddit.recommender.test;
+import com.reddit.recommender.api.ApifyClient;
+import com.reddit.recommender.api.ScraperParameters;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -71,20 +73,6 @@ public class testapi {
                 // Alternative option without pretty printing:
                 // System.out.println(post.toString());
             }
-//            for (int i = 0; i < Math.min(5, results2.length()); i++) {
-//                JSONObject post = results2.getJSONObject(i);
-//                System.out.println("\nPost " + (i + 1) + ":");
-//                System.out.println("Title: " + post.optString("title", "N/A"));
-//                System.out.println("Subreddit: " + post.optString("subreddit", "N/A"));
-//                System.out.println("Upvotes: " + post.optInt("upvotes", 0));
-//                System.out.println("URL: https://reddit.com" + post.optString("url", ""));
-//
-//                // Check if there are comments
-//                if (post.has("comments") && post.getJSONArray("comments").length() > 0) {
-//                    JSONObject comment = post.getJSONArray("comments").getJSONObject(0);
-//                    System.out.println("Top comment: " + comment.optString("text", "").substring(0, Math.min(100, comment.optString("text", "").length())) + "...");
-//                }
-//            }
 
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
