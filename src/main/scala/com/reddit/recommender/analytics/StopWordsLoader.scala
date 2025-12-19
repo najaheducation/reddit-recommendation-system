@@ -10,7 +10,9 @@ object StopWordsLoader {
     if (pathOrResource == null || pathOrResource.trim.isEmpty) return Set.empty
 
     val file = new File(pathOrResource)
-    if (file.exists()) return readSource(Source.fromFile(file, "UTF-8"))
+    if (file.exists()) {
+      return readSource(Source.fromFile(file, "UTF-8"))
+    }
 
     val is: InputStream =
       Option(Thread.currentThread().getContextClassLoader.getResourceAsStream(pathOrResource))
@@ -24,16 +26,18 @@ object StopWordsLoader {
 
     val src = Source.fromInputStream(is, "UTF-8")
     try readSource(src)
-    finally if (src != null) src.close()
+    finally src.close()
   }
 
   private def readSource(src: Source): Set[String] = {
     try {
       src.getLines()
-        .flatMap { line =>
-          line.split("[,;\\s\\t]+")
+        .flatMap(_.split("[,;\\s\\t]+"))
+        .map { w =>
+          w.replace("\uFEFF", "")  
+            .toLowerCase
+            .trim
         }
-        .map(_.trim.toLowerCase)
         .filter(w => w.nonEmpty && !w.startsWith("#"))
         .toSet
     } catch {

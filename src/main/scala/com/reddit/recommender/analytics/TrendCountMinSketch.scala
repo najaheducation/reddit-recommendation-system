@@ -8,7 +8,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 
-
 class TrendWindowTracker(
                           mongoConnection: MongoConnection,
                           windowDays: Int,
@@ -22,6 +21,7 @@ class TrendWindowTracker(
 
   private val stopWords: Set[String] = StopWordsLoader.load(stopWordsPath)
   println(s"[TREND] stopWords loaded=${stopWords.size} source=$stopWordsPath")
+  println(s"[TREND] contains(the)=${stopWords.contains("the")} contains(to)=${stopWords.contains("to")} contains(of)=${stopWords.contains("of")}")
 
   private val bucketTerms = mutable.LinkedHashMap[Long, mutable.Map[String, Long]]()
   private val bucketUsers = mutable.LinkedHashMap[Long, mutable.Map[String, Long]]()
@@ -52,6 +52,7 @@ class TrendWindowTracker(
       purgeOld(ts)
     }
   }
+
   def storeSnapshotAlways(topN: Int): Unit = {
     val windowEnd = lastEventTimeMillis
     val windowStart = windowEnd - windowMillis
@@ -101,6 +102,7 @@ class TrendWindowTracker(
         col.updateOne(filter, update, new org.mongodb.scala.model.UpdateOptions().upsert(true)).toFuture(),
         30.seconds
       )
+      println(s"[TREND] snapshot stored topN=$topN updatedAt=$updatedAt")
     } catch {
       case NonFatal(e) => println(s"[TREND] storeSnapshotAlways failed: ${e.getMessage}")
     }
@@ -128,9 +130,12 @@ class TrendWindowTracker(
       .map(_.toLowerCase)
   }
 
+
   private def tokenize(s: String): List[String] =
     s.toLowerCase
       .replaceAll("""https?://\S+""", " ")
+      .replaceAll("""\\u[0-9a-fA-F]{4}""", " ")
+      .replaceAll("""[^\x00-\x7F]""", " ")
       .replaceAll("""[^a-z0-9\s]""", " ")
       .split("\\s+")
       .toList
