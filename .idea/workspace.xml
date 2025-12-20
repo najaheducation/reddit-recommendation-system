@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/stopwords.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/stopwords.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" afterDir="false" />
-
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,13 +26,16 @@
     &quot;assignee&quot;: &quot;yahyazawadi&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/najaheducation/reddit-recommendation-system.git",
-    "accountId": "50ad329f-feba-444d-aced-68c8fdbf5ffb"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/najaheducation/reddit-recommendation-system.git&quot;,
+    &quot;accountId&quot;: &quot;50ad329f-feba-444d-aced-68c8fdbf5ffb&quot;
 
   }
-}]]></component>
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18-sources.jar!/scala/Option.scala" root0="SKIP_INSPECTION" />
+  </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -81,19 +81,17 @@
     "RunOnceActivity.git.unshallow": "true",
     "dart.analysis.tool.window.visible": "false",
     "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "feature/count-min-sketch",
+    "git-widget-placeholder": "BE",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "SDKs",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15332031",
-
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "profiler.jvm",
-
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -160,10 +158,8 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
-
       <workItem from="1765821748876" duration="62978000" />
       <workItem from="1766152721129" duration="15160000" />
-
     </task>
     <servers />
   </component>

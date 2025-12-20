@@ -20,7 +20,7 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
 
   private val checkpointLocation: String =
     sys.props.getOrElse("java.io.tmpdir", "/tmp") + "/checkpoints/reddit-mongo"
-    
+
   private val stopWordsPath: String = "stopwords.txt"
   @transient private lazy val cms =
     new CmsPipeline(
@@ -59,10 +59,10 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
       .selectExpr("CAST(value AS STRING) as json", "topic")
       .writeStream
       .foreachBatch { (batchDF: Dataset[Row], batchId: Long) =>
- val rowsCount = batchDF.count()
+        val rowsCount = batchDF.count()
         println(s"[BATCH $batchId] rows=$rowsCount")
 
-        processBatch(batchDF, batchId, rowsCount)E
+        processBatch(batchDF, batchId, rowsCount)
       }
       .option("checkpointLocation", checkpointLocation)
       .trigger(Trigger.ProcessingTime("10 seconds"))
@@ -152,32 +152,6 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
           println(s"[ERROR] Bulk upsert failed for $collectionName: ${e.getMessage}")
       }
     }
-
-    if (operations.nonEmpty) {
-      try {
-        Await.result(collection.bulkWrite(operations).toFuture(), 60.seconds)
-        println(s"[UPSERT] $collectionName: ${operations.size} documents processed (with upsert)")
-      } catch {
-        case NonFatal(e) =>
-          println(s"[ERROR] Bulk upsert failed for $collectionName: ${e.getMessage}")
-      }
-    }
-  }
-
-  private def extractRedditId(json: String): Option[String] = {
-    extractField(json, List("id", "name"))
-      .map(_.trim)
-      .filter(_.nonEmpty)
-      .map(id => if (id.startsWith("t3_") || id.startsWith("t1_")) id.drop(3) else id)
-  }
-
-  private def extractField(json: String, fields: List[String]): Option[String] = {
-    fields.view.flatMap { f =>
-      val r1 = (""""""" + f + """"\s*:\s*"([^"]*)"""").r
-      val r2 = (""""""" + f + """"\s*:\s*([0-9]+)""").r
-      r1.findFirstMatchIn(json).map(_.group(1))
-        .orElse(r2.findFirstMatchIn(json).map(_.group(1)))
-    }.headOption
   }
 
   private def extractRedditId(json: String): Option[String] = {
