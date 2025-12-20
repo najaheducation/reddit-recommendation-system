@@ -12,6 +12,7 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
+import java.nio.file.{Files, Paths}
 
 class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Serializable {
 
@@ -42,6 +43,8 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
     createIndexes()
     cms.ensureIndexes()
 
+    ensureCheckpointDir()
+
     println(s"[START] topics: ${config.topics.mkString(", ")}")
     println(s"[START] checkpointLocation: $checkpointLocation")
 
@@ -56,17 +59,43 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
       .selectExpr("CAST(value AS STRING) as json", "topic")
       .writeStream
       .foreachBatch { (batchDF: Dataset[Row], batchId: Long) =>
-        processBatch(batchDF, batchId)
+ val rowsCount = batchDF.count()
+        println(s"[BATCH $batchId] rows=$rowsCount")
+
+        processBatch(batchDF, batchId, rowsCount)E
       }
       .option("checkpointLocation", checkpointLocation)
       .trigger(Trigger.ProcessingTime("10 seconds"))
       .start()
 
+    println(s"[STREAM] started id=${query.id} runId=${query.runId} isActive=${query.isActive}")
+
     query.awaitTermination()
   }
 
-  private def processBatch(batchDF: Dataset[Row], batchId: Long): Unit = {
+  private def ensureCheckpointDir(): Unit = {
+    try {
+      val p = Paths.get(checkpointLocation)
+      if (!Files.exists(p)) {
+        Files.createDirectories(p)
+        println(s"[CHECKPOINT] directory created: $checkpointLocation")
+      } else {
+        println(s"[CHECKPOINT] directory exists: $checkpointLocation")
+      }
+    } catch {
+      case NonFatal(e) =>
+        println(s"[ERROR] Cannot create checkpoint directory: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  private def processBatch(batchDF: Dataset[Row], batchId: Long, rowsCount: Long): Unit = {
     metrics("batches") += 1
+
+    if (rowsCount == 0) {
+      cms.onBatchEnd()
+      return
+    }
 
     val posts = mutable.ListBuffer[(String, Document)]()
     val comments = mutable.ListBuffer[(String, Document)]()
@@ -82,14 +111,13 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
       if (json != null && json.nonEmpty) {
         cms.onMessage(topic, json)
 
-        val redditIdOpt = extractRedditId(json)
-        redditIdOpt match {
+        extractRedditId(json) match {
           case Some(redditId) =>
             val doc = Document(json)
             topic match {
               case "reddit-posts"    => posts += ((redditId, doc))
               case "reddit-comments" => comments += ((redditId, doc))
-              case _ =>
+              case _                 =>
             }
             batchCount += 1
 
@@ -103,9 +131,8 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
     if (comments.nonEmpty) upsertMany("comments", comments.toList)
 
     metrics("processed") += batchCount
-    if (batchCount > 0) {
-      println(s"[BATCH $batchId] processed=$batchCount total=${metrics("processed")} batches=${metrics("batches")}")
-    }
+    println(s"[BATCH $batchId] processed=$batchCount total=${metrics("processed")} batches=${metrics("batches")}")
+
     cms.onBatchEnd()
   }
 
@@ -125,6 +152,32 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
           println(s"[ERROR] Bulk upsert failed for $collectionName: ${e.getMessage}")
       }
     }
+
+    if (operations.nonEmpty) {
+      try {
+        Await.result(collection.bulkWrite(operations).toFuture(), 60.seconds)
+        println(s"[UPSERT] $collectionName: ${operations.size} documents processed (with upsert)")
+      } catch {
+        case NonFatal(e) =>
+          println(s"[ERROR] Bulk upsert failed for $collectionName: ${e.getMessage}")
+      }
+    }
+  }
+
+  private def extractRedditId(json: String): Option[String] = {
+    extractField(json, List("id", "name"))
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map(id => if (id.startsWith("t3_") || id.startsWith("t1_")) id.drop(3) else id)
+  }
+
+  private def extractField(json: String, fields: List[String]): Option[String] = {
+    fields.view.flatMap { f =>
+      val r1 = (""""""" + f + """"\s*:\s*"([^"]*)"""").r
+      val r2 = (""""""" + f + """"\s*:\s*([0-9]+)""").r
+      r1.findFirstMatchIn(json).map(_.group(1))
+        .orElse(r2.findFirstMatchIn(json).map(_.group(1)))
+    }.headOption
   }
 
   private def extractRedditId(json: String): Option[String] = {

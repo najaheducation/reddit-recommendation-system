@@ -5,12 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
+
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/stopwords.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/stopwords.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -23,8 +31,9 @@
 }</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "https://github.com/najaheducation/reddit-recommendation-system",
-    "accountId": "ed687ca6-229b-4508-b3ba-736ca14f1ca5"
+    "url": "https://github.com/najaheducation/reddit-recommendation-system.git",
+    "accountId": "50ad329f-feba-444d-aced-68c8fdbf5ffb"
+
   }
 }]]></component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -40,6 +49,7 @@
       </MavenImportingSettings>
     </option>
   </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="C:\xampp\php\php.exe" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -71,17 +81,19 @@
     "RunOnceActivity.git.unshallow": "true",
     "dart.analysis.tool.window.visible": "false",
     "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "BE",
+    "git-widget-placeholder": "feature/count-min-sketch",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15332031",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "profiler.jvm",
+
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -131,8 +143,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.21565.193" />
-        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-IU-243.21565.193" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.218" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.218" />
       </set>
     </attachedChunks>
   </component>
@@ -148,8 +160,10 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
-      <workItem from="1765821748876" duration="69596000" />
-      <workItem from="1766175662389" duration="166000" />
+
+      <workItem from="1765821748876" duration="62978000" />
+      <workItem from="1766152721129" duration="15160000" />
+
     </task>
     <servers />
   </component>
