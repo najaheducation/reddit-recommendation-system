@@ -1,6 +1,6 @@
 package com.reddit.recommender.test;
 
-import com.reddit.recommender.kafka.SimpleKafkaProducer;
+import com.reddit.recommender.kafkaproducer.SimpleKafkaProducer;
 import org.json.JSONObject;
 
 public class IntegrationTest {
@@ -16,7 +16,7 @@ public class IntegrationTest {
 
         System.out.println("\n=== Integration Test Complete ===");
         System.out.println("Next steps:");
-        System.out.println("  1. Run: docker exec kafka kafka-topics --list --bootstrap-server localhost:9092");
+        System.out.println("  1. Run: docker exec kafkaproducer kafkaproducer-topics --list --bootstrap-server localhost:9092");
         System.out.println("  2. Should see: reddit-posts and reddit-comments");
         System.out.println("  3. Run: mvn compile exec:java -Dexec.mainClass='com.reddit.recommender.test.ingestion.ApifyToKafka'");
     }
@@ -32,7 +32,7 @@ public class IntegrationTest {
             producer.sendPost(test);
             producer.flush();
 
-            System.out.println("✓ Kafka producer working");
+            System.out.println("✓ Kafka consumer working");
         } catch (Exception e) {
             System.err.println("✗ Kafka connection failed: " + e.getMessage());
             System.err.println("Make sure:");

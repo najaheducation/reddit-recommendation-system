@@ -26,7 +26,7 @@ final class CmsPipeline(
       delta = delta
     )
 
-  /** called for every kafka message (post/comment) */
+  /** called for every kafkaproducer message (post/comment) */
   def onMessage(topic: String, json: String): Unit =
     trendService.onMessage(topic, json)
 

@@ -1,7 +1,7 @@
 // File: src/main/scala/com/reddit/recommender/examples/KafkaToMongoOnly.scala
 package com.reddit.recommender.test
 
-import com.reddit.recommender.storage.{ConfigLoader, KafkaToMongoProcessor}
+import com.reddit.recommender.consumer.{ConfigLoader, KafkaToMongoProcessor}
 import org.apache.spark.sql.SparkSession
 
 object KafkaToMongoOnly {
@@ -9,7 +9,7 @@ object KafkaToMongoOnly {
     val spark = SparkSession.builder()
       .appName("Kafka-to-MongoDB-Only")
       .master("local[*]")
-      .config("spark.sql.streaming.checkpointLocation", "C:/tmp/checkpoints/kafka-mongo-only")
+      .config("spark.sql.streaming.checkpointLocation", "C:/tmp/checkpoints/kafkaproducer-mongo-only")
       .getOrCreate()
 
     

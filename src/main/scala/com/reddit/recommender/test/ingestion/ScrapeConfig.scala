@@ -1,3 +1,5 @@
+package com.reddit.recommender.test.ingestion
+
 //package com.reddit.recommender.test.ingestion
 //
 //import scala.collection.JavaConverters._

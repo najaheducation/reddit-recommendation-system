@@ -1,4 +1,4 @@
-package com.reddit.recommender.storage
+package com.reddit.recommender.consumer
 
 import scala.io.Source
 
