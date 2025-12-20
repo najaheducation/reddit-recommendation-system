@@ -1,6 +1,6 @@
 //package com.reddit.recommender.test
 //
-//import com.reddit.recommender.storage._
+//import com.reddit.recommender.consumer._
 //import org.apache.spark.sql.SparkSession
 //
 //object RedditPipelineTest {
@@ -43,7 +43,7 @@
 //      .withStorage(
 //        AppConfig(
 //          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
-//          kafka = KafkaConfig("localhost:9092"),
+//          kafkaproducer = KafkaConfig("localhost:9092"),
 //          topics = List("reddit-posts", "reddit-comments")
 //        )
 //      )
@@ -60,7 +60,7 @@
 //    // Test status
 //    val status = pipeline.getStatus
 //    println(s"   Status - Ingestion: ${status.ingestion.running}")
-//    println(s"   Status - Storage: ${status.storage.running}")
+//    println(s"   Status - Storage: ${status.consumer.running}")
 //
 //    // Cleanup
 //    pipeline.stop()
@@ -81,23 +81,23 @@
 //
 //    println("    Can create ingestion-only pipeline")
 //
-//    // Test storage only
+//    // Test consumer only
 //    val storageOnly = new RedditPipelineBuilder()
 //      .withStorage(
 //        AppConfig(
 //          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
-//          kafka = KafkaConfig("localhost:9092")
+//          kafkaproducer = KafkaConfig("localhost:9092")
 //        )
 //      )
 //      .withSparkSession(
 //        SparkSession.builder()
-//          .appName("test-storage")
+//          .appName("test-consumer")
 //          .master("local[1]")
 //          .getOrCreate()
 //      )
 //      .build()
 //
-//    println("    Can create storage-only pipeline")
+//    println("    Can create consumer-only pipeline")
 //
 //    // Cleanup
 //    ingestionOnly.stop()
@@ -121,8 +121,8 @@
 //
 //      println(s"    Ingested ${result.getTotalPosts} posts")
 //
-//      // Start storage briefly
-//      println("   Starting storage pipeline...")
+//      // Start consumer briefly
+//      println("   Starting consumer pipeline...")
 //      pipeline.startStorage()
 //      Thread.sleep(5000) // Run for 5 seconds
 //

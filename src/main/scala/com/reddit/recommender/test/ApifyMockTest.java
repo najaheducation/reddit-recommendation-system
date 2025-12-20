@@ -1,6 +1,6 @@
 package com.reddit.recommender.test;
 
-import com.reddit.recommender.kafka.SimpleKafkaProducer;
+import com.reddit.recommender.kafkaproducer.SimpleKafkaProducer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.Random;

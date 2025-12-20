@@ -2,7 +2,7 @@
 //package com.reddit.recommender.test
 //
 //import com.reddit.recommender.controller._
-//import com.reddit.recommender.storage._
+//import com.reddit.recommender.consumer._
 //import org.apache.spark.sql.SparkSession
 //
 //import java.util.concurrent.TimeUnit
@@ -29,7 +29,7 @@
 //      .withStorage(
 //        AppConfig(
 //          mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_custom", None, None),
-//          kafka = KafkaConfig("localhost:9092"),
+//          kafkaproducer = KafkaConfig("localhost:9092"),
 //          topics = List("reddit-posts", "reddit-comments"),
 //          featureExtractor = Some(
 //            FeatureExtractorConfig(
@@ -80,9 +80,9 @@
 //    val storageConfig = ConfigLoader.loadFromEnv()  // or hardcode if needed
 //
 //    val spark = SparkSession.builder()
-//      .appName("reddit-storage-only")
+//      .appName("reddit-consumer-only")
 //      .master("local[*]")
-//      .config("spark.sql.streaming.checkpointLocation", "C:/tmp/storage-only-checkpoints")
+//      .config("spark.sql.streaming.checkpointLocation", "C:/tmp/consumer-only-checkpoints")
 //      .getOrCreate()
 //
 //    val pipeline = new RedditPipelineBuilder()

@@ -5,9 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/kafka-producer.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/kafka-producer.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommenderApp.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommenderApp.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CmsPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CmsPipeline.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/KafkaConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/KafkaConfig.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafka/SimpleKafkaProducer.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/SimpleKafkaProducer.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/ConfigLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/ConfigLoader.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ApifyMockTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ApifyMockTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/FeatureExtractor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/FeatureExtractor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/KafkaConnectionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/KafkaConnectionTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipeline.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipelineTest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipelineTest.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/SimpleUsage.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/SimpleUsage.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/StorageController.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/StorageController.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/dep RedditMongoPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/dep RedditMongoPipeline.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/kafkaToMongoConsumer.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/kafkaToMongoConsumer.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +95,7 @@
     "Application.RedditRecommenderApp.executor": "Run",
     "Application.SimpleUsage.executor": "Run",
     "Application.UsageExamples.executor": "Run",
+    "Application.main.executor": "Run",
     "Application.testapi.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -102,6 +122,14 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration name="main" type="Application" factoryName="Application">
+      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.RedditRecommenderApp" />
+      <module name="reddit-srs" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="bigdatareddit" />
       <method v="2">

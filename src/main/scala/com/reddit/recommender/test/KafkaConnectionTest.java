@@ -1,6 +1,6 @@
 package com.reddit.recommender.test;
 
-import com.reddit.recommender.kafka.SimpleKafkaProducer;
+import com.reddit.recommender.kafkaproducer.SimpleKafkaProducer;
 import org.json.JSONObject;
 
 public class KafkaConnectionTest {
@@ -37,8 +37,8 @@ public class KafkaConnectionTest {
 
             System.out.println("\n=== Test Complete ===");
             System.out.println("Check if messages arrived:");
-            System.out.println("  docker exec kafka kafka-console-consumer --topic reddit-posts --from-beginning --bootstrap-server localhost:9092");
-            System.out.println("  docker exec kafka kafka-console-consumer --topic reddit-comments --from-beginning --bootstrap-server localhost:9092");
+            System.out.println("  docker exec kafkaproducer kafkaproducer-console-consumer --topic reddit-posts --from-beginning --bootstrap-server localhost:9092");
+            System.out.println("  docker exec kafkaproducer kafkaproducer-console-consumer --topic reddit-comments --from-beginning --bootstrap-server localhost:9092");
 
         } catch (Exception e) {
             System.err.println("✗ Kafka test failed: " + e.getMessage());

@@ -1,6 +1,6 @@
 //package com.reddit.recommender.test
 //
-//import com.reddit.recommender.storage._
+//import com.reddit.recommender.consumer._
 //import org.apache.spark.sql.SparkSession
 //
 //import java.time.Instant
@@ -28,7 +28,7 @@
 //  private val startTime = Instant.now()
 //
 //  /**
-//   * Start the complete pipeline (ingestion + storage)
+//   * Start the complete pipeline (ingestion + consumer)
 //   */
 //  def start(): this.type = {
 //    println("=" * 60)
@@ -50,7 +50,7 @@
 //      Thread.sleep(5000)
 //    }
 //
-//    // Start storage pipeline
+//    // Start consumer pipeline
 //    storageController.foreach { controller =>
 //      println("💾 Starting Storage Pipeline...")
 //      controller.start()
@@ -80,7 +80,7 @@
 //  }
 //
 //  /**
-//   * Start only the storage pipeline
+//   * Start only the consumer pipeline
 //   */
 //  def startStorage(): this.type = {
 //    storageController match {
@@ -105,7 +105,7 @@
 //      println("=" * 60)
 //
 //      stopStorage()
-//      Thread.sleep(2000) // Wait for storage to flush
+//      Thread.sleep(2000) // Wait for consumer to flush
 //      stopIngestion()
 //      stopSpark()
 //
@@ -127,7 +127,7 @@
 //  }
 //
 //  /**
-//   * Stop only storage
+//   * Stop only consumer
 //   */
 //  def stopStorage(): this.type = {
 //    if (storageRunning) {
@@ -180,7 +180,7 @@
 //        running = ingestionRunning,
 //        startedAt = if (ingestionRunning) Some(startTime) else None
 //      ),
-//      storage = PipelineComponentStatus(
+//      consumer = PipelineComponentStatus(
 //        running = storageRunning,
 //        startedAt = if (storageRunning) Some(startTime) else None
 //      ),
@@ -199,7 +199,7 @@
 //    println(" Pipeline Status")
 //    println("=" * 40)
 //    println(s"Ingestion: ${if (status.ingestion.running) " RUNNING" else "  STOPPED"}")
-//    println(s"Storage:   ${if (status.storage.running) " RUNNING" else "  STOPPED"}")
+//    println(s"Storage:   ${if (status.consumer.running) " RUNNING" else "  STOPPED"}")
 //    println(s"Spark:     ${if (status.spark) " ACTIVE" else "  STOPPED"}")
 //    println(s"Uptime:    ${formatDuration(status.uptime)}")
 //    println("=" * 40)
@@ -272,7 +272,7 @@
 //  }
 //
 //  /**
-//   * Set storage configuration
+//   * Set consumer configuration
 //   */
 //  def withStorage(config: AppConfig): RedditPipelineBuilder = {
 //    this.storageConfig = Some(config)
@@ -343,7 +343,7 @@
 //    // Default ingestion config
 //    val ingestionConfig = ScrapeConfig.trendingTechConfig()
 //
-//    // Default storage config from environment
+//    // Default consumer config from environment
 //    val storageConfig = ConfigLoader.loadFromEnv()
 //
 //    // Create Spark session
@@ -375,10 +375,10 @@
 //      .scrapeComments(false)
 //      .build()
 //
-//    // Minimal storage config
+//    // Minimal consumer config
 //    val storageConfig = AppConfig(
 //      mongo = MongoConfig(sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017"), "reddit_test", None, None),
-//      kafka = KafkaConfig("localhost:9092", "test-group"),
+//      kafkaproducer = KafkaConfig("localhost:9092", "test-group"),
 //      topics = List("reddit-posts", "reddit-comments")
 //    )
 //
@@ -408,7 +408,7 @@
 //      pipeline.start()
 //
 //      // Keep running until shutdown
-//      while (pipeline.getStatus.ingestion.running || pipeline.getStatus.storage.running) {
+//      while (pipeline.getStatus.ingestion.running || pipeline.getStatus.consumer.running) {
 //        Thread.sleep(5000)
 //        pipeline.printStatus()
 //      }
@@ -425,7 +425,7 @@
 // */
 //case class PipelineConfig(
 //                           name: String = "reddit-pipeline",
-//                           mode: String = "full", // "full", "ingestion-only", "storage-only"
+//                           mode: String = "full", // "full", "ingestion-only", "consumer-only"
 //                           healthCheckInterval: Int = 30, // seconds
 //                           metricsEnabled: Boolean = true
 //                         )
@@ -444,7 +444,7 @@
 //
 //case class PipelineStatus(
 //                           ingestion: PipelineComponentStatus,
-//                           storage: PipelineComponentStatus,
+//                           consumer: PipelineComponentStatus,
 //                           spark: Boolean,
 //                           uptime: java.time.Duration,
 //                           config: PipelineConfig

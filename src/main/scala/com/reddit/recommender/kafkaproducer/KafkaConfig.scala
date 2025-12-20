@@ -1,4 +1,4 @@
-package com.reddit.recommender.kafka
+package com.reddit.recommender.kafkaproducer
 
 import java.util.Properties
 

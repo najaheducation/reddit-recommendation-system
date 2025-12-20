@@ -20,10 +20,10 @@ Our app needs a topic called `reddit_posts`.
 
 ```bash
 # Create the topic
-docker exec bigdatareddit-kafka-1 kafka-topics --bootstrap-server localhost:9092 --create --topic reddit_posts --partitions 3 --replication-factor 1
+docker exec bigdatareddit-kafkaproducer-1 kafkaproducer-topics --bootstrap-server localhost:9092 --create --topic reddit_posts --partitions 3 --replication-factor 1
 
 # Verify it's there
-docker exec bigdatareddit-kafka-1 kafka-topics --bootstrap-server localhost:9092 --list
+docker exec bigdatareddit-kafkaproducer-1 kafkaproducer-topics --bootstrap-server localhost:9092 --list
 # Should print: reddit_posts
 ```
 
@@ -32,12 +32,12 @@ Make sure data can flow.
 
 **Terminal 1 - Listen for messages:**
 ```bash
-docker exec -it bigdatareddit-kafka-1 kafka-console-consumer --bootstrap-server localhost:9092 --topic reddit_posts --from-beginning
+docker exec -it bigdatareddit-kafkaproducer-1 kafkaproducer-console-consumer --bootstrap-server localhost:9092 --topic reddit_posts --from-beginning
 ```
 
 **Terminal 2 - Send a test message:**
 ```bash
-docker exec -it bigdatareddit-kafka-1 kafka-console-producer --bootstrap-server localhost:9092 --topic reddit_posts
+docker exec -it bigdatareddit-kafkaproducer-1 kafkaproducer-console-consumer --bootstrap-server localhost:9092 --topic reddit_posts
 ```
 Type `{"test": "hello"}` and press Enter. It should appear in Terminal 1.
 

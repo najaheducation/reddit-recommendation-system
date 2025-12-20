@@ -1,4 +1,4 @@
-package com.reddit.recommender.storage
+package com.reddit.recommender.consumer
 
 import scala.io.Source
 
@@ -44,8 +44,6 @@ object ConfigLoader {
     config
   }
 
-  private def getValue(lines: List[String], key: String): Option[String] = {
-    val prefix = s"$key="
-    lines.find(_.startsWith(prefix)).map(_.substring(prefix.length))
-  }
+  private def getValue(lines: List[String], key: String): Option[String] =
+    lines.collectFirst { case line if line.startsWith(s"$key=") => line.drop(key.length + 1) }
 }

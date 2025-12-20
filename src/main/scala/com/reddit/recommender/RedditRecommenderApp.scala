@@ -3,8 +3,8 @@ package com.reddit.recommender
 import org.apache.spark.sql.SparkSession
 import org.json.JSONObject
 import com.reddit.recommender.api.{ApifyClient, ScraperParameters}
-import com.reddit.recommender.kafka.SimpleKafkaProducer
-import com.reddit.recommender.storage.{AppConfig, ConfigLoader, KafkaToMongoProcessor}
+import com.reddit.recommender.kafkaproducer.SimpleKafkaProducer
+import com.reddit.recommender.consumer.{AppConfig, ConfigLoader, KafkaToMongoProcessor}
 
 import java.util.concurrent.{Executors, ScheduledFuture, TimeUnit}
 import scala.io.StdIn
@@ -20,22 +20,22 @@ object RedditRecommenderApp {
   def main(args: Array[String]): Unit = {
     println("""
               |=====================================
-              |   Launching Reddit Recommender System 
+              |   Reddit Recommender System
               |=====================================
               |""".stripMargin)
 
     val config = ConfigLoader.loadFromEnv()
 
-    // Clear any buffered input
+    // clear any buffered input
     clearInputBuffer()
 
-    // Start Spark in background thread
+    // start Spark in background thread
     startSparkConsumerInBackground(config)
 
     // Wait for Spark to initialize (with timeout)
     waitForSparkInitialization()
 
-    // Now show the menu
+    // show the menu
     showInteractiveMenu()
   }
 
@@ -51,12 +51,12 @@ object RedditRecommenderApp {
           .appName("Reddit-Kafka-To-Mongo")
           .master("local[*]")
           .config("spark.sql.streaming.checkpointLocation", "/tmp/checkpoints/reddit-mongo")
-          .config("spark.ui.showConsoleProgress", "false")  // Disable progress bars
+          .config("spark.ui.showConsoleProgress", "false")  // disable progress bars
 
         spark = Some(sparkBuilder.getOrCreate())
         val s = spark.get
 
-        s.sparkContext.setLogLevel("ERROR")  // Reduce Spark logs to only errors
+        s.sparkContext.setLogLevel("ERROR")  // reduce Spark logs to only errors
 
         processor = Some(new KafkaToMongoProcessor(s, config))
         processor.foreach(_.start())
@@ -164,7 +164,7 @@ object RedditRecommenderApp {
   }
 
   private def clearScreen(): Unit = {
-    // Try to clear screen for better UX
+    // Try to clear screen because spark logger keeps f***ing things up
     try {
       if (System.getProperty("os.name").contains("Windows")) {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor()
@@ -365,7 +365,7 @@ object RedditRecommenderApp {
     var builder = new ScraperParameters()
     var hasSources = false
 
-    // Keywords - NEW IMPROVED LOGIC
+    // Keywords
     print("Add keywords? (comma-separated, or press Enter to skip): ")
     Console.out.flush()
     val keywordsInput = StdIn.readLine().trim
@@ -381,7 +381,7 @@ object RedditRecommenderApp {
       println("   Skipping keywords.")
     }
 
-    // Subreddits/URLs - NEW IMPROVED LOGIC
+    // Subreddits/URLs
     print("\nAdd subreddits or URLs? (comma-separated, or press Enter to skip): ")
     Console.out.flush()
     val urlsInput = StdIn.readLine().trim
@@ -413,12 +413,12 @@ object RedditRecommenderApp {
     // Advanced parameters
     println("\n Advanced parameters (press Enter for defaults):")
     val maxPosts = promptInt("Max posts per source? (default 20): ", 20)
-    val scrapeComments = promptYesNo("Scrape comments? (default y): ", true)
+    val scrapeComments = promptYesNo("Scrape comments? (default n): ", false)
 
     val maxComments = if (scrapeComments) {
       promptInt("Max comments per post? (default 5, 0 = no limit): ", 5)
     } else {
-      1 // mininum allowed value 
+      1 // mininum allowed value
     }
 
     val sort = prompt("Sort by? (new/top/hot/relevance/controversial, default new): ").trim match {
@@ -453,7 +453,7 @@ object RedditRecommenderApp {
 
 
     if (scrapeComments) {
-      val safeMaxComments = math.max(maxComments, 1)  // Ensure at least 1 if comments are enabled
+      val safeMaxComments = math.max(maxComments, 1)  // ensure at least 1 if comments are enabled, this is to prevent a code of 403
       builder = builder.setMaxComments(safeMaxComments)
     }
     builder.build()

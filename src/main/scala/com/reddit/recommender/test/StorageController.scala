@@ -1,12 +1,12 @@
 //package com.reddit.recommender.test
 //
-//import com.reddit.recommender.storage._
+//import com.reddit.recommender.consumer._
 //import org.apache.spark.sql.SparkSession
 //
 //import scala.util.{Failure, Success, Try}
 //
 ///**
-// * Controller for the storage pipeline (Kafka → MongoDB)
+// * Controller for the consumer pipeline (Kafka → MongoDB)
 // */
 //class StorageController(spark: SparkSession, config: AppConfig) {
 //  private val 
@@ -15,11 +15,11 @@
 //  private var isRunning: Boolean = false
 //
 //  /**
-//   * Start the storage pipeline
+//   * Start the consumer pipeline
 //   */
 //  def start(): Unit = {
 //    if (!isRunning) {
-//      println(s"💾 Starting storage pipeline for topics: ${config.topics.mkString(", ")}")
+//      println(s"💾 Starting consumer pipeline for topics: ${config.topics.mkString(", ")}")
 //
 //      // Start in a separate thread to avoid blocking
 //      val thread = new Thread(() => {
@@ -40,7 +40,7 @@
 //  }
 //
 //  /**
-//   * Stop the storage pipeline
+//   * Stop the consumer pipeline
 //   */
 //  def stop(): Unit = {
 //    Try(processor.stop())
@@ -49,7 +49,7 @@
 //  }
 //
 //  /**
-//   * Check if storage is running
+//   * Check if consumer is running
 //   */
 //  def isActive: Boolean = isRunning
 //}

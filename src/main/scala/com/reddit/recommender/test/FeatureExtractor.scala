@@ -1,6 +1,6 @@
 package com.reddit.recommender.test
 
-//package com.reddit.recommender.storage
+//package com.reddit.recommender.consumer
 //
 //import java.time.Instant
 //import com.reddit.recommender.models.{TextFeatures, ProcessedComment, ProcessedPost, RawRedditPost, RawRedditComment}
