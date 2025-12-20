@@ -1,38 +1,39 @@
 package com.reddit.recommender.analytics
 
-import java.io.{File, InputStream}
+import java.io.File
 import scala.io.Source
 import scala.util.control.NonFatal
 
 object StopWordsLoader {
 
-  def load(pathOrResource: String): Set[String] = {
-    if (pathOrResource == null || pathOrResource.trim.isEmpty) return Set.empty
+  def load(pathOrResource: String): Set[String] =
+    Option(pathOrResource)
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .flatMap(loadFromFile)
+      .orElse(loadFromResource(pathOrResource))
+      .getOrElse {
+        println(s"[WARN] Stopwords not found: $pathOrResource")
+        Set.empty
+      }
 
-    val file = new File(pathOrResource)
-    if (file.exists()) return readSource(Source.fromFile(file, "UTF-8"))
+  // ---------- helpers ----------
 
-    val is: InputStream =
-      Option(Thread.currentThread().getContextClassLoader.getResourceAsStream(pathOrResource))
-        .orElse(Option(getClass.getClassLoader.getResourceAsStream(pathOrResource)))
-        .orNull
-
-    if (is == null) {
-      println(s"[WARN] Stopwords not found as file or resource: $pathOrResource")
-      return Set.empty
-    }
-
-    val src = Source.fromInputStream(is, "UTF-8")
-    try readSource(src)
-    finally if (src != null) src.close()
+  private def loadFromFile(path: String): Option[Set[String]] = {
+    val file = new File(path)
+    if (!file.exists()) None
+    else Some(read(Source.fromFile(file, "UTF-8")))
   }
 
-  private def readSource(src: Source): Set[String] = {
+  private def loadFromResource(name: String): Option[Set[String]] =
+    Option(getClass.getClassLoader.getResourceAsStream(name))
+      .map(Source.fromInputStream(_, "UTF-8"))
+      .map(read)
+
+  private def read(src: Source): Set[String] =
     try {
       src.getLines()
-        .flatMap { line =>
-          line.split("[,;\\s\\t]+")
-        }
+        .flatMap(_.split("[,;\\s\\t]+"))
         .map(_.trim.toLowerCase)
         .filter(w => w.nonEmpty && !w.startsWith("#"))
         .toSet
@@ -40,6 +41,7 @@ object StopWordsLoader {
       case NonFatal(e) =>
         println(s"[WARN] Stopwords load failed: ${e.getMessage}")
         Set.empty
+    } finally {
+      src.close()
     }
-  }
 }

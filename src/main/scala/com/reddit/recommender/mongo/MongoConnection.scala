@@ -32,7 +32,7 @@ class MongoConnection(config: MongoConfig) {
       client = MongoClient(settings)
       database = client.getDatabase(config.database)
 
-     
+
       Try {
         Await.result(database.runCommand(Document("ping" -> 1)).toFuture(), 5.seconds)
       } match {

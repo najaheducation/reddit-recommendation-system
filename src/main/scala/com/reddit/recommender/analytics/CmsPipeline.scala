@@ -5,39 +5,43 @@ import org.mongodb.scala.bson.Document
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-//Facade design pat..
+
+/**
+ * Facade over trend analytics (CMS-based).
+ * Keeps Kafka/Spark layer clean.
+ */
 final class CmsPipeline(
-                         mongoConnection: MongoConnection,
+                         mongo: MongoConnection,
                          stopWordsPath: String,
                          windowDays: Int = 7,
-                         bucketSizeMillis: Long = 5L * 60L * 1000L,
+                         bucketMillis: Long = 5L * 60L * 1000L,
                          epsilon: Double = 0.001,
                          delta: Double = 1e-5,
                          topN: Int = 10
                        ) extends Serializable {
 
-  @transient private lazy val trendService =
+  @transient private lazy val analytics =
     new TrendAnalyticsService(
-      mongoConnection = mongoConnection,
+      mongo = mongo,
       stopWordsPath = stopWordsPath,
       windowDays = windowDays,
-      bucketSizeMillis = bucketSizeMillis,
+      bucketMillis = bucketMillis,
       epsilon = epsilon,
       delta = delta
     )
 
-  /** called for every kafkaproducer message (post/comment) */
-  def onMessage(topic: String, json: String): Unit =
-    trendService.onMessage(topic, json)
+  /** called for every incoming Kafka message */
+  def onMessage(json: String): Unit =
+    analytics.onMessage(json)
 
   /** called once per micro-batch */
   def onBatchEnd(): Unit =
-    trendService.storeSnapshotAlways(topN)
+    analytics.snapshot()
 
-  /** CMS indexes only (keep KafkaToMongoProcessor clean) */
+  /** ensure indexes for CMS snapshots */
   def ensureIndexes(): Unit = {
-    val cmsCol = mongoConnection.getCollection("count_min_sketch")
-    Await.result(cmsCol.createIndex(Document("_id" -> 1)).toFuture(), 10.seconds)
-    Await.result(cmsCol.createIndex(Document("updatedAt" -> -1)).toFuture(), 10.seconds)
+    val col = mongo.getCollection("count_min_sketch")
+    Await.result(col.createIndex(Document("_id" -> 1)).toFuture(), 10.seconds)
+    Await.result(col.createIndex(Document("updatedAt" -> -1)).toFuture(), 10.seconds)
   }
 }
