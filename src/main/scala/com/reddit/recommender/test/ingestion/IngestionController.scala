@@ -1,3 +1,5 @@
+package com.reddit.recommender.test.ingestion
+
 //// File: controller/IngestionController.scala
 //package com.reddit.recommender.test.ingestion
 //

@@ -1,6 +1,8 @@
 package com.reddit.recommender.test
 
-//package com.reddit.recommender.storage
+
+
+//package com.reddit.recommender.consumer
 //
 //import org.apache.spark.sql.SparkSession
 //import org.apache.spark.SparkConf
