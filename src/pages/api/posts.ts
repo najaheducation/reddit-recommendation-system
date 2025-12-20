@@ -169,8 +169,8 @@ const resolveImageUrl = (post: any) => {
   const thumbnailUrl = normalizeUrl(post.thumbnail);
 
   if (imageUrl) return imageUrl;
-  if (previewUrl) return previewUrl;
   if (directUrl && looksLikeImageUrl(directUrl)) return directUrl;
+  if (previewUrl) return previewUrl;
   if (thumbnailUrl) return thumbnailUrl;
   return undefined;
 };
