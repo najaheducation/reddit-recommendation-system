@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CountMinSketch.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/storage/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CmsPipeline.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CmsPipeline.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendAnalyticsService.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendAnalyticsService.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/KafkaConfig.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/KafkaConfig.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +82,7 @@
     "Application.RedditRecommenderApp.executor": "Run",
     "Application.SimpleUsage.executor": "Run",
     "Application.UsageExamples.executor": "Run",
+    "Application.main.executor": "Run",
     "Application.testapi.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -102,6 +109,24 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration name="main" type="Application" factoryName="Application">
+      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.RedditRecommenderApp" />
+      <module name="reddit-srs" />
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="bigdatareddit" />
       <method v="2">
