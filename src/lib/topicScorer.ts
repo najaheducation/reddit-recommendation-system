@@ -1,7 +1,19 @@
 import { PostDocument, TopicConfig } from "./models/Post";
 
-const normalizeKeywords = (keywords: string[] = []) =>
-  keywords.map((k) => (k || "").toLowerCase()).filter(Boolean);
+const normalizeKeywords = (keywords: string[] = []) => {
+  const tokens = new Set<string>();
+  keywords.forEach((keyword) => {
+    const raw = (keyword || "").toString().toLowerCase();
+    if (!raw) return;
+    const compact = raw.replace(/[^a-z0-9]+/g, "");
+    if (compact) tokens.add(compact);
+    raw
+      .split(/[^a-z0-9]+/g)
+      .filter(Boolean)
+      .forEach((token) => tokens.add(token));
+  });
+  return Array.from(tokens);
+};
 
 const jaccardSimilarity = (a: string[], b: string[]): number => {
   const setA = new Set(normalizeKeywords(a));
@@ -26,7 +38,10 @@ export const computeTopicScore = (
   post: PostDocument,
   topics: TopicConfig[]
 ): number => {
-  const keywords = normalizeKeywords(post.text_features?.keywords);
+  const keywords = normalizeKeywords([
+    ...(post.text_features?.keywords || []),
+    post.query || "",
+  ]);
   const subreddit = (post.subreddit || "").toString().toLowerCase();
 
   const total = topics.reduce((acc, topic) => {

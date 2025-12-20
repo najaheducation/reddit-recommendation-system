@@ -1,6 +1,7 @@
 import {
   Alert,
   AlertIcon,
+  Badge,
   Box,
   Flex,
   Icon,
@@ -62,10 +63,12 @@ const PostItem: React.FC<PostItemProps> = ({
     body: "",
     creatorDisplayName: "",
     imageURL: "",
+    topic: "",
   });
   const singlePostPage = !onSelectPost;
   const router = useRouter();
   const toast = useToast();
+  const displayTopic = decryptedData.topic || post.topic;
 
   // Theme colors
   const bg = useColorModeValue("white", "rgba(255,255,255,0.04)");
@@ -81,11 +84,10 @@ const PostItem: React.FC<PostItemProps> = ({
   const metaTextColor = useColorModeValue("gray.600", "gray.400");
   const titleColor = useColorModeValue("#0F172A", "white");
   const bodyTextColor = useColorModeValue("gray.700", "gray.300");
-  const placeholderGradient = useColorModeValue(
-    "linear(to-br, rgba(30,136,255,0.14), rgba(18,180,151,0.14))",
-    "linear(to-br, rgba(30,136,255,0.18), rgba(18,180,151,0.2))"
-  );
-  const placeholderBorder = useColorModeValue("blue.100", "whiteAlpha.200");
+  const finalScoreText =
+    typeof post.finalScore === "number" && Number.isFinite(post.finalScore)
+      ? post.finalScore.toFixed(3)
+      : null;
 
   const handleDelete = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
@@ -152,6 +154,7 @@ const PostItem: React.FC<PostItemProps> = ({
       body: decryptValue(post.body),
       creatorDisplayName: decryptValue(post.creatorDisplayName),
       imageURL: decryptValue(post.imageURL),
+      topic: decryptValue(post.topic),
     });
     setLoadingImage(Boolean(post.imageURL));
   }, [post]);
@@ -220,56 +223,47 @@ const PostItem: React.FC<PostItemProps> = ({
             Posted by u/{decryptedData.creatorDisplayName || post.creatorDisplayName} •{" "}
             {moment(new Date(post.createdAt?.seconds * 1000)).fromNow()}
           </Text>
+          {displayTopic && (
+            <>
+              <BsDot color={metaTextColor as string} />
+              <Badge colorScheme="blue" variant="subtle" borderRadius="full" px={2}>
+                Topic: {displayTopic}
+              </Badge>
+            </>
+          )}
+          {finalScoreText && (
+            <>
+              <BsDot color={metaTextColor as string} />
+              <Badge colorScheme="teal" variant="subtle" borderRadius="full" px={2}>
+                Score: {finalScoreText}
+              </Badge>
+            </>
+          )}
         </Flex>
       </Stack>
     </Flex>
   );
 
   const PostImage = () => {
-    if (decryptedData.imageURL) {
-      return (
-        <Box borderRadius="14px" overflow="hidden" border="1px solid" borderColor={borderColor}>
-          {loadingImage && (
-            <Skeleton height="320px" width="100%" startColor="gray.100" endColor="gray.200" borderRadius="14px" />
-          )}
-          <Image
-            src={decryptedData.imageURL}
-            alt={decryptedData.title}
-            maxHeight="460px"
-            width="100%"
-            objectFit="cover"
-            display={loadingImage ? "none" : "block"}
-            onLoad={() => setLoadingImage(false)}
-            borderRadius="14px"
-            boxShadow="md"
-          />
-        </Box>
-      );
-    }
+    if (!decryptedData.imageURL) return null;
 
     return (
-      <Flex
-        borderRadius="14px"
-        border="1px solid"
-        borderColor={placeholderBorder}
-        bgGradient={placeholderGradient}
-        minH="220px"
-        align="center"
-        justify="center"
-        textAlign="center"
-        px={6}
-        py={8}
-      >
-        <Stack spacing={2} align="center">
-          <Icon as={FaReddit} fontSize={34} color="brand.500" />
-          <Text fontWeight={800} fontSize="lg" color={titleColor}>
-            r/{post.communityId}
-          </Text>
-          <Text fontSize="sm" color={metaTextColor} maxW="420px">
-            {decryptedData.title || "Community update"}
-          </Text>
-        </Stack>
-      </Flex>
+      <Box borderRadius="14px" overflow="hidden" border="1px solid" borderColor={borderColor}>
+        {loadingImage && (
+          <Skeleton height="320px" width="100%" startColor="gray.100" endColor="gray.200" borderRadius="14px" />
+        )}
+        <Image
+          src={decryptedData.imageURL}
+          alt={decryptedData.title}
+          maxHeight="460px"
+          width="100%"
+          objectFit="cover"
+          display={loadingImage ? "none" : "block"}
+          onLoad={() => setLoadingImage(false)}
+          borderRadius="14px"
+          boxShadow="md"
+        />
+      </Box>
     );
   };
 

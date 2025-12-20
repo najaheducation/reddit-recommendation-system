@@ -2,7 +2,7 @@ import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 import { Post } from "../atoms/PostAtom";
@@ -21,6 +21,10 @@ const Home: NextPage = () => {
   const user = useRecoilValue(userState);
   const loadingUser = false;
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const {
     postStateValue,
     setPostStateValue,
@@ -32,57 +36,111 @@ const Home: NextPage = () => {
 
   //const communityStateValue = useRecoilValue(CommunityState);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/posts", {
+  const PAGE_SIZE = 50;
+
+  const mapPost = useCallback(
+    (p: any): Post => ({
+      id: p.id || p._id?.toString?.() || "",
+      communityId: p.subreddit || p.communityId || "global",
+      creatorId: p.creatorId || p.subreddit || "system",
+      creatorDisplayName: p.creatorDisplayName || p.subreddit || "system",
+      title: p.title || "",
+      body: p.body || "",
+      topic: p.topic || p.query || p.text_features?.topic_category || "",
+      numberOfComments: p.num_comments ?? p.numberOfComments ?? 0,
+      voteStatus: p.score ?? p.voteStatus ?? 0,
+      imageURL: p.imageURL || p.thumbnail || undefined,
+      communityImageURL: p.communityImageURL,
+      createdAt:
+        p.createdAt ||
+        (p.created_utc
+          ? { seconds: Math.floor(new Date(p.created_utc).getTime() / 1000) }
+          : { seconds: Math.floor(Date.now() / 1000) }),
+      score: p.score,
+      finalScore: p.finalScore,
+      userUpvote: p.userUpvote ?? false,
+      userCommented: p.userCommented ?? false,
+    }),
+    []
+  );
+
+  const fetchPosts = useCallback(
+    async (targetOffset: number, mode: "reset" | "append") => {
+      const response = await fetch(
+        `/api/posts?limit=${PAGE_SIZE}&offset=${targetOffset}`,
+        {
           headers: user?.id ? { "x-user-id": String(user.id) } : undefined,
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch posts: ${response.status}`);
         }
-
-        const data = await response.json();
-        const mappedPosts =
-          (data.posts as any[])?.map((p) => ({
-            id: p.id || p._id?.toString?.() || "",
-            communityId: p.subreddit || p.communityId || "global",
-            creatorId: p.creatorId || p.subreddit || "system",
-            creatorDisplayName: p.creatorDisplayName || p.subreddit || "system",
-            title: p.title || "",
-            body: p.body || "",
-            numberOfComments: p.num_comments ?? p.numberOfComments ?? 0,
-            voteStatus: p.score ?? p.voteStatus ?? 0,
-            imageURL: p.imageURL || p.thumbnail || undefined,
-            communityImageURL: p.communityImageURL,
-            createdAt:
-              p.createdAt ||
-              (p.created_utc
-                ? { seconds: Math.floor(new Date(p.created_utc).getTime() / 1000) }
-                : { seconds: Math.floor(Date.now() / 1000) }),
-            score: p.score,
-            finalScore: p.finalScore,
-            userUpvote: p.userUpvote ?? false,
-            userCommented: p.userCommented ?? false,
-          })) || [];
-
-        setPostStateValue((prev) => ({
-          ...prev,
-          posts: mappedPosts as Post[],
-        }));
-      } catch (error) {
-        setPostStateValue((prev) => ({
-          ...prev,
-          posts: [],
-        }));
-      } finally {
-        setLoading(false);
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`);
       }
-    };
 
-    fetchPosts();
-  }, [setPostStateValue, user?.id]);
+      const data = await response.json();
+      const mappedPosts =
+        (data.posts as any[])?.map((p) => mapPost(p)) || [];
+
+      setPostStateValue((prev) => ({
+        ...prev,
+        posts:
+          mode === "append"
+            ? ([...prev.posts, ...mappedPosts] as Post[])
+            : (mappedPosts as Post[]),
+      }));
+
+      setOffset(targetOffset + mappedPosts.length);
+      setHasMore(mappedPosts.length === PAGE_SIZE);
+    },
+    [mapPost, setPostStateValue, user?.id]
+  );
+
+  const loadInitialPosts = useCallback(async () => {
+    setLoading(true);
+    setHasMore(true);
+    setOffset(0);
+    try {
+      await fetchPosts(0, "reset");
+    } catch (error) {
+      setPostStateValue((prev) => ({
+        ...prev,
+        posts: [],
+      }));
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchPosts, setPostStateValue]);
+
+  const loadMorePosts = useCallback(async () => {
+    if (loading || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      await fetchPosts(offset, "append");
+    } catch (_error) {
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [fetchPosts, hasMore, loading, loadingMore, offset]);
+
+  useEffect(() => {
+    loadInitialPosts();
+  }, [loadInitialPosts]);
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          loadMorePosts();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loadMorePosts]);
 
   return (
     <motion.div
@@ -202,6 +260,8 @@ const Home: NextPage = () => {
               ))}
             </Stack>
           )}
+          <Box ref={loadMoreRef} height="1px" />
+          {loadingMore && <PostLoader />}
         </>
         <Stack spacing={5}>
           <Recommendation />

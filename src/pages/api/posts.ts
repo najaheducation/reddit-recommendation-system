@@ -85,6 +85,7 @@ const mapWeightsFromConfig = (weightsMap: Record<string, number>) => {
     image: 0.2,
     video: 0.1,
     freshness: 0.1,
+    trendiness: 0,
   };
   const mapped = { ...defaults };
   Object.entries(weightsMap || {}).forEach(([label, value]) => {
@@ -96,16 +97,39 @@ const mapWeightsFromConfig = (weightsMap: Record<string, number>) => {
     else if (normalizedLabel.includes("video")) mapped.video = normalizedValue;
     else if (normalizedLabel.includes("fresh")) mapped.freshness = normalizedValue;
     else if (normalizedLabel.includes("upvote")) mapped.upvotes = normalizedValue;
+    else if (normalizedLabel.includes("trend")) mapped.trendiness = normalizedValue;
   });
   return mapped;
 };
 
 const sanitizeText = (value?: string | null) => (value || "").toString().trim();
 
+const stripHtml = (value: string) => value.replace(/<[^>]*>/g, " ");
+
+const decodeHtmlEntities = (value: string) =>
+  value
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+const normalizeHtmlText = (value?: string | null) => {
+  if (!value) return "";
+  const stripped = stripHtml(value);
+  const decoded = decodeHtmlEntities(stripped);
+  return sanitizeText(decoded.replace(/\s+/g, " "));
+};
+
+const resolveTopic = (post: any) =>
+  sanitizeText(post.query || post.text_features?.topic_category || post.topic);
+
 const buildDescription = (post: any): string => {
-  const body = sanitizeText(post.body);
+  const body = sanitizeText(post.body || post.selftext);
   if (body) return body;
-  const topic = sanitizeText(post.text_features?.topic_category);
+  const htmlBody = normalizeHtmlText(post.selftext_html);
+  if (htmlBody) return htmlBody;
+  const topic = resolveTopic(post);
   const keywords = Array.isArray(post.text_features?.keywords)
     ? post.text_features.keywords.map((k: any) => sanitizeText(k)).filter(Boolean)
     : [];
@@ -117,30 +141,61 @@ const buildDescription = (post: any): string => {
   return topic || "";
 };
 
-const resolveImageUrl = (post: any) => {
-  const candidate = sanitizeText(post.imageURL || post.thumbnail);
+const normalizeUrl = (value?: string | null) => {
+  const candidate = sanitizeText(value);
   if (!candidate) return undefined;
-  if (/^https?:\/\//i.test(candidate)) return candidate;
+  const decoded = candidate.replace(/&amp;/g, "&");
+  if (/^https?:\/\//i.test(decoded)) return decoded;
   return undefined;
 };
 
-const mapApiPostToClient = (post: any): Post => ({
-  id: post._id?.toString?.() || post.id || "",
-  communityId: post.subreddit || "global",
-  creatorId: post.subreddit || "system",
-  creatorDisplayName: post.subreddit || "system",
-  title: post.title || "",
-  body: buildDescription(post),
-  numberOfComments: post.num_comments ?? post.numberOfComments ?? 0,
-  voteStatus: post.score ?? post.voteStatus ?? 0,
-  imageURL: resolveImageUrl(post),
-  communityImageURL: post.communityImageURL,
-  createdAt: toSecondsTimestamp(post.createdAt || post.created_utc),
-  score: post.score,
-  finalScore: post.finalScore,
-  userUpvote: false,
-  userCommented: false,
-});
+const looksLikeImageUrl = (value: string) => {
+  const lower = value.toLowerCase();
+  return (
+    /\.(png|jpe?g|gif|webp)$/.test(lower) ||
+    lower.includes("://i.redd.it/") ||
+    lower.includes("://preview.redd.it/") ||
+    lower.includes("://i.imgur.com/")
+  );
+};
+
+const resolveImageUrl = (post: any) => {
+  const preview = post?.preview?.images?.[0];
+  const previewUrl =
+    normalizeUrl(preview?.source?.url) ||
+    normalizeUrl(preview?.resolutions?.[preview?.resolutions?.length - 1]?.url);
+  const directUrl = normalizeUrl(post.url_overridden_by_dest);
+  const imageUrl = normalizeUrl(post.imageURL);
+  const thumbnailUrl = normalizeUrl(post.thumbnail);
+
+  if (imageUrl) return imageUrl;
+  if (previewUrl) return previewUrl;
+  if (directUrl && looksLikeImageUrl(directUrl)) return directUrl;
+  if (thumbnailUrl) return thumbnailUrl;
+  return undefined;
+};
+
+const mapApiPostToClient = (post: any): Post => {
+  const author = post.author || post.author_fullname || "system";
+  return {
+    id: post._id?.toString?.() || post.id || "",
+    communityId: post.subreddit || post.communityId || "global",
+    creatorId: post.author_fullname || author,
+    creatorDisplayName: author,
+    title: post.title || resolveTopic(post) || "",
+    topic: resolveTopic(post) || undefined,
+    body: buildDescription(post),
+    numberOfComments: post.num_comments ?? post.numberOfComments ?? 0,
+    voteStatus: post.score ?? post.voteStatus ?? 0,
+    imageURL: resolveImageUrl(post),
+    communityImageURL: post.communityImageURL,
+    createdAt: toSecondsTimestamp(post.createdAt || post.created_utc),
+    score: post.score,
+    finalScore: post.finalScore,
+    userUpvote: false,
+    userCommented: false,
+  };
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -159,6 +214,12 @@ export default async function handler(
       : req.query.limit;
 
     const limitNumber = limitParam ? parseInt(limitParam, 10) : undefined;
+
+    const offsetParam = Array.isArray(req.query.offset)
+      ? req.query.offset[0]
+      : req.query.offset;
+    const offsetNumber = offsetParam ? parseInt(offsetParam, 10) : 0;
+    const safeOffset = Number.isFinite(offsetNumber) && offsetNumber > 0 ? offsetNumber : 0;
 
     const configCol = await getConfigCollection();
     const configDoc = userId ? await configCol.findOne({ userId: toObjectId(userId) }) : null;
@@ -203,6 +264,7 @@ export default async function handler(
       weights,
       topics,
       limit: limitNumber,
+      offset: safeOffset,
     });
 
     const postsResponse: Post[] = recommended.map(mapApiPostToClient);

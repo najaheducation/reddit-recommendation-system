@@ -31,6 +31,11 @@ type Interest = {
   subInterests: string[];
 };
 
+type QueryTopic = {
+  topic: string;
+  count: number;
+};
+
 const persistLocalInterests = (key: string, values: string[]) => {
   try {
     if (typeof window === "undefined") return;
@@ -60,116 +65,14 @@ const sanitizeSlug = (value: string) =>
 const toPercent = (value: number | undefined) =>
   Math.round(((typeof value === "number" ? value : 0) || 0) * 100);
 
-const subInterestOptions: Record<string, string[]> = {
-  politics: [
-    "palestine",
-    "israel",
-    "genocide",
-    "imperialism",
-    "socialist",
-    "capitalism",
-    "propaganda",
-    "fascist",
-    "nazi",
-    "gaza",
-    "resistance",
-    "communist",
-    "leftist",
-    "revolution",
-    "war",
-    "china",
-    "government",
-    "democracy",
-    "election",
-    "policy",
-    "protest",
-    "rights",
-    "freedom",
-  ],
-  technology: [
-    "ai",
-    "machine",
-    "learning",
-    "programming",
-    "technology",
-    "video",
-    "youtube",
-    "media",
-    "content",
-    "computer",
-    "software",
-    "algorithm",
-    "data",
-    "internet",
-    "digital",
-    "code",
-    "developer",
-    "app",
-    "phone",
-    "device",
-    "hardware",
-    "network",
-  ],
-  entertainment: [
-    "movie",
-    "trailer",
-    "film",
-    "video",
-    "youtube",
-    "media",
-    "documentary",
-    "series",
-    "show",
-    "music",
-    "game",
-    "gaming",
-    "stream",
-    "tv",
-    "netflix",
-    "hbo",
-    "disney",
-    "marvel",
-    "starwars",
-  ],
-  social: [
-    "discussion",
-    "question",
-    "ask",
-    "opinion",
-    "view",
-    "think",
-    "community",
-    "society",
-    "culture",
-    "people",
-    "human",
-    "social",
-    "relationship",
-    "family",
-    "friend",
-    "life",
-    "experience",
-    "story",
-  ],
-};
-
-const defaultInterests: Interest[] = [
-  { label: "politics", description: "Politics / policy / governance", selected: false, weight: 0.6, subInterests: [] },
-  { label: "technology", description: "Technology / software / devices", selected: false, weight: 0.6, subInterests: [] },
-  { label: "entertainment", description: "Movies / games / streaming", selected: false, weight: 0.6, subInterests: [] },
-  { label: "social", description: "Society / culture / discussion", selected: false, weight: 0.6, subInterests: [] },
-];
-
 const InterestsPage = () => {
   const router = useRouter();
   const toast = useToast();
   const user = useRecoilValue(userState);
   const { uid } = router.query;
   const DEFAULT_WEIGHT = 0.55;
-  const [interests, setInterests] = useState<Interest[]>(defaultInterests);
-  const [activeInterest, setActiveInterest] = useState<string>(
-    defaultInterests[0]?.label || ""
-  );
+  const [interests, setInterests] = useState<Interest[]>([]);
+  const [activeInterest, setActiveInterest] = useState<string>("");
   const [subInput, setSubInput] = useState<string>("");
   const [customInterestInput, setCustomInterestInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -211,15 +114,10 @@ const InterestsPage = () => {
     return interests.find((i) => i.selected) || interests[0];
   }, [activeInterest, interests]);
 
-  const activeSubOptions = useMemo(
-    () => {
-      if (!activeInterestData) return [];
-      const preset = subInterestOptions[activeInterestData.label] || [];
-      const merged = new Set<string>([...preset, ...(activeInterestData.subInterests || [])]);
-      return Array.from(merged);
-    },
-    [activeInterestData]
-  );
+  const activeSubOptions = useMemo(() => {
+    if (!activeInterestData) return [];
+    return [];
+  }, [activeInterestData]);
 
 
   const toggleInterest = (label: string) => {
@@ -281,7 +179,7 @@ const InterestsPage = () => {
       );
       if (!stillActive) {
         const next = updated.find((item) => item.selected);
-        setActiveInterest(next?.label || defaultInterests[0]?.label || "");
+        setActiveInterest(next?.label || updated[0]?.label || "");
       }
       return updated;
     });
@@ -423,34 +321,60 @@ const InterestsPage = () => {
 
   useEffect(() => {
     const loadInterests = async () => {
-      if (!user && !devUserId) return;
       setLoading(true);
       try {
-        const query = devUserId && !user?.id ? `?userId=${devUserId}` : "";
-        const res = await fetch(`/api/interests${query}`, {
-          credentials: "include",
-          headers: {
-            ...(user?.id ? { "x-user-id": String(user.id) } : {}),
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch interests");
+        const queryTopicsPromise = fetch("/api/query-topics?limit=20")
+          .then(async (response) => {
+            if (!response.ok) return [] as QueryTopic[];
+            const payload = (await response.json()) as { topics?: QueryTopic[] };
+            return Array.isArray(payload.topics) ? payload.topics : [];
+          })
+          .catch(() => [] as QueryTopic[]);
 
-        const data = (await res.json()) as { interests: UserInterest[] };
-        const remote = data.interests || [];
+        let remote: UserInterest[] = [];
+        if (user || devUserId) {
+          const query = devUserId && !user?.id ? `?userId=${devUserId}` : "";
+          const res = await fetch(`/api/interests${query}`, {
+            credentials: "include",
+            headers: {
+              ...(user?.id ? { "x-user-id": String(user.id) } : {}),
+            },
+          });
+          if (res.ok) {
+            const data = (await res.json()) as { interests: UserInterest[] };
+            remote = data.interests || [];
+          }
+        }
 
-        const base = defaultInterests.map((item) => ({
-          ...item,
-          selected: false,
-          weight: item.weight,
-          subInterests: [],
-        }));
+        const base: Interest[] = [];
+
+        const queryTopics = await queryTopicsPromise;
+        const dataInterests = queryTopics
+          .map((topic) => {
+            const label = sanitizeSlug(topic.topic);
+            if (!label) return null;
+            return {
+              label,
+              description: `From your data (${topic.count} posts)`,
+              selected: false,
+              weight: DEFAULT_WEIGHT,
+              subInterests: [],
+            } as Interest;
+          })
+          .filter((item): item is Interest => Boolean(item));
+
+        const baseLabels = new Set(base.map((item) => item.label));
+        const uniqueDataInterests = dataInterests.filter((item) => !baseLabels.has(item.label));
+        const mergedBase = [...base, ...uniqueDataInterests];
 
         const extras: Interest[] = [];
 
         remote.forEach((entry) => {
+          const entryKey = sanitizeSlug(entry.interest);
+          if (!entryKey) return;
           const weightValue = entry.weight ?? 0.6;
-          const match = base.find(
-            (i) => i.label.toLowerCase() === entry.interest.toLowerCase()
+          const match = mergedBase.find(
+            (i) => sanitizeSlug(i.label) === entryKey
           );
           if (match) {
             match.selected = true;
@@ -461,8 +385,9 @@ const InterestsPage = () => {
               match.subInterests = Array.from(set);
             }
           } else {
+            if (extras.some((item) => sanitizeSlug(item.label) === entryKey)) return;
             extras.push({
-              label: entry.interest,
+              label: entryKey,
               description: "From your saved preferences",
               selected: true,
               weight: weightValue,
@@ -471,7 +396,7 @@ const InterestsPage = () => {
           }
         });
 
-        const merged = [...base, ...extras];
+        const merged = [...mergedBase, ...extras];
         setInterests(merged);
         setActiveInterest((prev) => {
           const exists = merged.find((i) => i.label === prev);

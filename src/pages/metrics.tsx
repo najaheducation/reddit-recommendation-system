@@ -23,6 +23,7 @@ import { authModelState } from "../atoms/authModalAtom";
 import { userState } from "../atoms/userAtom";
 import MetricSlider from "../components/common/MetricSlider";
 import type { InterestsResponse, UserInterest } from "../types/interests";
+import type { TrendMetricsResponse } from "../types/trends";
 import type { UserWeight, WeightsResponse } from "../types/weights";
 
 type Interest = {
@@ -51,6 +52,7 @@ const defaultWeights: Weight[] = [
   { label: "isVideo", value: 10, hint: "Boost for video posts" },
   { label: "freshness", value: 30, hint: "Freshness based on creation time" },
   { label: "upvote", value: 20, hint: "Raw upvote count signal" },
+  { label: "trendiness", value: 15, hint: "Boost for trending topics from CMS" },
 ];
 
 const MetricsPage = () => {
@@ -62,6 +64,9 @@ const MetricsPage = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [weights, setWeights] = useState<Weight[]>(defaultWeights);
+  const [trendMetrics, setTrendMetrics] = useState<TrendMetricsResponse | null>(null);
+  const [trendLoading, setTrendLoading] = useState(false);
+  const [trendError, setTrendError] = useState<string | null>(null);
   const devUserId =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("userId")
@@ -74,6 +79,7 @@ const MetricsPage = () => {
     "linear-gradient(135deg, rgba(30,136,255,0.12) 0%, rgba(18,180,151,0.12) 100%)",
     "linear-gradient(135deg, rgba(30,136,255,0.12) 0%, rgba(18,180,151,0.12) 100%)"
   );
+  const trendItems = trendMetrics?.trends?.slice(0, 10) ?? [];
 
 const formatLabel = (value: string) =>
   value
@@ -125,6 +131,12 @@ const mergeWithDefaults = (incoming: Weight[]): Weight[] => {
   }, {});
   return defaultWeights.map((def) => (map[def.label] ? { ...def, ...map[def.label], label: def.label } : def));
 };
+
+const formatMetricNumber = (value?: number) =>
+  typeof value === "number" && Number.isFinite(value) ? value.toLocaleString() : "0";
+
+const formatTrendKey = (value: string) =>
+  value.replace(/^(term:|user:)/i, "").trim();
 
   const loadInterests = useCallback(async () => {
     if (!user && !devUserId) return;
@@ -185,6 +197,31 @@ const mergeWithDefaults = (incoming: Weight[]): Weight[] => {
     } catch (_err) {
       // fallback to defaults
       setWeights(defaultWeights);
+    }
+  }, [devUserId, user]);
+
+  const loadTrends = useCallback(async () => {
+    if (!user && !devUserId) return;
+    setTrendLoading(true);
+    setTrendError(null);
+    try {
+      const query = devUserId && !user?.id ? `?userId=${devUserId}` : "";
+      const res = await fetch(`/api/trends${query}`, {
+        credentials: "include",
+        headers: {
+          ...(user?.id ? { "x-user-id": String(user.id) } : {}),
+        },
+      });
+      const data = (await res.json()) as TrendMetricsResponse;
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch trends");
+      }
+      setTrendMetrics(data);
+    } catch (err: any) {
+      setTrendMetrics(null);
+      setTrendError(err?.message || "Failed to fetch trends");
+    } finally {
+      setTrendLoading(false);
     }
   }, [devUserId, user]);
 
@@ -280,7 +317,8 @@ const mergeWithDefaults = (incoming: Weight[]): Weight[] => {
   useEffect(() => {
     loadInterests();
     loadWeights();
-  }, [loadInterests, loadWeights]);
+    loadTrends();
+  }, [loadInterests, loadTrends, loadWeights]);
 
   if (!user) {
     return (
@@ -350,6 +388,114 @@ const mergeWithDefaults = (incoming: Weight[]): Weight[] => {
             </Flex>
           </Stack>
         </Box>
+
+        <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={5}>
+          <Box
+            p={{ base: 5, md: 6 }}
+            bg={cardBg}
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={borderColor}
+            boxShadow="xl"
+          >
+            <Flex justify="space-between" align="center" mb={3} wrap="wrap" gap={2}>
+              <Stack spacing={1}>
+                <Text fontWeight="700">Trendiness</Text>
+                <Text fontSize="sm" color={muted}>
+                  Streaming signal from the trend window
+                </Text>
+              </Stack>
+              <Badge colorScheme="green" variant="subtle" borderRadius="8px" px={2}>
+                Live
+              </Badge>
+            </Flex>
+            <Text fontSize={{ base: "3xl", md: "4xl" }} fontWeight={700} color={accent}>
+              {trendLoading ? "..." : formatMetricNumber(trendMetrics?.trendiness)}
+            </Text>
+            <Text fontSize="sm" color={muted}>
+              {trendMetrics?.trends?.length
+                ? `${trendMetrics.trends.length} trending terms detected.`
+                : "Waiting for trend updates."}
+            </Text>
+            {trendMetrics?.updatedAt && (
+              <Text fontSize="xs" color={muted} mt={2}>
+                Updated {new Date(trendMetrics.updatedAt).toLocaleString()}
+              </Text>
+            )}
+            {trendError && (
+              <Text fontSize="xs" color="red.400" mt={2}>
+                {trendError}
+              </Text>
+            )}
+          </Box>
+
+          <Box
+            p={{ base: 5, md: 6 }}
+            bg={cardBg}
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={borderColor}
+            boxShadow="xl"
+          >
+            <Flex justify="space-between" align="center" mb={3} wrap="wrap" gap={2}>
+              <Stack spacing={1}>
+                <Text fontWeight="700">Trending words</Text>
+                <Text fontSize="sm" color={muted}>
+                  Top terms detected by count-min sketch
+                </Text>
+              </Stack>
+              {typeof trendMetrics?.threshold === "number" && (
+                <Badge colorScheme="blue" variant="subtle" borderRadius="8px" px={2}>
+                  Threshold {trendMetrics.threshold}
+                </Badge>
+              )}
+            </Flex>
+            <Table size="sm" variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Term</Th>
+                  <Th isNumeric>Hits</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {trendLoading ? (
+                  <Tr>
+                    <Td colSpan={2}>
+                      <Text color={muted}>Loading trends...</Text>
+                    </Td>
+                  </Tr>
+                ) : trendError ? (
+                  <Tr>
+                    <Td colSpan={2}>
+                      <Text color="red.400">{trendError}</Text>
+                    </Td>
+                  </Tr>
+                ) : trendItems.length ? (
+                  trendItems.map((item) => (
+                    <Tr key={item.key}>
+                      <Td>
+                        <Flex align="center" gap={2}>
+                          <Badge colorScheme="blue" variant="subtle" borderRadius="8px" px={2}>
+                            {formatTrendKey(item.key)}
+                          </Badge>
+                        </Flex>
+                      </Td>
+                      <Td isNumeric fontWeight={700}>
+                        {formatMetricNumber(item.count)}
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td colSpan={2}>
+                      <Text color={muted}>No trend data yet.</Text>
+                    </Td>
+                  </Tr>
+                )}
+              </Tbody>
+            </Table>
+          </Box>
+        </SimpleGrid>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
           {(loading ? [] : interests.length ? interests : defaultInterests).map(
@@ -477,7 +623,7 @@ const mergeWithDefaults = (incoming: Weight[]): Weight[] => {
                     <Td isNumeric fontWeight={700}>
                       {w.value}%
                     </Td>
-                    <Td color={muted}>{w.hint || "—"}</Td>
+                    <Td color={muted}>{w.hint || "No description"}</Td>
                   </Tr>
                 ))}
               </Tbody>

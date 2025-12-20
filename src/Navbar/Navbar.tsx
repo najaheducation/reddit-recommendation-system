@@ -11,8 +11,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import React, { useMemo, useRef, useState } from "react";
-import { BsChatDots } from "react-icons/bs";
-import { FiBell, FiChevronDown, FiHome, FiMoon, FiPlusCircle, FiSun } from "react-icons/fi";
+import { FiChevronDown, FiGrid, FiHome, FiMoon, FiSun, FiTable } from "react-icons/fi";
 import { IoHeartOutline, IoBarChartOutline } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -192,9 +191,8 @@ const Navbar: React.FC = () => {
           />
           <IconButton icon={IoHeartOutline} onClick={() => go("/interests")} active={isActive("/interests")} />
           <IconButton icon={IoBarChartOutline} onClick={() => go("/metrics")} active={isActive("/metrics")} />
-          <IconButton icon={FiBell} onClick={() => go("/notifications")} active={isActive("/notifications")} />
-          <IconButton icon={BsChatDots} onClick={() => go("/messages")} active={isActive("/messages")} />
-          <IconButton icon={FiPlusCircle} onClick={() => go("/create")} active={isActive("/create")} />
+          <IconButton icon={FiGrid} onClick={() => go("/dashboard")} active={isActive("/dashboard")} />
+          <IconButton icon={FiTable} onClick={() => go("/score-table")} active={isActive("/score-table")} />
 
           {user ? (
             <Flex

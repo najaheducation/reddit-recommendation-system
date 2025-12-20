@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 
 const mongoUri =
-  process.env.MONGODB_URI ;
+  "mongodb+srv://fuckcodex:fuckcodexpassword@bigdatareddit.szfetsy.mongodb.net/?appName=bigdatareddit";
 
 const dbName = process.env.MONGODB_DB || "reddit_recommender";
 
@@ -51,6 +51,24 @@ export type WeightDocument = {
   value: number;
   hint?: string;
   createdAt?: Date;
+};
+
+export type TrendMetricEntry = {
+  key: string;
+  count: number;
+};
+
+export type TrendMetricsDocument = {
+  _id?: string;
+  bucketSizeMillis?: number;
+  topTerms?: TrendMetricEntry[];
+  topUsers?: TrendMetricEntry[];
+  updatedAt?: number | Date;
+  windowBuckets?: number;
+  windowEnd?: number | Date;
+  windowStart?: number | Date;
+  threshold?: number;
+  trends?: TrendMetricEntry[];
 };
 
 export type ConfigDocument = {
@@ -125,6 +143,14 @@ export const getWeightsCollection = async (): Promise<Collection<WeightDocument>
   const db = await getDb();
   const col = db.collection<WeightDocument>("user_weights");
   await col.createIndex({ userId: 1, label: 1 }, { unique: true });
+  return col;
+};
+
+export const getTrendsCollection = async (): Promise<Collection<TrendMetricsDocument>> => {
+  const db = await getDb();
+  const name = process.env.MONGODB_TRENDS_COLLECTION || "count_min_sketch";
+  const col = db.collection<TrendMetricsDocument>(name);
+  await col.createIndex({ updatedAt: -1 });
   return col;
 };
 
