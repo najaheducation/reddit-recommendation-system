@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
+
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/stopwords.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/stopwords.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +33,7 @@
   "selectedUrlAndAccountId": {
     "url": "https://github.com/najaheducation/reddit-recommendation-system.git",
     "accountId": "50ad329f-feba-444d-aced-68c8fdbf5ffb"
+
   }
 }]]></component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -87,8 +90,10 @@
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15332031",
+
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "profiler.jvm",
+
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -155,8 +160,10 @@
       <workItem from="1765709346941" duration="5218000" />
       <workItem from="1765723940749" duration="21151000" />
       <workItem from="1765819773085" duration="1165000" />
+
       <workItem from="1765821748876" duration="62978000" />
       <workItem from="1766152721129" duration="15160000" />
+
     </task>
     <servers />
   </component>
