@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 
-const mongoUri =
-  process.env.MONGODB_URI ;
+const mongoUri = process.env.MONGODB_URI || "";
+  
 
 const dbName = process.env.MONGODB_DB || "reddit_recommender";
 
@@ -91,6 +91,19 @@ export type PostDocument = {
   final_score?: number | null;
 };
 
+export type TrendDocument = {
+  _id?: ObjectId;
+  updatedAt?: Date | number;
+  windowStart?: Date | number;
+  windowEnd?: Date | number;
+  windowBuckets?: number;
+  bucketSizeMillis?: number;
+  threshold?: number;
+  trends?: { key: string; count: number }[];
+  topTerms?: { key: string; count: number }[];
+  topUsers?: { key: string; count: number }[];
+};
+
 export const toObjectId = (value: string | ObjectId | null | undefined) => {
   if (!value) return null;
   if (value instanceof ObjectId) return value;
@@ -138,4 +151,10 @@ export const getConfigCollection = async (): Promise<Collection<ConfigDocument>>
 export const getPostsCollection = async (): Promise<Collection<PostDocument>> => {
   const db = await getDb();
   return db.collection<PostDocument>("posts");
+};
+
+export const getTrendsCollection = async (): Promise<Collection<TrendDocument>> => {
+  const db = await getDb();
+  const name = process.env.MONGODB_TRENDS_COLLECTION || "count_min_sketch";
+  return db.collection<TrendDocument>(name);
 };

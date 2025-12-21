@@ -25,6 +25,7 @@ type ScoreRow = {
   title: string;
   subreddit: string;
   query?: string | null;
+  topic?: string | null;
   createdAt?: string | null;
   score: number;
   numComments: number;
@@ -183,7 +184,7 @@ const ScoreTablePage = () => {
                 <Tr>
                   <Th>Post ID</Th>
                   <Th>Subreddit</Th>
-                  <Th>Query</Th>
+                  <Th>Topic</Th>
                   <Th>Created</Th>
                   <Th isNumeric>Score</Th>
                   <Th isNumeric>Comments</Th>
@@ -203,7 +204,7 @@ const ScoreTablePage = () => {
                   <Th isNumeric>Fresh S</Th>
                   <Th isNumeric>Fresh W</Th>
                   <Th isNumeric>Quality</Th>
-                  <Th isNumeric>Topic</Th>
+                  <Th isNumeric>Topic S</Th>
                   <Th isNumeric>Multiplier</Th>
                   <Th isNumeric>Comment Sum</Th>
                   <Th isNumeric>Comment Boost</Th>
@@ -233,7 +234,7 @@ const ScoreTablePage = () => {
                     <Tr key={row.id}>
                       <Td>{row.id || "-"}</Td>
                       <Td>{row.subreddit || "-"}</Td>
-                      <Td>{row.query || "-"}</Td>
+                      <Td>{row.topic || row.query || "-"}</Td>
                       <Td>{row.createdAt ? new Date(row.createdAt).toLocaleString() : "-"}</Td>
                       <Td isNumeric>{row.score}</Td>
                       <Td isNumeric>{row.numComments}</Td>

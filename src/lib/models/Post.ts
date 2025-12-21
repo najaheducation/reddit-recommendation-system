@@ -1,5 +1,5 @@
 export type TextFeatures = {
-  keywords: string[];
+  keywords?: string[];
   topic_category?: string | null;
 };
 

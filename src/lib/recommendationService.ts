@@ -92,12 +92,6 @@ const buildInterestMatcher = (topics: RecommendationRequest["topics"]) => {
       .map(compact)
       .filter(Boolean)
   );
-  const keywordSet = new Set(
-    topics
-      .flatMap((topic) => topic.keywords || [])
-      .map(compact)
-      .filter(Boolean)
-  );
 
   return (post: PostDocument) => {
     const sub = compact(post.subreddit);
@@ -105,13 +99,7 @@ const buildInterestMatcher = (topics: RecommendationRequest["topics"]) => {
     if ((sub && topicSet.has(sub)) || (queryCompact && topicSet.has(queryCompact))) return true;
 
     const queryTokens = tokenize(post.query);
-    if (queryTokens.some((token) => topicSet.has(token))) return true;
-
-    const keywordTokens = [
-      ...(post.text_features?.keywords || []),
-      post.query || "",
-    ].flatMap((value) => tokenize(value));
-    return keywordTokens.some((token) => keywordSet.has(token));
+    return queryTokens.some((token) => topicSet.has(token));
   };
 };
 
@@ -119,7 +107,7 @@ const toResponsePost = (
   post: PostDocument,
   finalScore: number
 ): PostDocument => {
-  const textFeatures = post.text_features || { keywords: [] };
+  const topicCategory = post.query || post.text_features?.topic_category || null;
   return {
     _id: post._id,
     kind: "post",
@@ -144,8 +132,7 @@ const toResponsePost = (
     url: post.url,
     finalScore,
     text_features: {
-      keywords: textFeatures.keywords || [],
-      topic_category: post.query || textFeatures.topic_category || null,
+      topic_category: topicCategory,
     },
   };
 };

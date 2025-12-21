@@ -17,6 +17,7 @@ type ScoreRow = {
   title: string;
   subreddit: string;
   query?: string | null;
+  topic?: string | null;
   createdAt?: string | null;
   score: number;
   numComments: number;
@@ -86,6 +87,42 @@ const getUserIdFromRequest = (req: NextApiRequest): string | null => {
 
 const sanitize = (value?: string | null) =>
   (value || "").toString().toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+const sanitizeText = (value?: string | null) => (value || "").toString().trim();
+
+const resolveTopic = (post: any) =>
+  sanitizeText(post.query || post.text_features?.topic_category || post.topic);
+
+const compact = (value?: string | null) =>
+  (value || "")
+    .toString()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+
+const tokenize = (value?: string | null) =>
+  (value || "")
+    .toString()
+    .toLowerCase()
+    .split(/[^a-z0-9]+/g)
+    .filter(Boolean);
+
+const buildInterestMatcher = (topics: TopicConfig[]) => {
+  const topicSet = new Set(
+    topics
+      .flatMap((topic) => [topic.name, ...(topic.subreddits || [])])
+      .map(compact)
+      .filter(Boolean)
+  );
+
+  return (post: PostDocument) => {
+    if (topicSet.size === 0) return false;
+    const sub = compact(post.subreddit);
+    const queryCompact = compact(post.query);
+    if ((sub && topicSet.has(sub)) || (queryCompact && topicSet.has(queryCompact))) return true;
+    const queryTokens = tokenize(post.query);
+    return queryTokens.some((token) => topicSet.has(token));
+  };
+};
 
 const normalizeWeightValue = (value: any) => {
   const num = Number(value);
@@ -258,10 +295,15 @@ export default async function handler(
       .toArray();
     const trendIndex = buildTrendIndexFromDocs(trendDocs, cutoff);
 
+    const isInterestMatch = buildInterestMatcher(topics);
+
     const rows = posts.map((post) => {
       const postId = toId(post._id);
       const commentScoreSum = commentScores.get(postId) || 0;
       const commentBoost = Math.log1p(commentScoreSum) * 0.1;
+      const rawQuery = post.query ?? null;
+      const topic = resolveTopic(post);
+      const topicMatch = isInterestMatch(post);
       const upvoteScore = computeUpvoteScore(post);
       const commentScore = computeCommentScore(post);
       const ratioScore = computeRatioScore(post);
@@ -279,7 +321,8 @@ export default async function handler(
         id: post.id || postId,
         title: post.title || "",
         subreddit: post.subreddit || "",
-        query: post.query ?? null,
+        query: rawQuery,
+        topic: topic || null,
         createdAt: post.created_utc ? new Date(post.created_utc).toISOString() : null,
         score: post.score ?? 0,
         numComments: post.num_comments ?? 0,
@@ -306,12 +349,16 @@ export default async function handler(
         trendScoreRaw,
         trendScoreWeighted,
         finalScore,
+        topicMatch,
       };
     });
 
-    rows.sort((a, b) => b.finalScore - a.finalScore);
+    rows.sort((a, b) => {
+      if (a.topicMatch !== b.topicMatch) return a.topicMatch ? -1 : 1;
+      return b.finalScore - a.finalScore;
+    });
 
-    const sliced = rows.slice(offset, offset + limit);
+    const sliced = rows.slice(offset, offset + limit).map(({ topicMatch, ...row }) => row);
 
     return res.status(200).json({
       rows: sliced,

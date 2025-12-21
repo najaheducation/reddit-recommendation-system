@@ -53,7 +53,6 @@ const buildPostText = (post: PostDocument) => {
     post.body,
     post.selftext,
     post.text_features?.topic_category || "",
-    ...(post.text_features?.keywords || []),
   ];
   return parts.map(normalizeText).filter(Boolean).join(" ");
 };
