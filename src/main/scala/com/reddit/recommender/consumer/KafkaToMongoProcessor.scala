@@ -7,16 +7,11 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.streaming._
 import org.mongodb.scala.bson.Document
-import org.mongodb.scala.model.{ReplaceOneModel, ReplaceOptions}
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.{ReplaceOneModel, ReplaceOptions, Filters}
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Try
-import java.nio.file.{Files, Paths}
-import org.mongodb.scala.bson.Document
-import org.mongodb.scala.model.{Filters, ReplaceOneModel, ReplaceOptions}
-import org.mongodb.scala.model.Filters._
 
 class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Serializable {
 
@@ -40,36 +35,62 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
   def start(): Unit = {
     createIndexes()
 
-    // Comprehensive schema based on your actual Apify output
+    // 1. Fully Accounted Schema (Matched to items.json)
     val redditSchema = new StructType()
-      .add("kind", StringType, nullable = true)
-      .add("query", StringType, nullable = true)
-      .add("id", StringType, nullable = true)
-      .add("title", StringType, nullable = true)
-      .add("body", StringType, nullable = true)
-      .add("author", StringType, nullable = true)
-      .add("score", IntegerType, nullable = true)
-      .add("upvote_ratio", DoubleType, nullable = true)
-      .add("num_comments", IntegerType, nullable = true)
-      .add("subreddit", StringType, nullable = true)
-      .add("created_utc", StringType, nullable = true)
-      .add("url", StringType, nullable = true)
-      .add("flair", StringType, nullable = true)
-      .add("over_18", BooleanType, nullable = true)
-      .add("is_self", BooleanType, nullable = true)
-      .add("spoiler", BooleanType, nullable = true)
-      .add("locked", BooleanType, nullable = true)
-      .add("is_video", BooleanType, nullable = true)
-      .add("domain", StringType, nullable = true)
-      .add("thumbnail", StringType, nullable = true)
-      .add("url_overridden_by_dest", StringType, nullable = true)
-      .add("author_fullname", StringType, nullable = true)
-      .add("author_flair_text", StringType, nullable = true)
-      .add("author_premium", BooleanType, nullable = true)
-      .add("selftext_html", StringType, nullable = true)
-      .add("postId", StringType, nullable = true)
-      .add("parentId", StringType, nullable = true)
-      .add("depth", IntegerType, nullable = true)
+      .add("kind", StringType)
+      .add("query", StringType)
+      .add("id", StringType)
+      .add("title", StringType)
+      .add("body", StringType)
+      .add("author", StringType)
+      .add("score", IntegerType)
+      .add("upvote_ratio", DoubleType)
+      .add("num_comments", IntegerType)
+      .add("subreddit", StringType)
+      .add("created_utc", StringType)
+      .add("url", StringType)
+      .add("flair", StringType)
+      .add("over_18", BooleanType)
+      .add("is_self", BooleanType)
+      .add("spoiler", BooleanType)
+      .add("locked", BooleanType)
+      .add("is_video", BooleanType)
+      .add("domain", StringType)
+      .add("thumbnail", StringType)
+      .add("url_overridden_by_dest", StringType)
+      .add("author_fullname", StringType)
+      .add("author_flair_text", StringType)
+      .add("author_premium", BooleanType)
+      .add("selftext_html", StringType)
+      .add("postId", StringType)
+      .add("parentId", StringType)
+      .add("depth", IntegerType)
+      .add("media", StringType)
+      .add("media_metadata", StringType)
+      .add("gallery_data", StringType)
+      .add("stickied", BooleanType)
+      .add("distinguished", StringType)
+      .add("total_awards_received", IntegerType)
+      .add("all_awardings", StringType)
+      .add("gilded", IntegerType)
+      .add("num_crossposts", IntegerType)
+      .add("is_original_content", BooleanType)
+      .add("preview", StringType)
+      .add("secure_media", StringType)
+      .add("secure_media_embed", StringType)
+      .add("crosspost_parent_list", StringType)
+      .add("is_comment", BooleanType)
+      .add("treatment_tags", StringType)
+      .add("post_hint", StringType)
+      .add("author_cakeday", BooleanType)
+      .add("num_reports", IntegerType)
+      .add("approved_at_utc", StringType)
+      .add("archived", BooleanType)
+      // Comment Specific fields from items.json
+      .add("postUrl", StringType)
+      .add("is_submitter", BooleanType)
+      .add("score_hidden", BooleanType)
+      .add("controversiality", IntegerType)
 
     val kafkaDF = spark.readStream
       .format("kafka")
@@ -98,56 +119,56 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
           val commentOps = mutable.ListBuffer[ReplaceOneModel[Document]]()
 
           partition.foreach { row =>
-            Option(row.getAs[String]("id")) match {
-              case Some(redditId) =>
-                val topicOpt = Option(row.getAs[String]("topic"))
+            val redditId = row.getAs[String]("id")
+            val kind = row.getAs[String]("kind")
 
-                val doc = Document(
-                  "id"           -> redditId,
-                  "kind"         -> row.getAs[String]("kind"),
-                  "title"        -> row.getAs[String]("title"),
-                  "body"         -> row.getAs[String]("body"),
-                  "author"       -> row.getAs[String]("author"),
-                  "subreddit"    -> row.getAs[String]("subreddit"),
-                  "score"        -> row.getAs[Int]("score"),
-                  "upvote_ratio" -> row.getAs[Double]("upvote_ratio"),
-                  "num_comments" -> row.getAs[Int]("num_comments"),
-                  "created_utc"  -> row.getAs[String]("created_utc"),
-                  "url"          -> row.getAs[String]("url"),
-                  "over_18"      -> row.getAs[Boolean]("over_18"),
-                  "is_self"      -> row.getAs[Boolean]("is_self"),
-                  "domain"       -> row.getAs[String]("domain"),
-                  "thumbnail"    -> row.getAs[String]("thumbnail"),
-                  "raw_json"     -> row.json
-                )
-                val filter = Filters.eq("id", redditId)
+            if (redditId != null) {
+              // 1. Safely build the BSON Document field by field to handle nulls and types
+              var doc = Document()
 
-                val replace = new ReplaceOneModel[Document](
-                  filter,
-                  doc,
-                  ReplaceOptions().upsert(true)
-                )
-
-                if (topicOpt.contains("reddit-posts")) {
-                  postOps += replace
-                } else if (topicOpt.contains("reddit-comments")) {
-                  commentOps += replace
+              row.schema.fieldNames.foreach { fieldName =>
+                val value = row.getAs[Any](fieldName)
+                if (value != null) {
+                  // Spark types to BSON-friendly types
+                  doc = doc ++ Document(fieldName -> value.toString)
+                  // Note: .toString is the safest fallback, 
+                  // but Document(fieldName -> value) works for primitives like Int/Boolean
                 }
+              }
 
-                topicOpt.foreach { topic =>
-                  cms.onMessage(topic, row.json)
-                }
+              // 2. Add a timestamp for when we processed it
+              doc = doc ++ Document("processed_at" -> System.currentTimeMillis())
 
-              case None =>
+              val filter = Filters.eq("id", redditId)
+              val options = ReplaceOptions().upsert(true)
+              val replace = new ReplaceOneModel[Document](filter, doc, options)
+
+              // 3. Routing logic based on 'kind' or topic
+              val topic = row.getAs[String]("topic")
+              val isPost = kind == "post" || (topic != null && topic.contains("posts"))
+              val isComment = kind == "comment" || (topic != null && topic.contains("comments"))
+
+              if (isPost) {
+                postOps += replace
+              } else if (isComment) {
+                commentOps += replace
+              }
+
+              // 4. Analytics
+              if (topic != null) {
+                cms.onMessage(topic, row.json)
+              }
             }
-
           }
 
           if (postOps.nonEmpty) {
             Try(Await.result(postsColl.bulkWrite(postOps.toList).toFuture(), 60.seconds))
           }
           if (commentOps.nonEmpty) {
-            Try(Await.result(commentsColl.bulkWrite(commentOps.toList).toFuture(), 60.seconds))
+            Try(Await.result(commentOps.toList match {
+              case Nil => scala.concurrent.Future.successful(None)
+              case ops => commentsColl.bulkWrite(ops).toFuture()
+            }, 60.seconds))
           }
 
           cms.onBatchEnd()
@@ -159,12 +180,13 @@ class KafkaToMongoProcessor(spark: SparkSession, config: AppConfig) extends Seri
     query.awaitTermination()
   }
 
-
   private def createIndexes(): Unit = {
     val posts = mongoConnection.getCollection("posts")
     val comments = mongoConnection.getCollection("comments")
     Await.result(posts.createIndex(Document("id" -> 1)).toFuture(), 10.seconds)
     Await.result(comments.createIndex(Document("id" -> 1)).toFuture(), 10.seconds)
+    // Extra index for comment lookups by parent post
+    Await.result(comments.createIndex(Document("postId" -> 1)).toFuture(), 10.seconds)
   }
 
   def stop(): Unit = {
