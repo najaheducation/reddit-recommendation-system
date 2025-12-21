@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 
-const mongoUri = process.env.MONGODB_URI || "";
+const mongoUri = process.env.MONGO_URI || "";
   
 
 const dbName = process.env.MONGODB_DB || "reddit_recommender";
