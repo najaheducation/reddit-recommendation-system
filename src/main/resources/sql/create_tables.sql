@@ -1,1 +1,1 @@
-﻿-- Create tables
+-- Create tables

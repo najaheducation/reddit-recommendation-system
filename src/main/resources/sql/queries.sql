@@ -1,1 +1,1 @@
-﻿-- Common queries
+-- Common queries

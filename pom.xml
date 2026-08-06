@@ -6,8 +6,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.reddit.recommender</groupId>
-    <artifactId>reddit-srs</artifactId>
+    <groupId>com.linkedin.recommender</groupId>
+    <artifactId>linkedin-srs</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -237,7 +237,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.reddit.recommender.RedditRecommenderApp</mainClass>
+                            <mainClass>com.linkedin.recommender.LinkedInRecommenderApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

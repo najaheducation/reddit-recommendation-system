@@ -1,1 +1,1 @@
-﻿-- Database initialization script
+-- Database initialization script

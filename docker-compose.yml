@@ -39,7 +39,7 @@ services:
 
   mongodb:
     image: mongo:6  # This is just for consistency; you won't use this container's DB
-    container_name: reddit-mongodb
+    container_name: linkedin-mongodb
     ports:
       - "27017:27017"  # Optional: exposes the container's MongoDB (but we'll connect to host)
     environment:

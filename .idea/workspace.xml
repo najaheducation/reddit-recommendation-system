@@ -6,7 +6,128 @@
   <component name="ChangeListManager">
     <list default="true" id="9db7d8d6-d382-4708-8f9b-dde53af8ffa8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/.metadata.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.0.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.1.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.10.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.11.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.12.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.13.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.14.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.15.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.16.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.17.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.18.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.2.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.3.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.4.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.5.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.6.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.7.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.8.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/.9.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/10" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/11" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/12" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/13" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/14" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/15" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/16" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/17" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/18" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/6" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/commits/9" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/metadata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.0.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.1.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.10.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.11.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.12.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.13.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.14.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.15.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.16.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.17.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.18.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.2.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.3.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.4.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.5.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.6.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.7.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.8.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/.9.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/10" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/11" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/12" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/13" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/14" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/15" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/16" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/17" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/18" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/6" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/7" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/offsets/9" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/sources/0/.0.crc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoints/reddit-mongo/sources/0/0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/kafka-consumer.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/kafka-consumer.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/kafka-producer.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/kafka-producer.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j2.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j2.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sql/create_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sql/create_tables.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sql/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sql/init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sql/queries.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sql/queries.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/RedditRecommenderApp.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/CmsPipeline.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/StopWordsLoader.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendAnalyticsService.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/analytics/TrendCountMinSketch.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyCLient.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ApifyConfig.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/api/ScraperParameters.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/ConfigLoader.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/consumer/KafkaToMongoProcessor.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/KafkaConfig.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/kafkaproducer/SimpleKafkaProducer.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/models/models.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/mongo/MongoConnection.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ApifyMockTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/FeatureExtractor.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/IntegrationTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/KafkaConnectionTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipeline.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/RedditPipelineTest.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/SimpleUsage.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/StorageController.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/UsageExamples.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/dep RedditMongoPipeline.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafka.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ApifyToKafkaService.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/IngestionController.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeConfig.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeJobScheduler.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/ingestion/ScrapeResult.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/kafkaToMongoConsumer.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/com/reddit/recommender/test/testapi.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,8 +149,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/najaheducation/reddit-recommendation-system.git&quot;,
-    &quot;accountId&quot;: &quot;50ad329f-feba-444d-aced-68c8fdbf5ffb&quot;
-
+    &quot;accountId&quot;: &quot;ed687ca6-229b-4508-b3ba-736ca14f1ca5&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
@@ -67,44 +187,72 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.KafkaConnectionTest.executor": "Run",
-    "Application.KafkaToMongoOnly.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.RedditRecommenderApp.executor": "Run",
-    "Application.SimpleUsage.executor": "Run",
-    "Application.UsageExamples.executor": "Run",
-    "Application.main.executor": "Run",
-    "Application.testapi.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "BE",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15332031",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.KafkaConnectionTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.KafkaToMongoOnly.executor&quot;: &quot;Run&quot;,
+    &quot;Application.LinkedInJobScraperTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.LinkedInRecommenderApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RedditRecommenderApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SimpleUsage.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UsageExamples.executor&quot;: &quot;Run&quot;,
+    &quot;Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.testapi.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;BE&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15332031&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.importing&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\CLICK\IdeaProjects\bigdatareddit\src\main\scala\com\reddit\recommender\test" />
       <recent name="C:\Users\CLICK\IdeaProjects\bigdatareddit\src\main\scala\com\reddit\recommender\kafka" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.LinkedInRecommenderApp">
+    <configuration name="LinkedInJobScraperTest" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.linkedin.recommender.test.LinkedInJobScraperTest" />
+      <module name="reddit-srs" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.linkedin.recommender.test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LinkedInRecommenderApp" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.linkedin.recommender.LinkedInRecommenderApp" />
+      <module name="reddit-srs" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.linkedin.recommender.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="main" type="Application" factoryName="Application">
       <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
-      <option name="MAIN_CLASS_NAME" value="com.reddit.recommender.RedditRecommenderApp" />
+      <option name="MAIN_CLASS_NAME" value="com.linkedin.recommender.RedditRecommenderApp" />
       <module name="reddit-srs" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -121,6 +269,12 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.LinkedInRecommenderApp" />
+        <item itemvalue="Application.LinkedInJobScraperTest" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ScalaProjectSettings">
     <option name="compilerHighlightingScala2" value="true" />
@@ -149,8 +303,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.218" />
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.218" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.21565.193" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-IU-243.21565.193" />
       </set>
     </attachedChunks>
   </component>
@@ -168,6 +322,7 @@
       <workItem from="1765819773085" duration="1165000" />
       <workItem from="1765821748876" duration="62978000" />
       <workItem from="1766152721129" duration="15160000" />
+      <workItem from="1786023856262" duration="6867000" />
     </task>
     <servers />
   </component>
